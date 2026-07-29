@@ -1,0 +1,7 @@
+{
+  "name": "context-docs-kit",
+  "description": "Bootstraps a project's context/ foundation docs (product, architecture, schema, design, rules) by interviewing you one question at a time, surfacing the tradeoffs of every consequential decision, and writing docs in dependency order behind approval gates",
+  "author": {
+    "name": "Gabriel Castro"
+  }
+}
