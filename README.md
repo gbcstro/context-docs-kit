@@ -14,7 +14,7 @@ When you don't know something, it parks the question instead of inventing a plau
 
 Docs are written one at a time in dependency order, each behind an approval gate. It resumes across sessions, and on a repo that already has code it reads the code first so you confirm what's there instead of restating it from memory.
 
-## The four mechanisms
+## The five mechanisms
 
 The doc set isn't five files — it's five files plus the machinery that keeps them honest:
 
@@ -24,8 +24,9 @@ The doc set isn't five files — it's five files plus the machinery that keeps t
 | **`## Open Questions`** in every doc | The escape hatch that makes an honest doc possible without pretending to know everything |
 | **`Status: Draft vN`** + **`## Next Steps`** | The set is self-sequencing and resumable by a session with no memory of this one |
 | **Agent-file wiring** — docs map + `@context/RULES.md` import | Without it the folder is inert. Five excellent docs nobody opens change nothing |
+| **`CHANGE_LOG.md`** + **`PROGRESS/`** | Docs stay present-tense; revisions are logged separately instead of narrated inline, and each full bootstrap pass leaves a scope snapshot |
 
-The last one is the step most often skipped, and the one that decides whether any of this has an effect.
+Agent-file wiring is the step most often skipped, and the one that decides whether any of this has an effect.
 
 ## The doc set is adaptive
 
@@ -92,17 +93,20 @@ On a repo that already has scattered docs (`.docs/prd.md`, `blueprint.md`, `ai-r
 ## Layout
 
 ```
-.claude-plugin/plugin.json
+.claude-plugin/
+  plugin.json
+  marketplace.json
 skills/bootstrapping-context-docs/
   SKILL.md              process, gates, grilling and pros/cons discipline, red flags
   references/
-    wiring.md           entry scan, brownfield reconcile, agent-file merge
-    product.md          persona brief + question bank + skeleton, per doc
+    wiring.md                    entry scan, brownfield reconcile, agent-file merge
+    product.md                   persona brief + question bank + skeleton, per doc
     architecture.md
     schema.md
     design.md
     rules.md
-    optional-docs.md    dropping and adding docs, splicing into the chain
+    optional-docs.md             dropping and adding docs, splicing into the chain
+    changelog-and-progress.md    present-tense discipline, CHANGE_LOG.md, PROGRESS/
 agents/                 five doc personas + the critic
 scripts/sync-local.ps1
 ```

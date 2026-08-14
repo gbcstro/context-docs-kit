@@ -156,3 +156,7 @@ State plainly what you changed:
 > and an `@context/RULES.md` import. Existing sections untouched.
 
 Then confirm the set is complete, and note the one thing that keeps it alive: `RULES.md` contains the rules requiring future work to read these docs and update them when decisions change. Without that section the docs start drifting on the next change.
+
+### 4. Write the PROGRESS snapshot
+
+The last step of any full bootstrap pass — first-time bootstrap, or a later pass that meaningfully expanded the doc set — is writing the next `context/PROGRESS/PROGRESS_vN.md`: a scope summary of the doc set as it stands, per `references/changelog-and-progress.md`. A pass that only revised one existing doc does not get a new snapshot; log that in `context/CHANGE_LOG.md` instead.
