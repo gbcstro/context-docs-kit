@@ -44,7 +44,9 @@ Every doc in the set — no exceptions:
 - **`Depends on:`** encodes the chain. Decisions flow downhill and docs are written in that order. `PRODUCT` depends on nothing.
 - **`Open Questions`** is the escape hatch that makes honest docs possible. Never omit it, even when empty (say "none currently open").
 - **`Next Steps`** names the next doc to write, so the set is resumable by a future session with no memory of this one.
-- **`Status: Draft vN`** — bump N on every substantive revision. Version skew between docs is normal and informative.
+- **`Status: Draft vN`** — bump N on every substantive revision, and log it in `context/CHANGE_LOG.md` (see below). Version skew between docs is normal and informative.
+
+**Present tense only.** A doc describes what's decided *now* — never how it got there. No "previously", "used to be", "as of v2 we switched". If a decision changes, the doc reads after the edit as if that had always been the decision. Revision history goes in `context/CHANGE_LOG.md`, and scope snapshots go in `context/PROGRESS/PROGRESS_vN.md` — never inline in the doc itself. See `references/changelog-and-progress.md`.
 
 ## Flow
 
@@ -61,6 +63,7 @@ digraph bootstrap {
     "User approved doc?" [shape=diamond];
     "More docs in set?" [shape=diamond];
     "Wire into agent file" [shape=box];
+    "Write next PROGRESS_vN.md" [shape=box];
     "Done" [shape=doublecircle];
 
     "context/ docs exist?" -> "Resume at first missing doc" [label="yes, partial"];
@@ -75,7 +78,8 @@ digraph bootstrap {
     "User approved doc?" -> "More docs in set?" [label="yes"];
     "More docs in set?" -> "Run per-doc pass for next doc\nin dependency order" [label="yes"];
     "More docs in set?" -> "Wire into agent file" [label="no"];
-    "Wire into agent file" -> "Done";
+    "Wire into agent file" -> "Write next PROGRESS_vN.md";
+    "Write next PROGRESS_vN.md" -> "Done";
 }
 ```
 
@@ -170,6 +174,7 @@ Bad: a `$4.99/mo` that nobody ever chose.
 | "There's an existing prd.md, I'll just rename it" | Reconcile and interrogate it. Inherited docs carry unexamined assumptions. |
 | "Five docs is the standard, write all five" | Adaptive set. A stub doc teaches nothing. |
 | "The docs are written, we're done" | Not done until the agent file is wired. An unwired `context/` is never read. |
+| "I'll note in the doc that we used to do X" | History is never inline. Log it in `context/CHANGE_LOG.md`; the doc itself stays present tense. |
 
 ## Reference Index
 
@@ -184,3 +189,4 @@ Load only what the current pass needs.
 | `references/design.md` | DESIGN.md pass |
 | `references/rules.md` | RULES.md pass |
 | `references/optional-docs.md` | doc-set proposal, if the core five don't fit |
+| `references/changelog-and-progress.md` | any substantive revision to an existing doc, and at the end of a full bootstrap pass |

@@ -32,7 +32,7 @@ Six rules earn their place. Adapt the wording; keep the substance:
 
 1. **Read before writing.** Read the relevant `context/*.md` before implementing in that area, rather than assuming. Name which doc covers what.
 2. **No undocumented architecture decisions.** Never introduce a library, service, or architectural approach that isn't in `ARCHITECTURE.md`/`SCHEMA.md` without flagging it and getting confirmation — *held to the same standard every existing choice was held to.* This sentence is what makes the rule stick: it's not bureaucracy, it's parity with how the doc was built.
-3. **Keep the docs living, not frozen.** When an implementation decision changes or resolves something documented, update that doc **in the same change**. The docs are the source of truth and must never drift from what's actually decided.
+3. **Keep the docs living, not frozen.** When an implementation decision changes or resolves something documented, update that doc **in the same change** — present tense only, describing what's true now, never narrating what it used to say. Log the revision itself in `context/CHANGE_LOG.md`. The docs are the source of truth and must never drift from what's actually decided.
 4. **No speculative scope.** Don't add features beyond `PRODUCT.md` without checking first.
 5. **Ask, don't guess.** When a requirement is ambiguous, ask rather than silently picking an interpretation.
 6. **Wireframe before building UI** (only if `DESIGN.md` exists). Present an ASCII wireframe reflecting the visual system for approval before writing component code.
