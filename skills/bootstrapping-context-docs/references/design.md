@@ -92,7 +92,8 @@ Screens deferred, flows undecided, anything awaiting a parked product decision.
 ```markdown
 # <Project> — Design (UI/UX Direction)
 
-**Status:** Draft v1
+**Project version:** v1
+**Revision:** 1
 **Last updated:** YYYY-MM-DD
 **Depends on:** [PRODUCT.md](./PRODUCT.md), [ARCHITECTURE.md](./ARCHITECTURE.md), [SCHEMA.md](./SCHEMA.md)
 

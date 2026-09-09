@@ -7,7 +7,10 @@
     {
       "name": "context-docs-kit",
       "source": "./",
-      "description": "Bootstraps a project's context/ foundation docs (product, architecture, schema, design, rules) by interviewing you one question at a time, surfacing the tradeoffs of every consequential decision, and writing docs in dependency order behind approval gates"
+      "version": "2.0.0",
+      "description": "Three skills that build and maintain a project's context/ foundation docs: bootstrapping-context-docs interviews you into a doc set, aligning-context-docs pulls the docs back in line with the code, and versioning-context-docs closes one version and opens the next.",
+      "license": "MIT",
+      "homepage": "https://github.com/gbcstro/context-docs-kit"
     }
   ]
 }

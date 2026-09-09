@@ -12,15 +12,22 @@ Run these checks before asking the user anything.
 context/*.md present?
   none            -> greenfield or brownfield-code path (§2)
   some            -> RESUME
-  all in set      -> nothing to bootstrap; offer to revise a specific doc instead
+  all in set      -> nothing to bootstrap. Which skill they want depends on why:
+                       docs drifted from code  -> aligning-context-docs
+                       this version is finished -> versioning-context-docs
+                       one doc needs a section  -> just edit it
+                     Say which you think it is, and why, then let them redirect you.
 ```
 
 **To resume**, read every existing doc's header and parse:
 
-- `**Status:** Draft vN` — how settled it is
+- `**Project version:**` — which version the set describes. Cross-check against the highest `context/PROGRESS/PROGRESS_v*.md`; if they disagree, say so before continuing.
+- `**Revision:**` — how many times that doc has been reworked
 - `**Depends on:**` — its position in the chain
 - `## Next Steps` — what the previous session said comes next
 - `## Open Questions` — decisions already parked; carry them forward, do not re-ask unless the user reopens them
+
+A doc carrying the legacy `**Status:** Draft vN` header gets migrated per `references/doc-contract.md` — one line saying what you changed, no edit to the body.
 
 Then start the per-doc pass at **the first doc in the set that has no file**. Treat existing approved docs as fixed input, not as drafts to revisit. If an existing doc contradicts something the user says now, surface the contradiction and ask which wins — never silently overwrite an approved doc.
 
@@ -81,82 +88,43 @@ The scan is per-doc, run as stage 1 of each pass — the `solutions-architect` s
 
 ---
 
+
 ## 3. Agent-File Merge — make the docs actually get read
 
-**An unwired `context/` folder is inert.** Five excellent documents that no agent opens have zero effect on the project. This step is what closes the loop, and the work is not complete without it.
+**An unwired `context/` folder is inert.** Excellent documents that no agent opens have zero effect on the project. This step is what closes the loop, and the work is not complete without it.
 
-### Detect the convention
+The full procedure — which file, the three blocks to merge, and the import-vs-inline
+split that differs by host — is in **`references/agent-file.md`**. Run it now, then
+come back for §4.
 
-Check in this order and use what the repo already has; do not introduce a second convention alongside an existing one:
+Two things to carry in while you read it: the doc set you actually wrote (the map
+table lists only docs that exist), and the binding constraint from
+`ARCHITECTURE.md` §2 (it is the single most valuable Quick-Reference bullet).
 
-| Present | Wire into |
-|---|---|
-| `CLAUDE.md` | `CLAUDE.md` |
-| `GEMINI.md` | `GEMINI.md` |
-| `AGENTS.md`, `.agents/AGENTS.md` | that file |
-| several of the above | the root-level one, and mention the others exist |
-| none | create `CLAUDE.md`, or ask if the user works with a different assistant |
+---
 
-In a monorepo with per-package agent files (e.g. `apps/web/GEMINI.md`), wire the **root** file only. Per-package files stay scoped to their package.
+## 4. Close the pass: PROGRESS_v1.md and CHANGELOG_v1.md
 
-### What to merge in
+The last two files, in this order. Full spec in `references/history-discipline.md`.
 
-Three pieces. **Merge — never overwrite.** Read the file, insert or update these sections, preserve everything else verbatim.
+**`context/PROGRESS/PROGRESS_v1.md`** — read every approved doc and derive the v1 scope: the shippable slices, each with acceptance criteria and a pointer to the doc section it came from, all unchecked. Then the explicit out-of-scope list, the open questions that block v1, and the exit criteria.
 
-**A. Context Docs Map** — the discovery path. Without this an agent has no reason to open any doc.
+This is a gate like any other doc. Present it, take corrections, and get approval. It is the file that decides when v1 is done, so a checklist the user has not agreed to is worse than none.
 
-```markdown
-## Context Docs Map
+Two failure modes to avoid:
 
-The `context/` folder is the source of truth for this project. Read the relevant
-doc(s) before working in that area:
+- **Inventing items.** Every checklist item traces to an approved doc section, and the pointer is written down. An item with no source is scope nobody agreed to.
+- **Dropping altitude.** Items are shippable slices, not tasks. "Habit CRUD" with three acceptance criteria, not "add a column to the habits table".
 
-| Doc | Covers |
-|---|---|
-| [`context/PRODUCT.md`](./context/PRODUCT.md) | Features, monetization, success metrics — the what and why |
-| [`context/ARCHITECTURE.md`](./context/ARCHITECTURE.md) | Tech stack, infra, hosting, build pipeline |
-| [`context/SCHEMA.md`](./context/SCHEMA.md) | Data model |
-| [`context/DESIGN.md`](./context/DESIGN.md) | UI/UX direction, navigation, visual system |
-| [`context/RULES.md`](./context/RULES.md) | Coding conventions, git workflow, AI assistant rules |
-```
+**`context/PROGRESS/CHANGELOG_v1.md`** — created with its title line and nothing else. A first draft is not a revision of anything, so there is nothing to log yet.
 
-Include only the docs that actually exist. The "Covers" column must describe *this* project's docs, not be copied boilerplate.
+Always `v1`. Even if the project has shipped before, what shipped was never tracked here.
 
-**B. Quick-Reference Key Facts** — the handful of facts that prevent an agent from having to open a doc for routine work. Derive from the approved docs; keep to 4–6 bullets.
+### Then hand off
 
-```markdown
-## Quick-Reference Key Facts
+Tell the user, in two lines, what the other two skills are for:
 
-- **Monorepo layout:** <apps and packages, one line each>
-- **Frontend:** <framework, key libraries>
-- **Backend:** <framework, ORM, database>
-- **Hosting:** <where it runs>
-- **Defining constraint:** <the binding constraint from ARCHITECTURE.md>
-```
-
-The **defining constraint** bullet matters most — it's the fact that most often prevents a wrong suggestion, and the one an agent is least likely to infer.
-
-**C. Rules import** — so conventions apply unconditionally rather than only when an agent chooses to read them:
-
-```markdown
-## Rules
-
-@context/RULES.md
-```
-
-The `@` prefix loads the file into every conversation. Use it for `RULES.md` only. Do **not** `@`-import the other docs — they're large, situational, and the map table already makes them discoverable. Importing all five would burn context in every conversation to no benefit.
-
-If the user declined the import during the doc-set discussion, include the map table and skip section C.
-
-### After merging
-
-State plainly what you changed:
-
-> Wired into `GEMINI.md`: added Context Docs Map (3 docs), Quick-Reference Key Facts,
-> and an `@context/RULES.md` import. Existing sections untouched.
-
-Then confirm the set is complete, and note the one thing that keeps it alive: `RULES.md` contains the rules requiring future work to read these docs and update them when decisions change. Without that section the docs start drifting on the next change.
-
-### 4. Write the PROGRESS snapshot
-
-The last step of any full bootstrap pass — first-time bootstrap, or a later pass that meaningfully expanded the doc set — is writing the next `context/PROGRESS/PROGRESS_vN.md`: a scope summary of the doc set as it stands, per `references/changelog-and-progress.md`. A pass that only revised one existing doc does not get a new snapshot; log that in `context/CHANGE_LOG.md` instead.
+> Changes inside v1 — a decision reversed, a doc that no longer matches the
+> code — go through `aligning-context-docs`, which rewrites the doc and puts the
+> reason in `CHANGELOG_v1.md`. When every box in `PROGRESS_v1.md` is checked and
+> you say v1 is done, `versioning-context-docs` closes it and opens v2.

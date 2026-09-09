@@ -45,7 +45,8 @@ Structure (adapt numbering to sections that apply; drop what doesn't):
 ```
 # <Project> — Product Requirements Document (PRD)
 
-**Status:** Draft v1
+**Project version:** v1
+**Revision:** 1
 **Last updated:** YYYY-MM-DD
 
 ## 1. Overview / Vision

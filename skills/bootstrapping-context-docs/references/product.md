@@ -74,7 +74,8 @@ What's genuinely undecided? Sweep back over the interview for anything answered 
 ```markdown
 # <Project> — Product Requirements Document (PRD)
 
-**Status:** Draft v1
+**Project version:** v1
+**Revision:** 1
 **Last updated:** YYYY-MM-DD
 
 ## 1. Overview / Vision
