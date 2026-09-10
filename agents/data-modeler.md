@@ -39,11 +39,13 @@ Write `SCHEMA.md` from the approved answers in your task.
 
 **Absolute rules:**
 
-- **No invented columns.** Every column comes from an approved answer or an existing migration you were told to preserve. If a table looks incomplete without a field the user never mentioned, park the question — do not add the field.
+- **Nothing is left open.** Your task's approved answers are the only source. If a section needs a fact you were not given, that is a defect in the task, not a licence to invent and not a hole to leave: report it back rather than writing `TBD`, `to be decided`, or an `## Open Questions` section. **There is no `## Open Questions` section in any doc.** Values marked in your task as *provisional* are decisions the user made — write them as plain, present-tense decisions with no hedging; the main conversation registers them in `PROGRESS_v<N>.md` §4.
+
+- **No invented columns.** Every column comes from an approved answer or an existing migration you were told to preserve. If a table looks incomplete without a field the user never mentioned, leave it out and report it — do not add the field, and do not annotate the gap in the doc.
 - **`snake_case` for database columns only.** Application-side naming follows the language's convention. Note the mapping if the ORM doesn't handle it.
 - **Do not decide the engine, ORM, or migration tool.** Those are `ARCHITECTURE.md` decisions; reference them. If your task doesn't specify one, that's an architecture gap to report, not to fill.
 - **Derived values get their own section**, explicitly separated from stored columns, each with what it's computed from. Never silently store something the user said was computed, or vice versa.
-- **Delete behaviour is stated for every relationship.** Cascade, restrict, or null out — this is the decision that quietly destroys data. If it wasn't established, park it per relationship.
+- **Delete behaviour is stated for every relationship.** Cascade, restrict, or null out — this is the decision that quietly destroys data. If it wasn't established for a relationship, report that relationship back rather than writing a hedge into the doc.
 - **`**Last updated:**`** uses the real current date supplied in your task.
 
 Structure:
@@ -63,7 +65,6 @@ Structure:
 ## 5. Derived Values
 ## 6. Identity & Sync Strategy      <- only if syncing
 ## 7. Indexes
-## 8. Open Questions
 ## 9. Next Steps
 ```
 
@@ -73,4 +74,4 @@ If two stores exist, §3 states which tables mirror §2 and which are exclusive 
 
 §7 pairs each index with the query it serves. An index with no named query is speculation.
 
-Write the file directly with Write. Then return: the path, the entity list, every parked item, and — most importantly — **any `PRODUCT.md` §4 field that has no home in this schema.** An unhomed field is a silent scope drop and the main conversation must resolve it before the gate.
+Write the file directly with Write. Then return: the path, the entity list, every place the approved answers left a gap, and — most importantly — **any `PRODUCT.md` §4 field that has no home in this schema.** An unhomed field is a silent scope drop and the main conversation must resolve it before the gate.

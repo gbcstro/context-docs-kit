@@ -64,7 +64,10 @@ scope you are about to agree.
 
 For each candidate, get to a **shippable slice** with **acceptance criteria**,
 the same altitude as v1's checklist. If the user cannot say what would prove it
-works, it is not ready to be scope — park it as an open question.
+works, it is not ready to be scope. Either close it — the cheapest-to-reverse
+version of the item, with acceptance criteria that match — or leave it out of the
+version entirely. It does not go in as a fuzzy item to be firmed up later; those
+are the items that never close.
 
 Apply the pros/cons discipline to anything consequential. A new version is where
 vendors get chosen, and a vendor recorded without confirmation poisons the docs
@@ -84,10 +87,14 @@ The exit criteria. Usually "every item met and the user says so", but ask whethe
 anything else gates it — a deploy, a migration run against real data, someone
 else's review. Write down what you learn.
 
-### 7. Open questions
+### 7. Nothing left open
 
-Sweep for anything undecided. Carry forward any v1 question that is still open
-and still relevant; drop the ones the closure answered.
+Sweep the whole pass. Every question is decided, provisionally decided and
+registered in the new §4, or descoped — `references/closing-questions.md`. The
+new version's docs carry no holes, the same as v1's.
+
+Carried §4 entries from the previous version arrive here already: their decision
+stays in force, and the entry moves across unchanged.
 
 ---
 

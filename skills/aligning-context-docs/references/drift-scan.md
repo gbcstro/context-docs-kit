@@ -30,7 +30,7 @@ looked at `ARCHITECTURE.md`, and finding it twice wastes the user's attention.
 
 **What drift looks like here:** a feature in the product that the PRD never
 mentions (usually scope that crept in), or a §4 feature with no code, no
-checklist item and no open question (usually scope that quietly died). Both
+checklist item and no register entry (usually scope that quietly died). Both
 matter; the second is easier to miss.
 
 Field lists are the highest-value part of §4, because `SCHEMA.md` derives from
@@ -142,11 +142,16 @@ show the user, or park the principle.
 | the docs' current state | does §1's doc-set table still list the right revisions? |
 | unticked items | is anything already done? |
 | ticked items | is anything **no longer** true — a regression, or a feature removed? |
-| `§4` open questions | has any been answered in code without being closed here? |
+| `§4` provisional decisions | is each still the decision in force in the doc it names? has the code settled one — or quietly departed from one? |
 
 **A ticked item that has regressed is the most damaging state in the file**,
 because it is the one nobody re-checks. If evidence for a ticked criterion has
 disappeared, report it as CRITICAL.
+
+**A §4 entry the code has silently departed from is the second.** The register
+says the decision in force is X, the code does Y, and the doc still says X. That
+is a decision made inline without going through the change protocol — report it
+as CRITICAL, not as a stale register entry.
 
 ---
 
@@ -162,7 +167,12 @@ enforcement path that has disappeared; an architecture artifact that no longer
 matches disk; a worked example that no longer compiles.
 
 **MINOR** — stale wording; an unticked item that is met; numbering; a doc-set
-table with outdated revisions.
+table with outdated revisions; a §4 entry whose question is settled in practice
+but not yet retired.
+
+Any `## Open Questions` section, `TBD`, or `to be decided` surviving in a doc is
+**MAJOR** — a hole left where a decision belongs, per
+`references/closing-questions.md`.
 
 Every finding carries its evidence — file and line, manifest entry, migration
 name. A finding the user cannot verify in ten seconds is a finding they cannot

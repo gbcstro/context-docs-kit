@@ -25,7 +25,7 @@ context/*.md present?
 - `**Revision:**` — how many times that doc has been reworked
 - `**Depends on:**` — its position in the chain
 - `## Next Steps` — what the previous session said comes next
-- `## Open Questions` — decisions already parked; carry them forward, do not re-ask unless the user reopens them
+- `context/PROGRESS/PROGRESS_v*.md` §4 — provisional decisions already in force; carry them forward as decisions, and do not re-ask unless the user reopens one
 
 A doc carrying the legacy `**Status:** Draft vN` header gets migrated per `references/doc-contract.md` — one line saying what you changed, no edit to the body.
 
@@ -75,7 +75,7 @@ For each mapped doc:
 1. Extract its actual decisions into a short list.
 2. Cross-check them against what the code does. **Where a doc and the code disagree, the code is evidence and the doc is intent** — surface the gap explicitly; it is usually the most valuable thing you'll find.
 3. Present the decisions for confirmation in batches by topic, one topic at a time. Flag anything stale, contradicted, or unsupported by the code.
-4. Anything the old doc left vague goes to `## Open Questions` — not into the new doc as if it were settled.
+4. Anything the old doc left vague gets **closed**, not copied across vague. Decide it, or take the cheapest-to-reverse reading and register it in `PROGRESS_v1.md` §4, or descope it. An inherited `TBD` copied into a new doc is the oldest way this set rots — `references/closing-questions.md`.
 
 > `.docs/prd.md` lists "CSV import" as a v1 feature, but there's no parser anywhere in `apps/`
 > and no CSV dependency in any manifest. Still v1, or has it slipped out of scope?
@@ -107,7 +107,7 @@ table lists only docs that exist), and the binding constraint from
 
 The last two files, in this order. Full spec in `references/history-discipline.md`.
 
-**`context/PROGRESS/PROGRESS_v1.md`** — read every approved doc and derive the v1 scope: the shippable slices, each with acceptance criteria and a pointer to the doc section it came from, all unchecked. Then the explicit out-of-scope list, the open questions that block v1, and the exit criteria.
+**`context/PROGRESS/PROGRESS_v1.md`** — read every approved doc and derive the v1 scope: the shippable slices, each with acceptance criteria and a pointer to the doc section it came from, all unchecked. Then the explicit out-of-scope list, the §4 register of provisional decisions, and the exit criteria.
 
 This is a gate like any other doc. Present it, take corrections, and get approval. It is the file that decides when v1 is done, so a checklist the user has not agreed to is worse than none.
 

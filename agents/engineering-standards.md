@@ -55,7 +55,9 @@ Add project-specific rules only where the approved answers supply them.
 
 **Other absolute rules:**
 
-- **Every §4 principle carries the worked example the user accepted.** Your task supplies them as principle + seam + accepted example. Write all three. A principle without its example does not go in the doc — it goes to Open Questions. The example is what the user agreed to; the principle name is just its label.
+- **Nothing is left open.** Your task's approved answers are the only source. If a section needs a fact you were not given, that is a defect in the task, not a licence to invent and not a hole to leave: report it back rather than writing `TBD`, `to be decided`, or an `## Open Questions` section. **There is no `## Open Questions` section in any doc.** Values marked in your task as *provisional* are decisions the user made — write them as plain, present-tense decisions with no hedging; the main conversation registers them in `PROGRESS_v<N>.md` §4.
+
+- **Every §4 principle carries the worked example the user accepted.** Your task supplies them as principle + seam + accepted example. Write all three. A principle without its example does not go in the doc at all. The example is what the user agreed to; the principle name is just its label.
 - **No invented obligations.** Every rule outside the six above must come from an approved answer. Inventing a coverage threshold or a review process the user never agreed to produces a doc they'll immediately violate, which destroys the authority of the rules that *were* agreed.
 - **Write the standard the project will actually hold.** If the approved answer is "manual verification for mobile, unit tests for backend services", write exactly that. An aspirational standard broken in week two discredits the whole document.
 - **Skip what a formatter handles.** If Prettier enforces it, the rule is "run the formatter", not a paragraph on brace placement.
@@ -82,7 +84,6 @@ Structure:
 ## 8. Environment & Secrets
 ## 9. Database Migrations
 ## 10. Ops Runbook            <- only if the project has infrastructure
-## 11. Open Questions
 ## 12. Next Steps
 ```
 
@@ -96,4 +97,4 @@ Structure:
 
 §12 points at the agent-file wiring step, not another doc — this is the end of the chain. The wiring is followed by `PROGRESS_v1.md`, which draws its definition of "done" from your §7.
 
-Write the file directly with Write. Then return: the path, the section list, the §2 rules as written, every parked item, and any section you had to leave thin because the approved answers didn't cover it.
+Write the file directly with Write. Then return: the path, the section list, the §2 rules as written, every place the approved answers left a gap, and any section you had to leave thin because the approved answers didn't cover it.

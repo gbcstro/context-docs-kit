@@ -46,9 +46,9 @@ Write `ARCHITECTURE.md` from the approved answers in your task.
 - **Every library, service, and vendor in the doc must be one the user explicitly confirmed.** If your task's approved answers don't name it, it does not go in — not as a suggestion, not as a default, not as "typically you'd use X". Recording an unconfirmed vendor is the most damaging error available to you, because every later doc inherits it.
 - **The binding constraint gets its own top-level section**, normally §2, titled for the constraint *and its resolution* — e.g. "The No-Mac Constraint, Solved". State the constraint, then the exact mechanism that defeats it. This is the section a future reader is least able to reconstruct and most needs.
 - **State costs, not just choices.** Where the user accepted a tradeoff, record it. "Local-first with last-write-wins, meaning conflicting edits from two devices resolve by timestamp and the older edit is lost" is a decision. "Uses local-first sync" is a label.
-- **Conflict resolution is never left implied.** If data lives in more than one place, the doc names the resolution strategy or parks it explicitly in Open Questions.
+- **Conflict resolution is never left implied.** If data lives in more than one place, the doc names the resolution strategy. If your task marks it provisional, write it as a plain decision anyway.
 - **The three approved artifacts go in verbatim.** Your task carries a stack block, a repo tree and a system diagram the user approved at the presentation gate. Paste them into §1, §3 and §4 exactly as approved. Do not redraw, tidy, extend or "improve" them — a redrawn diagram is an invented specific in picture form, and it was the picture the user agreed to, not your reading of it.
-- **Unknowns are parked**, never filled with a reasonable-sounding default.
+- **Nothing is left open.** Your task's approved answers are the only source. If a section needs a fact you were not given, that is a defect in the task, not a licence to invent and not a hole to leave: report it back rather than writing `TBD`, `to be decided`, or an `## Open Questions` section. **There is no `## Open Questions` section in any doc.** Values marked in your task as *provisional* are decisions the user made — write them as plain, present-tense decisions with no hedging; the main conversation registers them in `PROGRESS_v<N>.md` §4.
 - **`**Last updated:**`** uses the real current date supplied in your task.
 
 Structure (renumber for sections that apply; delete those that don't — no empty sections):
@@ -76,7 +76,6 @@ Structure (renumber for sections that apply; delete those that don't — no empt
 ## 13. Notifications & Background Work
 ## 14. Error Handling & Testing
 ## 15. Out of Scope for <current version>
-## 16. Open Questions
 ## 17. Next Steps
 ```
 
@@ -86,4 +85,4 @@ Structure (renumber for sections that apply; delete those that don't — no empt
 
 §7 must state what the backend is *not* responsible for. "A sync/backup service, not the primary data owner" settles conflict-resolution arguments before they start.
 
-Write the file directly with Write. Then return: the path, the section list, the constraint you gave its own section, every parked item, and any place you recorded a choice whose cost the approved answers didn't establish — the main conversation needs to close that.
+Write the file directly with Write. Then return: the path, the section list, the constraint you gave its own section, every place the approved answers left a gap, and any place you recorded a choice whose cost the approved answers didn't establish — the main conversation needs to close that.

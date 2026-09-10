@@ -35,7 +35,9 @@ Write `PRODUCT.md` from the approved answers in your task. Nothing else goes in 
 
 **Absolute rules:**
 
-- **Use only approved answers.** If a section needs a fact you weren't given, it goes in `## Open Questions` — never a plausible-sounding invention. A fabricated price point, user segment, or metric reads as decided, and three docs downstream will depend on it.
+- **Nothing is left open.** Your task's approved answers are the only source. If a section needs a fact you were not given, that is a defect in the task, not a licence to invent and not a hole to leave: report it back rather than writing `TBD`, `to be decided`, or an `## Open Questions` section. **There is no `## Open Questions` section in any doc.** Values marked in your task as *provisional* are decisions the user made — write them as plain, present-tense decisions with no hedging; the main conversation registers them in `PROGRESS_v<N>.md` §4.
+
+- **Use only approved answers.** If a section needs a fact you weren't given, report it back — never a plausible-sounding invention, and never a `TBD` left in the doc. A fabricated price point, user segment, or metric reads as decided, and three docs downstream will depend on it.
 - **Preserve the user's framing and vocabulary.** Their words for their domain are more precise than your synonyms, and the doc has to sound like theirs.
 - **Enumerate, don't summarize.** Where the user listed the fields a feature captures, reproduce the full list. `SCHEMA.md` derives its entities from these lists — compressing them guarantees a guessed data model.
 - **`**Last updated:**`** uses the real current date supplied in your task. Never invent or approximate a date.
@@ -57,7 +59,6 @@ Structure (adapt numbering to sections that apply; drop what doesn't):
 ## 6. Platform
 ## 7. Success Metrics
 ## 8. Out of Scope for v1
-## 9. Open Questions
 ## 10. Next Steps
 ```
 
@@ -67,7 +68,6 @@ Quality bar for specific sections:
 - **§3** states differentiation as a *mechanism*, not an adjective — what the product does structurally that the incumbent doesn't.
 - **§4** says up front whether v1 is the full set or a phased subset, then details each feature with its captured fields.
 - **§7** metrics are falsifiable and time-bound.
-- **§9** every parked item carries enough context to resume it later.
 - **§10** names the next doc in the confirmed set and what it must resolve.
 
-Write the file directly with Write. Then return a short report: the path, the section list, every item you parked in Open Questions, and anything you were forced to leave thin because the approved answers didn't cover it. That last list is what the main conversation follows up on.
+Write the file directly with Write. Then return a short report: the path, the section list, every place the approved answers left a gap, and anything you were forced to leave thin because the approved answers didn't cover it. That last list is what the main conversation follows up on.

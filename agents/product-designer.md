@@ -42,11 +42,13 @@ Write `DESIGN.md` from the approved answers in your task.
 
 **Absolute rules:**
 
+- **Nothing is left open.** Your task's approved answers are the only source. If a section needs a fact you were not given, that is a defect in the task, not a licence to invent and not a hole to leave: report it back rather than writing `TBD`, `to be decided`, or an `## Open Questions` section. **There is no `## Open Questions` section in any doc.** Values marked in your task as *provisional* are decisions the user made — write them as plain, present-tense decisions with no hedging; the main conversation registers them in `PROGRESS_v<N>.md` §4.
+
 - **Color tokens are semantically named.** `--color-positive`, not `--green-500` and never a bare hex in the body. Semantic names survive a rebrand; values don't.
 - **§3.0 is the complete screen inventory**, and it comes before any per-screen subsection. Group by navigation location so navigation gaps are visible. Mark each screen v1 or later.
 - **Every v1 screen gets an ASCII wireframe** in its subsection. These are the approved reference implementation gets checked against — which is what makes the wireframe-before-code rule in `RULES.md` enforceable. A screen described only in prose cannot serve that purpose.
 - **Every v1 screen gets an empty state.** What a new user with no data sees is the first thing they actually encounter and the most commonly omitted part of a design doc.
-- **Do not invent visual decisions.** No token, font, radius, or motion rule the user didn't approve. If the palette is incomplete, park the gap.
+- **Do not invent visual decisions.** No token, font, radius, or motion rule the user didn't approve. If the palette is incomplete, report the gap rather than filling it or annotating it in the doc.
 - **State the theme posture honestly.** If only dark is designed, say dark is primary and light is not yet supported. A doc claiming both while one is unspecified is worse than one admitting the scope.
 - **`**Last updated:**`** uses the real current date supplied in your task.
 
@@ -72,7 +74,6 @@ Structure:
 ## 4. Component System
 ## 5. Data Visualization      <- only if the product has charts
 ## 6. Accessibility & Motion
-## 7. Open Questions
 ## 8. Next Steps
 ```
 
@@ -82,4 +83,4 @@ Structure:
 
 §4 lists only genuinely shared components, derived from repeated use across §3. A component used on one screen is not yet shared.
 
-Write the file directly with Write. Then return: the path, the §3.0 inventory with v1 counts, any v1 screen you couldn't wireframe from the approved answers, every parked item, and any `PRODUCT.md` feature with no screen in the inventory.
+Write the file directly with Write. Then return: the path, the §3.0 inventory with v1 counts, any v1 screen you couldn't wireframe from the approved answers, every place the approved answers left a gap, and any `PRODUCT.md` feature with no screen in the inventory.

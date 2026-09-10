@@ -82,8 +82,8 @@ Only if the product displays charts. Which chart types, what library, and how ch
 ### 11. Accessibility & motion
 Minimum tap target, focus treatment, dynamic-type or zoom support, reduced-motion handling, and what motion is actually for (orientation and feedback, not decoration).
 
-### 12. Open questions
-Screens deferred, flows undecided, anything awaiting a parked product decision.
+### 12. Nothing left open
+Sweep back over the pass: decided, provisionally decided and registered, or descoped. `references/closing-questions.md`.
 
 ---
 
@@ -126,7 +126,6 @@ Screens deferred, flows undecided, anything awaiting a parked product decision.
 
 ## 6. Accessibility & Motion
 
-## 7. Open Questions
 
 ## 8. Next Steps
 ```

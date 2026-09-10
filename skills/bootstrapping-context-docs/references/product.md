@@ -64,8 +64,8 @@ How will you know in N weeks whether this worked? Demand falsifiability and a ti
 ### 9. Out of scope for v1
 What are you deliberately not building? Every item here is a future argument you've pre-settled. Common candidates worth prompting for: integrations and imports, other platforms, collaboration/sharing, analytics beyond the core, admin tooling.
 
-### 10. Open questions
-What's genuinely undecided? Sweep back over the interview for anything answered with "not sure yet" and confirm each belongs here rather than in the body.
+### 10. Nothing left open
+Sweep back over the pass. Every question raised must be decided, provisionally decided and registered, or descoped — `references/closing-questions.md`. Anything still hanging gets closed now, before the draft.
 
 ---
 
@@ -119,7 +119,6 @@ incumbent doesn't? Bullet the concrete consequences.>
 
 <Deliberate exclusions.>
 
-## 9. Open Questions
 
 <Genuinely undecided, with enough context to resume.>
 

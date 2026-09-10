@@ -73,14 +73,22 @@ work lands. It is frozen only when the user closes the version.
 - Accounts and auth — nothing to sync yet
 - Reminders and notifications — needs a push story the local-first design has not paid for
 
-## 4. Open questions blocking v1
+## 4. Provisional decisions
 
-- Target frequency shape: "N times per week" or "specific weekdays"? Blocks the SCHEMA §3.1 column type.
+Each is **in force** — the docs state it as a decision and the code is built
+against it. Listed here because new information could change it.
+
+- **Target frequency shape** — *in force:* an integer count per week.
+  *Settled by:* whether anyone asks for specific weekdays once people are using it.
+  *Reversal cost:* a column type change plus a data migration; the weekday variant
+  also needs a second UI surface v1 does not have.
+  *Recorded in:* SCHEMA.md §3.1.
 
 ## 5. Exit criteria
 
-v1 is done when every box in §2 is checked with evidence, §4 is empty, and the
-user says v1 is done. Nothing here closes on its own.
+v1 is done when every box in §2 is checked with evidence, every §4 entry is
+settled or explicitly carried, and the user says v1 is done. Nothing here closes
+on its own.
 ```
 
 ### Rules for `PROGRESS_vN.md`
@@ -89,6 +97,7 @@ user says v1 is done. Nothing here closes on its own.
 - **Acceptance criteria are observable.** "Auth works" is not a criterion. "A user can register, verify by email, sign in, and the session survives an app restart" is four. Write what you would check, not what you would hope.
 - **High-level, not a task list.** Items are shippable slices — the thing a user can do when it is done. Ten to twenty for a normal v1. If you are writing "add a column to the habits table", you have dropped an altitude too far.
 - **A box is ticked with evidence** — the file, test, or route that satisfies the criterion — and only ever by proposing the tick to the user first.
+- **§4 is the only place unsettled things live.** The docs themselves carry no open questions — every one is closed before its doc is approved, per `references/closing-questions.md`.
 - **Only the user closes a version.** However complete it looks, the skill states the status and waits.
 - **Never start at anything but v1.** On a first bootstrap, the file is `PROGRESS_v1.md`, even if the project has shipped before. What shipped before was not tracked here.
 
@@ -109,7 +118,7 @@ version. When the version closes, it is never written to again — vN+1 gets its
 
 ## 2026-04-09 — SCHEMA.md rev 3
 **Changed:** `habit.target_frequency` is an integer count per week, not a weekday bitmask.
-**Why:** resolves the §4 open question — the user picked the simpler shape after seeing that weekday-specific targets need a second UI surface v1 does not have.
+**Why:** the §4 provisional decision is settled — nobody asked for weekday-specific targets, so the simpler shape stands permanently.
 **Affects:** SCHEMA.md §3.1, PROGRESS_v1.md §4 (question closed).
 ```
 
@@ -129,7 +138,7 @@ explaining a change inside the doc feels helpful in the moment.
 2. **Bump `**Revision:**` and `**Last updated:**`.** `**Project version:**` does not move.
 3. **Append the entry to `CHANGELOG_v<current>.md`** — changed, why, affects. The reason lives here and nowhere else.
 4. **Cascade before you finish.** Walk the `Depends on:` chain downhill from the doc you changed. Every dependent doc that now disagrees gets fixed in the same pass, each with its own revision bump; one changelog entry can cover them all. A change is not complete while a downstream doc contradicts it.
-5. **Re-check `PROGRESS_v<current>.md`.** If the change altered a scope item, its acceptance criteria, or an open question, update it and say so in the entry's **Affects**.
+5. **Re-check `PROGRESS_v<current>.md`.** If the change altered a scope item, its acceptance criteria, or a §4 provisional decision, update it and say so in the entry's **Affects**. A provisional decision that has just been settled leaves §4 in this same pass.
 6. **Run the banned-phrase check** over every `context/*.md` before declaring the change done.
 
 ### The banned-phrase check

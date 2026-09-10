@@ -136,16 +136,17 @@ recording a principle the user has agreed to a different version of.
 
 ### 6. Cap at three rounds
 
-If three rounds have not converged, stop. Park it in `## Open Questions` with
-what was tried and where the disagreement sits, and move to the next principle.
+If three rounds have not converged, stop. The principle does not go in the doc —
+that absence is the decision. Register it in `PROGRESS_v<N>.md` §4 with what was
+tried and where the disagreement sits, and move to the next principle.
 A principle nobody can pin down is not one the project will follow, and grinding
 on it costs more than it returns.
 
 ### 7. Record the principle with its example
 
 The accepted example goes into `RULES.md` §4 **with** the principle. A principle
-with no accepted worked example does not enter the doc — it goes to Open
-Questions or it goes nowhere.
+with no accepted worked example does not enter the doc. It goes to the
+`PROGRESS_v<N>.md` §4 register, or it goes nowhere.
 
 That is what makes §4 the section a contributor can act on: it does not say what
 the project believes, it shows what the project does.
@@ -185,7 +186,8 @@ Derived from `ARCHITECTURE.md` and `SCHEMA.md`. The tool per store, the rule tha
 ### 9. Ops runbook
 Only if the project has infrastructure. Backups (what, where, how often), network exposure, deploy sequence, rollback. Resolves items other docs flagged as operational.
 
-### 10. Open questions
+### 10. Nothing left open
+Sweep back over the pass: decided, provisionally decided and registered, or descoped. `references/closing-questions.md`. A rule nobody could settle is not written down vaguely — it is left out, and that absence is the decision.
 
 ---
 
@@ -221,7 +223,6 @@ user accepted. No principle appears without its example.>
 ## 8. Environment & Secrets
 ## 9. Database Migrations
 ## 10. Ops Runbook            <- only if the project has infrastructure
-## 11. Open Questions
 ## 12. Next Steps
 ```
 

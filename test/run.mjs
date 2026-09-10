@@ -238,5 +238,38 @@ test('the claude @-import appears only behind a host capability check', () => {
   assert.deepEqual(offenders, [], `unguarded @context/RULES.md in: ${offenders.join(', ')}`);
 });
 
+test('no skeleton or agent template emits an Open Questions section', () => {
+  // The rule is only real if the templates obey it: a skeleton with
+  // "## N. Open Questions" in it puts the hole straight back into every doc.
+  const offenders = [];
+  const scan = (dir) => {
+    for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+      const p = path.join(dir, e.name);
+      if (e.isDirectory()) scan(p);
+      else if (e.name.endsWith('.md')) {
+        for (const [i, line] of fs.readFileSync(p, 'utf8').split('\n').entries()) {
+          // A heading emitted into a generated doc, not prose about the rule.
+          if (/^#{1,3} (\d+\. )?Open Questions\s*$/.test(line)) {
+            offenders.push(`${path.relative(ROOT, p)}:${i + 1}`);
+          }
+        }
+      }
+    }
+  };
+  scan(path.join(ROOT, 'skills'));
+  scan(path.join(ROOT, 'agents'));
+  scan(path.join(ROOT, 'shared'));
+  assert.deepEqual(offenders, [], `Open Questions heading in: ${offenders.join(', ')}`);
+});
+
+test('every skill ships the closing-questions reference', () => {
+  for (const skill of shippedSkills()) {
+    const ref = path.join(ROOT, 'skills', skill, 'references', 'closing-questions.md');
+    assert.ok(fs.existsSync(ref), `${skill} is missing closing-questions.md`);
+    const body = fs.readFileSync(path.join(ROOT, 'skills', skill, 'SKILL.md'), 'utf8');
+    assert.match(body, /closing-questions\.md/, `${skill}/SKILL.md never points at it`);
+  }
+});
+
 console.log(`\n${passed} passed, ${failed} failed\n`);
 process.exit(failed ? 1 : 0);

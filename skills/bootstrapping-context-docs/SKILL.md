@@ -10,9 +10,9 @@ license: MIT
 
 A context doc records **decisions that have been earned by interrogation** — not fields filled into a template. The folder is the contract every later change is checked against, so a doc containing a guess is worse than a doc containing an admitted unknown.
 
-**Core principle:** you are not producing documents. You are extracting decisions the user already half-holds, pricing the ones they haven't costed, and parking the ones they genuinely haven't made.
+**Core principle:** you are not producing documents. You are extracting decisions the user already half-holds, pricing the ones they haven't costed, and forcing the ones they haven't made into the cheapest form that can still be reversed.
 
-A generated template and a grilled doc look similar and behave nothing alike. The template's gaps are invisible; the grilled doc's gaps are written down in `## Open Questions`.
+A generated template and a grilled doc look similar and behave nothing alike. The template is full of gaps nobody can see. The grilled doc has none — every question in it was closed before it was written, and the ones that could not be settled are decisions the user made knowingly, registered where they stay visible.
 
 ## When to Use
 
@@ -44,10 +44,11 @@ Every doc in the set carries the same header and closing sections. The full cont
 **Depends on:** [PRODUCT.md](./PRODUCT.md), [ARCHITECTURE.md](./ARCHITECTURE.md)
 ```
 
-Two things it is worth carrying in your head for the whole pass:
+Three things it is worth carrying in your head for the whole pass:
 
 - **`v` means the project version, never a doc's revision.** A doc's revision is a bare integer. `v1` is the product; `Revision: 3` is the file.
 - **Present tense only.** A doc says what is decided now, never how it got there. Reasons live in `context/PROGRESS/CHANGELOG_v1.md`. See `references/history-discipline.md`.
+- **No doc ships with a hole in it.** There is no `## Open Questions` section anywhere in the set. Every question closes before its doc is drafted. See `references/closing-questions.md`.
 
 ## Flow
 
@@ -166,16 +167,36 @@ For every **consequential** decision — anything a future change would be expen
 
 **Never introduce a library, service, or architectural approach the user has not explicitly confirmed.** Recording an unconfirmed vendor choice as settled is the single most damaging thing this skill can do, because every later doc inherits it.
 
-## Open Questions Discipline
+## Closing Questions — No Parking
 
-**Park, don't guess.** When the user doesn't know, hasn't decided, or says "figure it out later", that goes in `## Open Questions` with enough context to resume it — not into the body as a plausible-looking value.
+**A question is closed before the doc is drafted, one of three ways.** There is
+no `## Open Questions` section in any doc. Full procedure in
+`references/closing-questions.md`; the shape of it:
 
-A parked unknown is a success. An invented specific is the primary failure mode of this skill: it reads as decided, nobody revisits it, and three docs downstream depend on it.
+| Closure | When | What the doc says |
+|---|---|---|
+| **Decided** | the user picks, knowing the cost | the decision, present tense |
+| **Provisionally decided** | they genuinely cannot settle it yet | the decision, present tense — and it is registered in `PROGRESS_v1.md` §4 |
+| **Descoped** | nothing sensible can be decided at all | nothing; the thing it concerns moves to `## Out of Scope for v1` |
 
-Good: *"Paid storage tier sizes and price point — to be decided once the core product is validated with real usage."*
-Bad: a `$4.99/mo` that nobody ever chose.
+The middle one is the work. "I don't know yet" is not an answer you accept and
+write down — it is the start of a shorter conversation:
 
-An open question that would block v1 also goes into `PROGRESS_v1.md` §4, so it is visible from the scope file rather than only from the doc that parked it.
+1. Name the option that is **cheapest to reverse**, not the one that is best if the guess is right.
+2. State the reversal cost concretely.
+3. Get it accepted as the decision **in force**, not as a placeholder.
+4. Write it into the doc with **no hedging language** — no `TBD`, no "for now", no "probably".
+5. Register it in `PROGRESS_v1.md` §4 with what would settle it and what changing it costs.
+
+**None of this softens the rule against inventing.** A provisional decision and an
+invented specific look identical on the page; what separates them is that the
+user chose it, knew it was unsettled, and it is registered with a reversal cost.
+A `$4.99/mo` you supplied because it sounded reasonable is still the worst defect
+available to this skill. `v1 is free` after an actual exchange is a decision.
+
+Closing costs more effort than parking, not less — that is the point. The cost
+moves from a future reader, who cannot pay it, to this conversation, where it is
+cheap.
 
 ## Closing the Pass
 
@@ -194,7 +215,9 @@ Then tell the user what happens next: changes inside v1 go through `aligning-con
 | "I'll draft the docs and let them edit" | Editing a template is not deciding. Grill first. |
 | "This project is simple, skip the doc-set confirmation" | Simple projects are where unexamined assumptions cost most. |
 | "I'll write SCHEMA now and reconcile with PRODUCT later" | Dependents after dependencies. Always. |
-| "I don't know their price point, I'll put something reasonable" | Park it. Inventing decisions is the main failure. |
+| "I don't know their price point, I'll put something reasonable" | Inventing decisions is the main failure. Close it: cheapest-to-reverse option, reversal cost, user's assent, register it. |
+| "They don't know, so I'll note it as an open question" | Docs carry no open questions. Convert it into a provisional decision or descope it. |
+| "I'll write TBD, it's honest" | It is a hole that reads as honesty. Downstream docs get written against it. |
 | "They clearly know this, tradeoffs would be condescending" | One sentence naming the cost. Always. |
 | "I'll ask these five things together to save time" | One question at a time. |
 | "The stack is obvious for this kind of project" | Never record an unconfirmed library or service. |
@@ -220,6 +243,7 @@ Load only what the current pass needs.
 | `references/hosts.md` | first, before anything else |
 | `references/wiring.md` | second, and again at the end |
 | `references/doc-contract.md` | before drafting any doc |
+| `references/closing-questions.md` | any time the user cannot answer, and before every gate |
 | `references/product.md` | PRODUCT.md pass |
 | `references/architecture.md` | ARCHITECTURE.md pass |
 | `references/schema.md` | SCHEMA.md pass |

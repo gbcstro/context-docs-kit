@@ -86,11 +86,11 @@ highest context/PROGRESS/PROGRESS_v*.md
                        say so, and offer bootstrapping-context-docs.
 ```
 
-Read the checklist, the open questions, `CHANGELOG_v<N>.md`, and every doc's
+Read the checklist, the §4 provisional decisions, `CHANGELOG_v<N>.md`, and every doc's
 header. State the position in one line before doing anything:
 
 > v1 has been open since 2026-03-14. Eleven checklist items, eight ticked,
-> three not. One open question still listed as blocking. Nine changelog entries.
+> three not. Two provisional decisions still in force. Nine changelog entries.
 
 ## Step 2 — Scan for drift before closing anything
 
@@ -127,8 +127,17 @@ in the closing summary as dropped, with the reason. A dropped item is not a
 failure; an *undocumented* dropped item is, because it looks like an oversight
 forever after.
 
-Do the same for **§4 open questions**: answered (record where), carried forward,
-or no longer relevant.
+Do the same for every **§4 provisional decision**, in the same three buckets:
+
+**Settled** — the information arrived. If the answer differs from the decision in
+force, that is a doc change: apply the In-Version Change Protocol before closing,
+because it belongs to vN. Then delete the entry.
+
+**Carried forward** — still unsettled. The decision in force stays in force, and
+the entry moves to vN+1's §4 unchanged.
+
+**No longer relevant** — whatever it concerned has left the product. Delete the
+entry and note it in the closing summary.
 
 ### Never carry anything silently
 
@@ -139,7 +148,8 @@ Say the accounting out loud before asking for confirmation:
 
 > Of eleven items: eight met with evidence, two carried to v2 (offline sync,
 > export), one dropped (weekly email digest — you said notifications are out of
-> scope entirely now). One open question answered, none carried.
+> scope entirely now). Of two provisional decisions: pricing settled (v1 stays
+> free, now permanently), target-frequency shape carried to v2 still provisional.
 >
 > That accounts for everything. Close v1?
 
@@ -247,6 +257,8 @@ Then report the whole transition in one block:
 | "Everything's ticked, I'll close it" | Only the user closes a version. State the position and wait. |
 | "This item is basically done, tick it" | Every criterion needs evidence. "Basically done" is not met. |
 | "I'll move the unfinished items to v2 quietly" | Every item is met, carried, or dropped — out loud, in the closing summary. |
+| "The §4 register is just notes, I'll carry it across" | Every entry is settled, carried, or dropped, with the same accounting a checklist item gets. |
+| "This new scope is fuzzy, I'll add it as an open question" | Then it is not scope yet. Close it as a provisional decision or leave it out of the version. |
 | "I'll fix the drift after closing" | Closing freezes a claim about what vN was. Fix drift first. |
 | "The docs are fine, skip the scan" | The scan is what makes the frozen doc-set table true. |
 | "Bumping the version is a revision" | It is not. `Revision` stays; nothing is logged for a bump alone. |
@@ -263,6 +275,7 @@ Then report the whole transition in one block:
 | `references/doc-contract.md` | before touching any header |
 | `references/history-discipline.md` | the file shapes, and the change protocol |
 | `references/drift-scan.md` | step 2, before closing anything |
+| `references/closing-questions.md` | step 3's register accounting, and any vN+1 question that will not settle |
 | `references/next-version.md` | step 5, the scope grill |
 | `references/agent-file.md` | step 8 |
 | `references/critic.md` | any doc that gets a full pass in step 6 |

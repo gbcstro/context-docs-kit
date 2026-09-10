@@ -82,7 +82,7 @@ none present                     -> the set predates PROGRESS/. Say so, offer to
                                     PROGRESS_v1.md from the docs as they stand, and gate it.
 ```
 
-Read `PROGRESS_v<N>.md` (scope, checklist, open questions) and `CHANGELOG_v<N>.md`
+Read `PROGRESS_v<N>.md` (scope, checklist, §4 provisional decisions) and `CHANGELOG_v<N>.md`
 (what has already changed this version — do not re-report a change that is
 already logged). Then read every `context/*.md` header and note each doc's
 `Revision`.
@@ -90,7 +90,8 @@ already logged). Then read every `context/*.md` header and note each doc's
 State in one line where things stand before you diff anything:
 
 > Current version is v1, open since 2026-03-14. Four docs, revisions 3/2/1/1.
-> Eleven checklist items, four ticked. Six changelog entries so far.
+> Eleven checklist items, four ticked. Three provisional decisions in force.
+> Six changelog entries so far.
 
 ## Step 2 — The three-way diff
 
@@ -158,7 +159,7 @@ For each accepted fix, in full, per `references/history-discipline.md`:
 2. **Bump `Revision` and `Last updated`.** `Project version` does not move.
 3. **Append to `CHANGELOG_v<N>.md`** — changed, why, affects.
 4. **Cascade** along `Depends on` before you finish.
-5. **Re-check `PROGRESS_v<N>.md`** if scope, criteria or open questions moved.
+5. **Re-check `PROGRESS_v<N>.md`** if scope, criteria or a §4 provisional decision moved. A decision that is now settled leaves §4 in this same pass.
 6. **Run the banned-phrase check.**
 
 ### The cascade is the part that gets skipped
@@ -262,6 +263,8 @@ explicitly. Doing it quietly, item by item, is how a version stops ever ending.
 | "I fixed the doc the finding was about" | Then you are half done. Cascade downhill along `Depends on` before reporting back. |
 | "It's obviously done, I'll tick it" | Every tick needs evidence, and every tick is proposed to the user first. |
 | "These docs are a mess, I'll rewrite the set" | This is not a re-bootstrap. Fix what drifted; leave earned decisions alone. |
+| "The user can't decide, I'll add an open question to the doc" | Docs carry no open questions. Close it: cheapest-to-reverse option, reversal cost, assent, register it in §4. `references/closing-questions.md`. |
+| "A `TBD` in the doc is honest about the uncertainty" | It is a hole. Downstream docs get written against it and nobody treats it as urgent. |
 | "I'll add the missing feature to the checklist while I'm here" | That is scope, not drift. The user decides, explicitly. |
 | "I changed RULES §2, the agent file will pick it up" | Only on hosts with import support. Everywhere else you refresh the marker block by hand. |
 | "The version looks finished, I'll close it" | Only the user closes a version, and only through `versioning-context-docs`. |
@@ -276,4 +279,5 @@ explicitly. Doing it quietly, item by item, is how a version stops ever ending.
 | `references/history-discipline.md` | the protocol itself — the core of this skill |
 | `references/drift-scan.md` | step 2, the per-doc three-way diff |
 | `references/agent-file.md` | step 7, if the agent file needs refreshing |
+| `references/closing-questions.md` | any time a fix cannot be settled outright |
 | `references/critic.md` | after a substantial rewrite, to check the result like a fresh draft |

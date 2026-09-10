@@ -2,7 +2,7 @@
 
 Three Agent Skills that build a project's `context/` foundation docs — product, architecture, schema, design, rules — by **interviewing you** rather than filling in a template, then keep them true as the code moves.
 
-Every project should start with these docs. The problem is that generated docs and decided docs look identical and behave nothing alike: a template's gaps are invisible, while a grilled doc's gaps are written down under `## Open Questions`. This kit exists to produce the second kind, and to stop the first kind quietly replacing it six weeks later.
+Every project should start with these docs. The problem is that generated docs and decided docs look identical and behave nothing alike: a template is full of gaps nobody can see. A grilled doc has none — every question in it was closed before it was written. This kit exists to produce the second kind, and to stop the first kind quietly replacing it six weeks later.
 
 Runs on **Claude Code, Codex, Gemini CLI and Antigravity**.
 
@@ -90,7 +90,11 @@ Each has one job and one trigger, so your assistant picks the right one without 
 
 One question at a time. A recommendation with every question. The realistic options and their costs for every consequential decision — and if you pick one without acknowledging its main downside, it says the downside once and asks you to confirm before recording it as settled.
 
-When you don't know something, it parks the question instead of inventing a plausible answer. **This is the point.** An invented `$4.99/mo` reads as decided, nobody revisits it, and three docs downstream inherit it.
+When you don't know something, it doesn't invent a plausible answer — and it doesn't leave a `TBD` either. **Both are holes; the second just looks honest.** An invented `$4.99/mo` reads as decided and three docs downstream inherit it. A "pricing TBD" is worse in a different way: `SCHEMA.md` still has to decide whether a price is a column, so it guesses, and nobody notices.
+
+Instead the question gets *closed*. It finds the option that's **cheapest to reverse**, tells you what reversing it would actually cost, and asks you to accept it as the decision in force. The doc then reads like any other decision — "v1 is free, there is no billing" — and the fact that it's unsettled is registered in one place, `PROGRESS_v1.md` §4, with what would settle it and what changing it costs.
+
+That's more work than parking a question, not less. The point is that the cost moves from a future reader, who can't pay it, to the conversation you're already having.
 
 Docs are written one at a time in dependency order, each behind an approval gate. On a repo that already has code it reads the code first, so you confirm what's there instead of restating it from memory.
 
@@ -98,7 +102,7 @@ Two passes go further than a question:
 
 **Architecture is presented, not described.** Before a word of `ARCHITECTURE.md` is written, you get the stack block, an ASCII repo tree and a system diagram with the binding constraint annotated where it bites — and you approve the picture. A paragraph gets nodded at; a diagram gets corrected. On an existing repo you get two: what's there, what's proposed, and every delta named.
 
-**Principles are agreed on examples, not names.** Everyone says yes to "single responsibility" and nobody means the same thing. So `RULES.md` §4 runs a loop: a principle tied to a named seam in *your* codebase, then a worked example — a before/after in your real language and paths, showing the actual consequence — and you accept, adjust or reject **the example**. Adjust and it re-renders with your correction. Three rounds without agreement and it's parked as an open question. A principle with no accepted example never enters the doc.
+**Principles are agreed on examples, not names.** Everyone says yes to "single responsibility" and nobody means the same thing. So `RULES.md` §4 runs a loop: a principle tied to a named seam in *your* codebase, then a worked example — a before/after in your real language and paths, showing the actual consequence — and you accept, adjust or reject **the example**. Adjust and it re-renders with your correction. Three rounds without agreement and the principle simply isn't written down; that absence is the decision. A principle with no accepted example never enters the doc.
 
 ## Versions, and why the docs stay readable
 
@@ -108,7 +112,8 @@ The set is versioned as a product, not as files:
 context/
   PRODUCT.md  ARCHITECTURE.md  SCHEMA.md  DESIGN.md  RULES.md
   PROGRESS/
-    PROGRESS_v1.md      v1's scope, checklist and acceptance criteria
+    PROGRESS_v1.md      v1's scope, checklist, acceptance criteria,
+                        and the register of provisional decisions
     CHANGELOG_v1.md     why anything changed during v1
 ```
 
@@ -123,7 +128,7 @@ Then the cascade, which is the part that usually gets skipped: a change is not f
 | Mechanism | What it does |
 |---|---|
 | **Dependency chain** — `Depends on:` in each header | Decisions flow downhill, so docs are written in an order where nothing depends on an unwritten doc |
-| **`## Open Questions`** in every doc | The escape hatch that makes an honest doc possible without pretending to know everything |
+| **No open questions, anywhere** | Every question closes before its doc is drafted; what can't be settled becomes a registered provisional decision |
 | **`Project version` + `Revision`** | Two separate axes: `v1` is the product, `Revision: 3` is the file. `v` never means both |
 | **Agent-file wiring** — docs map + rules | Without it the folder is inert. Excellent docs nobody opens change nothing |
 | **`PROGRESS_vN` + `CHANGELOG_vN`** | Docs stay present-tense; scope is committed with criteria; reasons stay findable |

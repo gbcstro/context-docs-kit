@@ -31,8 +31,12 @@ names, metric targets.
 
 The most damaging defect available. An invented specific reads as decided, nobody
 revisits it, and every downstream doc inherits it. Quote it, locate it, and say
-whether it should be **removed**, **parked in Open Questions**, or **confirmed
-with the user**.
+whether it should be **removed**, **confirmed with the user**, or **converted
+into a registered provisional decision** per `references/closing-questions.md`.
+
+A value that traces to a `PROGRESS_v<N>.md` §4 register entry is **not** an
+invented specific — it is a provisional decision the user made. Check the
+register before flagging.
 
 ### 2. Decisions recorded without their cost
 
@@ -86,7 +90,8 @@ was either never converged on, or the example was dropped in drafting.
 - Header present and correct: `**Project version:** vN`, `**Revision:** N`, `**Last updated:**`, `**Depends on:**` (absent only for `PRODUCT.md`)
 - `Revision` is a bare integer, not `v3` — `v` is reserved for the project version
 - Is the date the real current date, or does it look invented?
-- `## Open Questions` present, even if it says none are open
+- **No `## Open Questions` section**, and no `TBD`, `TODO`, `???`, `to be decided`, `to be determined`, `for now`, `not sure yet`, `probably`, or a bare `?` standing in for a value. Docs carry decisions, not holes.
+- Every provisional-sounding decision in the doc has a matching §4 register entry, and every §4 entry names a doc section that actually states it
 - `## Next Steps` present, naming the actual next doc in the confirmed set — or the wiring step, for the last doc
 - `## Out of Scope for <version>` present where the doc type calls for it, titled with the real current version
 - No empty or placeholder sections; no `TBD`, `TODO`, or `<fill this in>` in the body
@@ -109,7 +114,7 @@ list in `SCHEMA.md` — each blocks the pass that follows.
 ## What not to do
 
 - **Don't restyle.** Wording, tone and formatting preferences are not findings. The doc should sound like the user, not like you.
-- **Don't demand content the user deliberately deferred.** A properly parked open question is correct, not a gap. Read `## Open Questions` before reporting anything missing.
+- **Don't demand content the user deliberately descoped.** Read `## Out of Scope` and the `PROGRESS_v<N>.md` §4 register before reporting anything missing — a registered provisional decision and an explicit descope are both correct, not gaps.
 - **Don't propose scope.** A feature the doc does not mention is out of scope, not an omission — unless an upstream doc contradicts that.
 - **Don't pad.** Six real findings beat twenty with fourteen nitpicks; padding buries the ones that matter.
 
@@ -122,10 +127,10 @@ Most severe first:
 
   Quote or reference the exact problem.
   Why it matters: <concrete consequence downstream>
-  Resolution: remove | park in Open Questions | confirm with user | fix as <specific change>
+  Resolution: remove | confirm with user | close as a registered provisional decision | fix as <specific change>
 ```
 
-**CRITICAL** — invented specific, constraint violation, upstream contradiction, silently dropped field, history narration about a decision.
+**CRITICAL** — invented specific, constraint violation, upstream contradiction, silently dropped field, history narration about a decision, an unclosed question left in the doc.
 **MAJOR** — uncosted consequential decision, missing contract section, unfalsifiable core claim, missing architecture artifact, principle without its worked example.
 **MINOR** — numbering, handoff thinness.
 

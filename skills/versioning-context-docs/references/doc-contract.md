@@ -16,8 +16,7 @@ No exceptions, in any of the three skills.
 ## 1. Overview
 ...
 ## N. Out of Scope for <current version>
-## N+1. Open Questions
-## N+2. Next Steps
+## N+1. Next Steps
 ```
 
 ## The two version axes
@@ -46,9 +45,10 @@ formatting passes are not revisions and are not logged.
 
 ## The closing sections
 
-- **`## Open Questions`** is the escape hatch that makes an honest doc possible. Never omit it, even when empty — write "none currently open".
+- **`## Out of Scope for <version>`** is titled with the current project version, not a hardcoded "v1". Anything deliberately not being built, and anything descoped because it could not be settled, appears here.
 - **`## Next Steps`** names the next doc to write, so the set is resumable by a future session with no memory of this one.
-- **`## Out of Scope for <version>`** is titled with the current project version, not a hardcoded "v1".
+
+**There is no `## Open Questions` section.** A doc is a set of decisions; every question closes before the doc is drafted. See `references/closing-questions.md` — that rule is load-bearing, and dropping it turns the docs back into a place where holes hide.
 
 ## Present tense, always
 
@@ -62,10 +62,7 @@ weaker place to put them — it is the *only* place they are findable when someo
 asks "why is it like this", because a doc that argues with its own history buries
 the one fact a reader needs under the account of how it got there.
 
-Two things are status, not narration, and stay in the doc:
-
-- `## Open Questions` — recording that something is undecided.
-- The header fields — metadata.
+One thing is metadata rather than narration and stays in the doc: the header fields.
 
 Full rules, including the banned-phrase check, in `references/history-discipline.md`.
 
