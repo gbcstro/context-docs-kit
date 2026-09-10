@@ -80,8 +80,8 @@ If `ARCHITECTURE.md` says data lives locally *and* on a server, the doc describe
 ### 8. Indexes
 Only where a known query needs one, derived from the features. Speculative indexes are cost without benefit; note the queries you're indexing for.
 
-### 9. Open questions
-Anything undecided — especially derived-vs-stored calls the user wants to defer, and fields whose necessity depends on a parked product decision.
+### 9. Nothing left open
+Sweep back over the pass: decided, provisionally decided and registered, or descoped. `references/closing-questions.md`.
 
 ---
 
@@ -90,7 +90,8 @@ Anything undecided — especially derived-vs-stored calls the user wants to defe
 ```markdown
 # <Project> — Data Schema
 
-**Status:** Draft v1
+**Project version:** v1
+**Revision:** 1
 **Last updated:** YYYY-MM-DD
 **Depends on:** [PRODUCT.md](./PRODUCT.md), [ARCHITECTURE.md](./ARCHITECTURE.md)
 
@@ -129,7 +130,6 @@ Say which are mirrored and which are exclusive.>
 
 <Index, and the query it serves.>
 
-## 8. Open Questions
 
 ## 9. Next Steps
 ```

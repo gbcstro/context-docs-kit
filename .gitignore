@@ -8,6 +8,16 @@ desktop.ini
 .idea/
 *.swp
 
+# Node
+node_modules/
+*.tgz
+
+# Local installs made by `context-docs-kit install --project`
+.claude/skills/
+.claude/agents/
+.agents/skills/
+.gemini/skills/
+
 # Scratch / local experiments
 scratch/
 tmp/

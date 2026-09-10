@@ -1,0 +1,48 @@
+{
+  "name": "context-docs-kit",
+  "version": "2.0.0",
+  "description": "Bootstraps and maintains a project's context/ foundation docs (product, architecture, schema, design, rules) by interviewing you one question at a time. Installs as an Agent Skill into Claude Code, Codex, Gemini CLI or Antigravity.",
+  "type": "module",
+  "license": "MIT",
+  "author": "Gabriel Castro",
+  "homepage": "https://github.com/gbcstro/context-docs-kit#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gbcstro/context-docs-kit.git"
+  },
+  "bugs": {
+    "url": "https://github.com/gbcstro/context-docs-kit/issues"
+  },
+  "keywords": [
+    "agent-skills",
+    "claude-code",
+    "codex",
+    "gemini-cli",
+    "antigravity",
+    "context-engineering",
+    "documentation",
+    "prd",
+    "architecture",
+    "ai-agents"
+  ],
+  "bin": {
+    "context-docs-kit": "bin/cli.mjs"
+  },
+  "files": [
+    "bin",
+    "src",
+    "skills",
+    "agents",
+    ".claude-plugin",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "sync": "node src/sync-shared.mjs",
+    "test": "node test/run.mjs",
+    "prepack": "node src/sync-shared.mjs --check"
+  }
+}

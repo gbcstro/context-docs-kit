@@ -46,8 +46,8 @@ Write `RULES.md` from the approved answers in your task.
 
 1. **Read before writing.** Read the relevant `context/*.md` before implementing in that area rather than assuming. Name which doc covers which concern.
 2. **No undocumented architecture decisions.** Never introduce a library, service, or architectural approach absent from `ARCHITECTURE.md`/`SCHEMA.md` without flagging it and getting confirmation — *held to the same standard every existing choice was held to.* Include that clause; it's what makes the rule read as parity rather than bureaucracy.
-3. **Keep the docs living, not frozen.** When an implementation decision changes or resolves something documented, update that doc **in the same change**.
-4. **No speculative scope.** Don't add features beyond `PRODUCT.md` without checking first.
+3. **Keep the docs living, not frozen.** When an implementation decision changes or resolves something documented, update that doc **in the same change**, bump its `Revision`, and cascade downstream. Present tense only — the reason goes in `context/PROGRESS/CHANGELOG_v<current>.md`, never in the doc.
+4. **No speculative scope.** Don't add features beyond `PRODUCT.md`, or beyond the current version's checklist in `context/PROGRESS/PROGRESS_v<current>.md`, without checking first. The checklist is what this version is committed to; anything outside it is a conversation, not a task.
 5. **Ask, don't guess.** When a requirement is ambiguous, ask rather than silently choosing an interpretation.
 6. **Wireframe before building UI** — include only if `DESIGN.md` exists in the set.
 
@@ -55,6 +55,9 @@ Add project-specific rules only where the approved answers supply them.
 
 **Other absolute rules:**
 
+- **Nothing is left open.** Your task's approved answers are the only source. If a section needs a fact you were not given, that is a defect in the task, not a licence to invent and not a hole to leave: report it back rather than writing `TBD`, `to be decided`, or an `## Open Questions` section. **There is no `## Open Questions` section in any doc.** Values marked in your task as *provisional* are decisions the user made — write them as plain, present-tense decisions with no hedging; the main conversation registers them in `PROGRESS_v<N>.md` §4.
+
+- **Every §4 principle carries the worked example the user accepted.** Your task supplies them as principle + seam + accepted example. Write all three. A principle without its example does not go in the doc at all. The example is what the user agreed to; the principle name is just its label.
 - **No invented obligations.** Every rule outside the six above must come from an approved answer. Inventing a coverage threshold or a review process the user never agreed to produces a doc they'll immediately violate, which destroys the authority of the rules that *were* agreed.
 - **Write the standard the project will actually hold.** If the approved answer is "manual verification for mobile, unit tests for backend services", write exactly that. An aspirational standard broken in week two discredits the whole document.
 - **Skip what a formatter handles.** If Prettier enforces it, the rule is "run the formatter", not a paragraph on brace placement.
@@ -66,21 +69,21 @@ Structure:
 ```
 # <Project> — Rules (Coding & Process Conventions)
 
-**Status:** Draft v1
+**Project version:** v1
+**Revision:** 1
 **Last updated:** YYYY-MM-DD
 **Depends on:** [PRODUCT.md](./PRODUCT.md), [ARCHITECTURE.md](./ARCHITECTURE.md), [SCHEMA.md](./SCHEMA.md), [DESIGN.md](./DESIGN.md)
 
 ## 1. Purpose
 ## 2. AI Assistant Rules
 ## 3. Code Organization
-## 4. Design Principles
+## 4. Design Principles      <- each with its seam and accepted worked example
 ## 5. Language & Style
 ## 6. Git Workflow
 ## 7. Testing Conventions
 ## 8. Environment & Secrets
 ## 9. Database Migrations
 ## 10. Ops Runbook            <- only if the project has infrastructure
-## 11. Open Questions
 ## 12. Next Steps
 ```
 
@@ -88,10 +91,10 @@ Structure:
 
 §2 is written in the imperative, second person, addressed to the assistant.
 
-§4 ties principles to *this* codebase's actual seams rather than reciting SOLID. One concrete example ("a new metric type can be added as its own calculator, dispatched by type, without touching existing calculation code") is worth more than five definitions. Include the pragmatism caveat: applied where it adds clarity or testability, not as a checklist on every trivial function.
+§4 ties principles to *this* codebase's actual seams rather than reciting SOLID. Each entry is three things: the principle, the seam it applies to, and the worked example — a before/after snippet or a concrete scenario — that the user accepted during the loop. Two principles written this way beat eight names. Include the pragmatism caveat: applied where it adds clarity or testability, not as a checklist on every trivial function.
 
 §9 includes the lockstep rule: a schema change isn't complete until `SCHEMA.md` reflects it.
 
-§12 points at the agent-file wiring step, not another doc — this is the end of the chain.
+§12 points at the agent-file wiring step, not another doc — this is the end of the chain. The wiring is followed by `PROGRESS_v1.md`, which draws its definition of "done" from your §7.
 
-Write the file directly with Write. Then return: the path, the section list, the §2 rules as written, every parked item, and any section you had to leave thin because the approved answers didn't cover it.
+Write the file directly with Write. Then return: the path, the section list, the §2 rules as written, every place the approved answers left a gap, and any section you had to leave thin because the approved answers didn't cover it.
