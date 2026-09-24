@@ -103,7 +103,7 @@ stays in force, and the entry moves across unchanged.
 Three questions once scope is agreed:
 
 1. **Does any doc need real content changes?** Those go through a full gated pass, and are logged in `CHANGELOG_v<N+1>.md`.
-2. **Does the doc set change?** New scope sometimes adds a doc — a `DESIGN.md` when a UI arrives, a `SECURITY.md` when the data gets sensitive. Splice it into the chain per the bootstrap skill's `references/optional-docs.md`.
+2. **Does the doc set change?** New scope sometimes adds a doc — `DESIGN.md` and `SCREENS.md` when a UI arrives, a `SECURITY.md` when the data gets sensitive. Splice it into the chain per the bootstrap skill's `references/optional-docs.md`.
 3. **Do `RULES.md` §4's worked examples still describe real seams?** New architecture moves seams. An example describing a structure the new version replaces teaches the wrong thing.
 
 ---

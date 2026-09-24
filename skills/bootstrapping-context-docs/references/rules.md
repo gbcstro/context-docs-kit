@@ -36,7 +36,7 @@ Six rules earn their place. Adapt the wording; keep the substance:
 3. **Keep the docs living, not frozen.** When an implementation decision changes or resolves something documented, update that doc **in the same change**, bump its `Revision`, and cascade to any doc that depends on it. Present tense only: the doc reads as if the new decision had always been the decision. **The reason goes in `context/PROGRESS/CHANGELOG_v<current>.md`, never in the doc.** The docs are the source of truth and must never drift from what is actually decided.
 4. **No speculative scope.** Don't add features beyond `PRODUCT.md`, or beyond the current version's checklist in `context/PROGRESS/PROGRESS_v<current>.md`, without checking first. The checklist is what this version is committed to; anything outside it is a conversation, not a task.
 5. **Ask, don't guess.** When a requirement is ambiguous, ask rather than silently picking an interpretation.
-6. **Wireframe before building UI** (only if `DESIGN.md` exists). Present an ASCII wireframe reflecting the visual system for approval before writing component code.
+6. **Wireframe before building UI** (only if `DESIGN.md` or `SCREENS.md` exists). Present an ASCII wireframe reflecting the visual system and screen layout for approval before writing component code.
 
 Add project-specific rules — but confirm each with the user; don't invent obligations they never agreed to.
 
@@ -199,7 +199,7 @@ Sweep back over the pass: decided, provisionally decided and registered, or desc
 **Project version:** v1
 **Revision:** 1
 **Last updated:** YYYY-MM-DD
-**Depends on:** [PRODUCT.md](./PRODUCT.md), [ARCHITECTURE.md](./ARCHITECTURE.md), [SCHEMA.md](./SCHEMA.md), [DESIGN.md](./DESIGN.md)
+**Depends on:** [PRODUCT.md](./PRODUCT.md), [ARCHITECTURE.md](./ARCHITECTURE.md), [SCHEMA.md](./SCHEMA.md), [DESIGN.md](./DESIGN.md), [SCREENS.md](./SCREENS.md)
 
 ## 1. Purpose
 

@@ -42,7 +42,8 @@ Read the upstream docs and compare directly:
 
 - Does `SCHEMA.md` have a home for every `PRODUCT.md` §4 field? **An unhomed field is a silent scope drop** — report each one.
 - Does `SCHEMA.md` assume an engine, ORM, or migration tool that `ARCHITECTURE.md` doesn't name?
-- Does `DESIGN.md` have a screen for every `PRODUCT.md` feature, and is every v1 screen reachable by a navigation path?
+- Does `DESIGN.md` define semantic tokens, overlay contracts, and component states for every UI interaction, without raw hex or unstated states?
+- Does `SCREENS.md` have a screen for every `PRODUCT.md` feature, and is every v1 screen reachable by a navigation path?
 - Does `RULES.md` reference docs that aren't in the set, or omit a rule for a tool the architecture depends on?
 - Does anything contradict the stated binding constraint? A constraint-violating choice is the most serious contradiction possible.
 

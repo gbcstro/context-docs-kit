@@ -135,7 +135,8 @@ Before the gate, confirm the doc gives the next docs what they need:
 
 - `ARCHITECTURE.md` needs: platform, multi-user or not, sync/offline expectations, anything in §4 implying infrastructure (file uploads, notifications, background work)
 - `SCHEMA.md` needs: the §4 field lists — its entities are derived from them, so a vague §4 guarantees a guessed schema
-- `DESIGN.md` needs: the feature list as a screen-inventory starting point
+- `DESIGN.md` needs: UI requirements and visual aesthetic direction
+- `SCREENS.md` needs: the feature list as a screen-inventory starting point
 - Every doc needs §3, the premise scope questions get checked against
 
 If any of these is missing, that's a gap to close now, not downstream.

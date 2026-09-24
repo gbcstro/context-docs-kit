@@ -110,7 +110,7 @@ The set is versioned as a product, not as files:
 
 ```
 context/
-  PRODUCT.md  ARCHITECTURE.md  SCHEMA.md  DESIGN.md  RULES.md
+  PRODUCT.md  ARCHITECTURE.md  SCHEMA.md  DESIGN.md  SCREENS.md  RULES.md
   PROGRESS/
     PROGRESS_v1.md      v1's scope, checklist, acceptance criteria,
                         and the register of provisional decisions
@@ -137,7 +137,7 @@ Agent-file wiring is the step most often skipped, and the one that decides wheth
 
 ## The doc set is adaptive
 
-`PRODUCT.md`, `ARCHITECTURE.md` and `RULES.md` always. `SCHEMA.md` only if something is persisted. `DESIGN.md` only if there's a user interface. Extra docs (`PROTOCOL.md`, `SECURITY.md`, `ML.md`) when the project warrants them.
+`PRODUCT.md`, `ARCHITECTURE.md` and `RULES.md` always. `SCHEMA.md` only if something is persisted. `DESIGN.md` and `SCREENS.md` only if there's a user interface. Extra docs (`PROTOCOL.md`, `SECURITY.md`, `ML.md`) when the project warrants them.
 
 A CLI tool with no persistence gets three docs, not five with two stubs — a stub doc is worse than a missing one, because it implies the concern was considered.
 
@@ -150,7 +150,7 @@ Each doc has a lens and its own list of things it won't let slide:
 | `product-strategist` | `PRODUCT.md` | Differentiation with no named competitor; feature names without field lists; success metrics you can't fail |
 | `solutions-architect` | `ARCHITECTURE.md` | A stack proposed before the binding constraint is known; a vendor recorded without confirmation; a system described only in prose |
 | `data-modeler` | `SCHEMA.md` | Entities invented rather than derived from the product's field lists; unstated delete behaviour |
-| `product-designer` | `DESIGN.md` | Per-screen detail before a complete screen inventory; raw hex instead of semantic tokens; missing empty states |
+| `product-designer` | `DESIGN.md`, `SCREENS.md` | Raw hex instead of semantic tokens; hand-waved navbar/overlay specs; missing tooltip/popover/menu/confirmation/toast contracts; components without all interactive states; animations without durations and reduced-motion posture; screens without complete inventory and layout wireframes; orphan screens; missing empty/loading/error states |
 | `engineering-standards` | `RULES.md` | Omitting the AI-assistant rules section; rules with no enforcement path; a principle with no worked example |
 | `context-doc-critic` | all | Reviews every draft before it reaches you — independently, because an author can't see its own blind spots |
 

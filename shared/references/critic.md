@@ -51,7 +51,8 @@ monetization, identity strategy, hosting.
 
 - Does `SCHEMA.md` have a home for every `PRODUCT.md` §4 field? **An unhomed field is a silent scope drop.**
 - Does `SCHEMA.md` assume an engine, ORM, or migration tool `ARCHITECTURE.md` never names?
-- Does `DESIGN.md` have a screen for every feature, and is every screen reachable by a navigation path?
+- Does `DESIGN.md` define semantic tokens, overlay contracts, and component states for every UI interaction, without raw hex or unstated states?
+- Does `SCREENS.md` have a screen for every feature, and is every screen reachable by a navigation path?
 - Does `RULES.md` reference docs outside the set, or omit a rule for a tool the architecture depends on?
 - Does anything contradict the binding constraint? That is the most serious contradiction possible.
 

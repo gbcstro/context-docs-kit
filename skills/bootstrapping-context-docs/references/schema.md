@@ -138,7 +138,7 @@ Say which are mirrored and which are exclusive.>
 
 ## Handoff
 
-- `DESIGN.md` needs the entity list — screens are mostly views over these, and the field lists determine what forms must collect
+- `DESIGN.md` and `SCREENS.md` need the entity list — screens are mostly views over these, and the field lists determine what forms, tables, and controls must display and collect
 - `RULES.md` needs the naming convention and the migration workflow to encode as rules
 
 Before the gate, verify the loop closes: **every `PRODUCT.md` §4 field appears somewhere in this doc** — as a column, a derived value, or an explicitly parked question. A field that appears in the product doc and nowhere here is a silent scope drop, and it will surface as a missing feature during implementation.

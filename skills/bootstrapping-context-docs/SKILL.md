@@ -100,6 +100,7 @@ Confirm the set with the user before writing anything. Default is adaptive, not 
 | `ARCHITECTURE.md` | always | `solutions-architect` |
 | `SCHEMA.md` | the project has persistent data | `data-modeler` |
 | `DESIGN.md` | the project has a user interface | `product-designer` |
+| `SCREENS.md` | the project has a user interface | `product-designer` |
 | `RULES.md` | always | `engineering-standards` |
 
 Additional docs when the project warrants them — see `references/optional-docs.md`. A CLI tool with no persistence gets three docs, not five with two stubs. Say which you are dropping and why, then let the user correct you.
@@ -248,6 +249,7 @@ Load only what the current pass needs.
 | `references/architecture.md` | ARCHITECTURE.md pass |
 | `references/schema.md` | SCHEMA.md pass |
 | `references/design.md` | DESIGN.md pass |
+| `references/screens.md` | SCREENS.md pass |
 | `references/rules.md` | RULES.md pass |
 | `references/critic.md` | stage 4 of every pass |
 | `references/optional-docs.md` | doc-set proposal, if the core five don't fit |

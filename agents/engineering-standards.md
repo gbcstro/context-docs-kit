@@ -49,7 +49,7 @@ Write `RULES.md` from the approved answers in your task.
 3. **Keep the docs living, not frozen.** When an implementation decision changes or resolves something documented, update that doc **in the same change**, bump its `Revision`, and cascade downstream. Present tense only — the reason goes in `context/PROGRESS/CHANGELOG_v<current>.md`, never in the doc.
 4. **No speculative scope.** Don't add features beyond `PRODUCT.md`, or beyond the current version's checklist in `context/PROGRESS/PROGRESS_v<current>.md`, without checking first. The checklist is what this version is committed to; anything outside it is a conversation, not a task.
 5. **Ask, don't guess.** When a requirement is ambiguous, ask rather than silently choosing an interpretation.
-6. **Wireframe before building UI** — include only if `DESIGN.md` exists in the set.
+6. **Wireframe before building UI** — include only if `DESIGN.md` or `SCREENS.md` exists in the set.
 
 Add project-specific rules only where the approved answers supply them.
 
@@ -72,7 +72,7 @@ Structure:
 **Project version:** v1
 **Revision:** 1
 **Last updated:** YYYY-MM-DD
-**Depends on:** [PRODUCT.md](./PRODUCT.md), [ARCHITECTURE.md](./ARCHITECTURE.md), [SCHEMA.md](./SCHEMA.md), [DESIGN.md](./DESIGN.md)
+**Depends on:** [PRODUCT.md](./PRODUCT.md), [ARCHITECTURE.md](./ARCHITECTURE.md), [SCHEMA.md](./SCHEMA.md), [DESIGN.md](./DESIGN.md), [SCREENS.md](./SCREENS.md)
 
 ## 1. Purpose
 ## 2. AI Assistant Rules

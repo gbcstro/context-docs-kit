@@ -95,15 +95,54 @@ check that they still agree with each other.
 
 | Read | Compare against |
 |---|---|
-| route definitions, screen/page files | the complete screen inventory — every route has an entry |
-| the design token file, theme config, CSS variables | the color and typography tokens |
-| component directory | the component system section |
-| navigation config, router layout | the navigation model, and whether every screen is reachable |
+| the design token file, theme config, CSS variables | the color palette, semantic token taxonomy, surface hierarchy, and pairing/contrast rules |
+| font loading, type scale config, typography constants | the typography ramp (Display through Code), font families, weights, and line heights |
+| spacing/padding/margin constants, radius values | the spacing scale, radius scale, and elevation/shadow tokens |
+| navigation bar, header, sidebar, and layout frame components | the app shell architecture, navbar anatomy, sidebar (if any), and mobile collapse behavior |
+| modal / dialog components, confirmation dialogs | the modal dialog spec (sizes, backdrop, focus trap, dismiss, animation) and confirmation/destructive dialog spec |
+| drawer / sheet components | the slide-over drawer and bottom sheet specs |
+| tooltip components or libraries | the tooltip spec (trigger delay, placement/flip, arrow, sizing, ARIA) |
+| popover components | the popover spec (click-to-toggle, interactive content, focus, ARIA) |
+| dropdown menu / action menu components | the dropdown menu spec (item anatomy, groups, submenus, keyboard nav, ARIA) |
+| context menu / right-click handlers | the context menu spec (cursor-anchor, same anatomy as dropdown) |
+| select / combobox / autocomplete components | the select menu and combobox spec (search, multi-select, ARIA) |
+| date picker components | the date/calendar picker spec |
+| command palette / spotlight / search modal | the command palette spec (Cmd+K, result groups, z-index) |
+| toast / notification components | the toast spec (position, auto-dismiss, pause-on-hover, stacking, status variants, ARIA) |
+| alert / banner components | the inline alert and banner notification spec (variants, dismiss rules) |
+| z-index values across all files | the calibrated z-index scale (base through tooltip) |
+| button components | button variants, sizes, and *all six+ states* (default, hover, active, focus-visible, disabled, loading) |
+| form input / control components | input, textarea, select, checkbox, radio, toggle, slider, file upload — each with all states |
+| card / container components | card variants (static, clickable, selected), surface treatment |
+| badge / chip / tag / status components | status variants, removable chips, dot indicators |
+| avatar components | sizes, fallback initials, status dot, avatar groups |
+| table / data grid components | header, hover/selected rows, pagination, mobile card-stack, bulk selection |
+| list / list item components | item anatomy, hover/active, dividers |
+| tab / segmented control components | active indicator, states, scroll overflow, ARIA |
+| breadcrumb components | separator, truncation, current page aria |
+| pagination components | variant, active/disabled states |
+| progress bar, spinner, stepper, skeleton components | all loading and progress variants |
+| accordion / collapsible components | expand/collapse behavior, ARIA |
+| empty state, error state, loading state patterns | standard component empty/loading/error styles and skeletons |
+| CSS transitions, keyframe animations, motion libraries | the animation system (duration tokens, easing curves, per-component table, reduced-motion handling) |
+| icon usage and library | icon set, default sizes, stroke weight, color inheritance |
 
-**What drift looks like here:** screens that exist and are not in the inventory —
-usually added one at a time — and tokens that have quietly become raw hex values
-in components. Check whether contrast commitments (WCAG AA, say) still hold for
-the tokens as they are now, not as they were written.
+**What drift looks like here:** raw hex values scattered in components instead of semantic tokens, broken WCAG AA contrast ratios, navbar components missing mobile collapse or active indicators, ad-hoc tooltip or popover implementations that bypass the spec'd placement and z-index rules, dropdown menus without keyboard navigation or ARIA, confirmation dialogs that don't match the destructive styling contract, toast notifications with inconsistent auto-dismiss timing or positioning, new button variants or form input states invented without updating the component spec, and animation durations or easing that diverge from the token system.
+
+---
+
+## SCREENS.md
+
+| Read | Compare against |
+|---|---|
+| route definitions, router configuration, screen/page files | the complete screen inventory (§1.1) and route map — every route has an entry |
+| navigation config, navbar/sidebar link lists | the navigation graph and hierarchy — every screen is reachable by a link, CTA, or explicit flow |
+| screen / page layout components | the ASCII wireframes in §3 — layout framing, component placement, and CTA positions match |
+| screen-level empty, loading, and error states | per-screen state specifications in §3 — every screen handles zero-data, skeleton loading, and fetch failure |
+| modal, drawer, and dialog invocation sites | modal and drawer flows in §4 — every trigger connects to the specified overlay flow |
+| user journey / flow implementations | the core user flows in §2 — step-by-step sequences match the documented flow |
+
+**What drift looks like here:** screens that exist in the codebase but are not in the inventory (§1.1) — usually added ad-hoc one at a time — orphan routes with no navigation path leading to them, screens with missing empty or error handling, wireframes that depict layouts different from what was implemented, and modal/drawer flows triggered from screens without an entry in §4.
 
 ---
 

@@ -205,7 +205,8 @@ test('every skill carries an identical copy of every shared reference', () => {
 
 test('every skill has valid frontmatter with name and description', () => {
   for (const skill of shippedSkills()) {
-    const body = fs.readFileSync(path.join(ROOT, 'skills', skill, 'SKILL.md'), 'utf8');
+    const raw = fs.readFileSync(path.join(ROOT, 'skills', skill, 'SKILL.md'), 'utf8');
+    const body = raw.replace(/\r\n/g, '\n');
     assert.ok(body.startsWith('---\n'), `${skill}: no frontmatter`);
     const fm = body.slice(4, body.indexOf('\n---', 4));
     assert.match(fm, /^name:\s*\S+/m, `${skill}: no name`);

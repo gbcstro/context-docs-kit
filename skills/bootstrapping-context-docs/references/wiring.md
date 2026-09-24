@@ -66,6 +66,7 @@ Look in `.docs/`, `docs/`, `doc/`, repo root, and any agent file. Common mapping
 | `architecture.md`, `design-doc.md`, `tech-design.md`, `adr/` | `ARCHITECTURE.md` |
 | `schema.md`, `data-model.md`, `erd.md` | `SCHEMA.md` |
 | `ui.md`, `design.md`, `style-guide.md`, `brand.md` | `DESIGN.md` |
+| `screens.md`, `views.md`, `wireframes.md`, `routes.md`, `flows.md` | `SCREENS.md` |
 | `ai-rules.md`, `conventions.md`, `contributing.md`, `standards.md` | `RULES.md` |
 
 **Reconcile — never silently adopt.** Inherited docs are the highest-risk input in this whole process: they look authoritative, they were often written early, and their assumptions are unexamined. Treat their content as *claims to verify*, exactly as you'd treat a confident answer with no cost attached.

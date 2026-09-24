@@ -10,6 +10,7 @@ context/
   ARCHITECTURE.md
   SCHEMA.md
   DESIGN.md
+  SCREENS.md
   RULES.md
   PROGRESS/
     PROGRESS_v1.md        v1 scope + checklist + acceptance criteria

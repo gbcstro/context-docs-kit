@@ -35,7 +35,8 @@ doc(s) before working in that area:
 | [`context/PRODUCT.md`](./context/PRODUCT.md) | Features, monetization, success metrics — the what and why |
 | [`context/ARCHITECTURE.md`](./context/ARCHITECTURE.md) | Tech stack, repo layout, system diagram, infra, build pipeline |
 | [`context/SCHEMA.md`](./context/SCHEMA.md) | Data model |
-| [`context/DESIGN.md`](./context/DESIGN.md) | UI/UX direction, navigation, visual system |
+| [`context/DESIGN.md`](./context/DESIGN.md) | Frontend design system, tokens, UI components, overlays, animations |
+| [`context/SCREENS.md`](./context/SCREENS.md) | Screen inventory, route map, wireframes, screen states, user flows |
 | [`context/RULES.md`](./context/RULES.md) | Coding conventions, git workflow, AI assistant rules |
 | [`context/PROGRESS/`](./context/PROGRESS/) | `PROGRESS_v<N>.md` is the current version's scope and checklist; `CHANGELOG_v<N>.md` records why anything changed during it |
 ```

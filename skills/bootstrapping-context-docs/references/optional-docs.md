@@ -12,6 +12,7 @@ Dropping is the common case, not the exception. A stub doc is worse than a missi
 |---|---|---|
 | `SCHEMA.md` | no persistent data — a pure CLI filter, a stateless transformer | config-file shape into `ARCHITECTURE.md` |
 | `DESIGN.md` | no GUI — CLI, library, daemon | CLI ergonomics / public API surface into `PRODUCT.md` |
+| `SCREENS.md` | no GUI — CLI, library, daemon | (omitted alongside `DESIGN.md`) |
 
 `PRODUCT.md`, `ARCHITECTURE.md`, and `RULES.md` are never dropped. Even a single-file script has a purpose, a stack, and conventions — those docs get short, not skipped.
 
