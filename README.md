@@ -10,6 +10,30 @@ Runs on **Claude Code, Codex, Gemini CLI and Antigravity**.
 
 ## Install
 
+### Using `skills` (Recommended)
+
+Install directly into your assistant via [`skills`](https://skills.sh):
+
+```bash
+# Install into the current project (.agents/skills/)
+npx skills add gbcstro/context-docs-kit
+
+# Or install globally across all projects on your machine
+npx skills add gbcstro/context-docs-kit -g
+
+# Install all skills non-interactively
+npx skills add gbcstro/context-docs-kit --all
+```
+
+To update skills when new versions land:
+
+```bash
+npx skills update
+```
+
+<details>
+<summary>Alternative: using context-docs-kit CLI</summary>
+
 ```bash
 npx context-docs-kit install
 ```
@@ -31,6 +55,8 @@ npx context-docs-kit install --target all
 | `--dry-run` | print what would happen, write nothing |
 
 `npx context-docs-kit list` shows what is installed where. `npx context-docs-kit uninstall` removes it — and only ever removes what it installed, tracked in a manifest at each install root, so a hand-written skill sitting in the same directory is never touched.
+
+</details>
 
 Restart your assistant afterwards.
 
