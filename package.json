@@ -1,6 +1,6 @@
 {
   "name": "context-docs-kit",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Bootstraps and maintains a project's context/ foundation docs (product, architecture, schema, design, rules) by interviewing you one question at a time. Installs as an Agent Skill into Claude Code, Codex, Gemini CLI or Antigravity.",
   "type": "module",
   "license": "MIT",

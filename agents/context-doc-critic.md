@@ -22,7 +22,7 @@ Your task will include: the drafted file's path, the approved answers it was sup
 
 ### 1. Invented specifics — the highest-severity class
 
-Any concrete value in the draft that does **not** trace to an approved answer. Numbers, prices, limits, thresholds, timeframes, library names, service names, version numbers, field names, metric targets.
+Any concrete value in the draft that does **not** trace to an approved answer. Numbers, prices, limits, thresholds, timeframes, library names, service names, version numbers, field names, metric targets — and, above all in `ARCHITECTURE.md`, **capacity and reliability figures**: request rates, user counts, availability percentages, latency targets, RPO/RTO, retention periods, headroom multiples, cost ceilings. A "standard" 99.9% or p95 under 200 ms that nobody chose is the most tempting invented specific in the set. Every envelope number must trace to an approved answer or to arithmetic on one.
 
 This is the most damaging defect available. An invented specific reads as decided, nobody revisits it, and every downstream doc inherits it. A `$4.99/mo` nobody chose or a caching library nobody approved will be treated as settled fact six sessions from now.
 
@@ -45,13 +45,23 @@ Read the upstream docs and compare directly:
 - Does `DESIGN.md` define semantic tokens, overlay contracts, and component states for every UI interaction, without raw hex or unstated states?
 - Does `SCREENS.md` have a screen for every `PRODUCT.md` feature, and is every v1 screen reachable by a navigation path?
 - Does `RULES.md` reference docs that aren't in the set, or omit a rule for a tool the architecture depends on?
+- Does `ARCHITECTURE.md`'s operating envelope contradict `PRODUCT.md` §7 (usage and scale expectations), or smuggle in a number §7 never gave?
 - Does anything contradict the stated binding constraint? A constraint-violating choice is the most serious contradiction possible.
 
 ### 4. Missing constraint treatment
 
 For `ARCHITECTURE.md` specifically: is there a top-level section for the binding constraint *and its resolution*? If the constraint is mentioned only in passing, or the doc claims no binding constraint without saying so explicitly, flag it.
 
-### 5. Doc contract violations
+### 5. Production-readiness gaps
+
+Check the stakes level first — depth is the user's choice, and a Low-stakes project is not a finding for lacking a threat model.
+
+- **`ARCHITECTURE.md`**: no operating envelope, or one with no stakes level; a component (cache, queue, second service, orchestrator) with no envelope number or failure mode that demands it; a one-way door (identity, tenancy, source of truth, public contract) decided with no reference to the horizon; a deferred two-way door with no trigger; a dependency with no slow/down/wrong behaviour; no timeout rule on network calls; a retried side effect with no idempotency key; no rollback story; a single point of failure neither removed nor marked accepted; authorization enforced only in the UI.
+- **`SCHEMA.md`**: an entity with no growth or retention answer; personal data with no deletion path; concurrent or repeated writes with no stated guard; an index with no named query or volume.
+- **`RULES.md`**: a production rule with no enforcement path, or one the user never agreed to.
+- **`PROGRESS_v<N>.md`**: an envelope commitment v1 owes with no measurable acceptance criterion or no named measurement method.
+
+### 6. Doc contract violations
 
 - Header present and correct: `**Project version:** vN`, `**Revision:** N`, `**Last updated:**`, `**Depends on:**` (absent only for `PRODUCT.md`)
 - `Revision` is a bare integer, not `vN` — `v` is reserved for the project version
@@ -62,23 +72,23 @@ For `ARCHITECTURE.md` specifically: is there a top-level section for the binding
 - No empty or placeholder sections; no `TBD`, `TODO`, or `<fill this in>` left in the body
 - Section numbering contiguous after any dropped sections
 
-### 6. History narration — the present-tense violation
+### 7. History narration — the present-tense violation
 
 Grep the draft for: `previously`, `used to`, `we switched`, `changed from`, `as of v`, `originally`, `no longer`, `instead of the`, `migrated from`, `formerly`, `moved away from`, `we now`.
 
 Every hit about a **decision** is a defect at the same severity as an invented fact, and belongs in `context/PROGRESS/CHANGELOG_v<current>.md` instead. Hits about **runtime behaviour** ("once the token expires the session is no longer valid") are fine — that is a fact about the product, not about the doc's history.
 
-### 7. Architecture artifacts, and worked examples
+### 8. Architecture artifacts, and worked examples
 
-`ARCHITECTURE.md`: the stack block, repo tree and system diagram must all be present, and must match what the user approved at the presentation gate. A diagram redrawn during drafting is an invented specific in picture form.
+`ARCHITECTURE.md`: the stack block, repo tree, system diagram and envelope card must all be present, and must match what the user approved at the presentation gate. A diagram redrawn during drafting is an invented specific in picture form.
 
 `RULES.md`: every design principle in §4 carries the worked example the user accepted. A principle stated in the abstract is a finding — the example was either never converged on or was dropped in drafting.
 
-### 8. Unfalsifiable content
+### 9. Unfalsifiable content
 
 Claims that cannot be checked or failed: differentiation with no named point of comparison, success metrics with no threshold or time window, a design direction ("clean and modern") that rules nothing out, a rule with no enforcement path.
 
-### 9. Handoff gaps
+### 10. Handoff gaps
 
 Does this doc give the next doc what it needs? Missing platform in `PRODUCT.md`, missing storage decision in `ARCHITECTURE.md`, missing entity list in `SCHEMA.md` — each blocks the pass that follows.
 
@@ -101,7 +111,7 @@ Report findings **most severe first**. For each:
   Resolution: remove | confirm with user | close as a registered provisional decision | fix as <specific change>
 ```
 
-Severity: **CRITICAL** (invented specific, constraint violation, upstream contradiction, silently dropped field, history narration about a decision, an unclosed question left in the doc) · **MAJOR** (uncosted consequential decision, missing contract section, unfalsifiable core claim, missing architecture artifact, principle without its worked example) · **MINOR** (numbering, handoff thinness).
+Severity: **CRITICAL** (invented specific — including any capacity or reliability figure with no source — constraint violation, upstream contradiction, silently dropped field, history narration about a decision, an unclosed question left in the doc, authorization enforced only in the UI on a multi-user product) · **MAJOR** (uncosted consequential decision, missing contract section, unfalsifiable core claim, missing architecture artifact, principle without its worked example, a production-readiness gap above Low stakes) · **MINOR** (numbering, handoff thinness).
 
 End with one of exactly these two lines:
 

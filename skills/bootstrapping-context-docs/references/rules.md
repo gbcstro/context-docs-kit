@@ -18,6 +18,7 @@ You are a staff engineer writing the conventions document, and you understand th
 - **Style rules that a formatter already handles.** If Prettier or gofmt enforces it, the rule is "run the formatter" — not a paragraph about brace placement.
 - **Secrets handling left implicit.** It gets a section, always, even for a solo hobby project.
 - **A design principle with no worked example.** A principle name is not a rule anyone can follow. §4 carries the example the user accepted, or the principle does not appear.
+- **Production decisions that never become rules.** The architecture says every network call has a timeout, migrations stay compatible with the previous release, and logs carry no personal data — and nothing in the repo stops a contributor, or an assistant, from doing the opposite. §11 turns each decision the user made into a rule with an enforcement path, and writes no rule the user did not agree to.
 
 **The core insight:** every other doc in the set describes decisions. This one describes **how those decisions stay true.** Its §2 is addressed to future AI assistants, not to the human author.
 
@@ -37,6 +38,10 @@ Six rules earn their place. Adapt the wording; keep the substance:
 4. **No speculative scope.** Don't add features beyond `PRODUCT.md`, or beyond the current version's checklist in `context/PROGRESS/PROGRESS_v<current>.md`, without checking first. The checklist is what this version is committed to; anything outside it is a conversation, not a task.
 5. **Ask, don't guess.** When a requirement is ambiguous, ask rather than silently picking an interpretation.
 6. **Wireframe before building UI** (only if `DESIGN.md` or `SCREENS.md` exists). Present an ASCII wireframe reflecting the visual system and screen layout for approval before writing component code.
+
+**A seventh rule, when stakes are above Low** (`references/production-readiness.md`):
+
+7. **Check changes against the envelope.** Before changing a hot path, a call to an external dependency, a migration, or anything covered by a retention or deletion rule, read `ARCHITECTURE.md` §Operating Envelope and §Reliability & Failure Modes and the matching part of `SCHEMA.md`. If the change would break a number or a failure-mode rule there, say so and ask rather than shipping it.
 
 Add project-specific rules — but confirm each with the user; don't invent obligations they never agreed to.
 
@@ -158,7 +163,7 @@ the project believes, it shows what the project does.
 Most answers are already implied by the approved docs. **Read them and propose, rather than asking cold** — a question whose answer is sitting in `ARCHITECTURE.md` wastes the user's attention.
 
 ### 1. AI-assistant rules
-Present the six above, adapted to this project, for confirmation. Ask what else has bitten them before that's worth encoding.
+Present the six above — seven when stakes are above Low — adapted to this project, for confirmation. Ask what else has bitten them before that's worth encoding.
 
 ### 2. Code organization
 Derived from `ARCHITECTURE.md` §3. State what belongs in each app/package and — more usefully — the rule for deciding where new code goes. "Needed by more than one app? It's a shared package."
@@ -184,9 +189,23 @@ Is there a committed `.env.example` documenting every variable? Confirm the real
 Derived from `ARCHITECTURE.md` and `SCHEMA.md`. The tool per store, the rule that schema changes go through it rather than manual edits, and the lockstep rule: **a schema change isn't complete until `SCHEMA.md` reflects it.**
 
 ### 9. Ops runbook
-Only if the project has infrastructure. Backups (what, where, how often), network exposure, deploy sequence, rollback. Resolves items other docs flagged as operational.
+Only if the project has infrastructure. Backups (what, where, how often, **and how a restore is run**), network exposure, deploy sequence, rollback. Resolves items other docs flagged as operational.
 
-### 10. Nothing left open
+### 10. Production standards
+Only above Low stakes, though a Low project still gets the secrets and timeout lines. **Read `ARCHITECTURE.md` and `SCHEMA.md` and propose; do not ask cold.** Turn each production decision the user already made into a rule, and for each name its enforcement path — lint rule, CI check, test, review step, or judgment call:
+
+| Decision made in | Rule it becomes | Typical enforcement |
+|---|---|---|
+| Reliability & Failure Modes | every outbound call goes through the project's client with a timeout; retries only through the retry helper; side-effecting handlers accept an idempotency key | lint rule banning the raw client; a test per handler |
+| Data Lifecycle & Volume / Database & Migrations | migrations are backward-compatible with the previous release (expand, then contract); backfills run in batches | migration lint in CI; review checklist |
+| Observability | structured logs with the correlation ID; every new endpoint or job emits the agreed metrics; no secrets or personal data in logs | logger wrapper; test on the redaction list; review |
+| Operating Envelope | the latency target is checked against the seeded dataset; the stated ceiling is re-tested before a release that changes a hot path | load test in CI or a pre-release step |
+| Hosting, Deploy & Rollback | required CI checks before merge; the rollback procedure is exercised, not just written | branch protection; a scheduled drill |
+| Security Baseline | new dependencies pass the vulnerability scan; authorization is enforced in the data layer, never only in the UI | scanner in CI; a test per tenant-scoped query |
+
+Offer only the rows the project's stakes warrant, and **confirm each rule** — an obligation the user never agreed to is one they will violate in week two, taking the authority of the agreed rules with it. A rule whose only enforcement is "be careful" is a judgment call and is labelled as one.
+
+### 11. Nothing left open
 Sweep back over the pass: decided, provisionally decided and registered, or descoped. `references/closing-questions.md`. A rule nobody could settle is not written down vaguely — it is left out, and that absence is the decision.
 
 ---
@@ -223,6 +242,7 @@ user accepted. No principle appears without its example.>
 ## 8. Environment & Secrets
 ## 9. Database Migrations
 ## 10. Ops Runbook            <- only if the project has infrastructure
+## 11. Production Standards   <- only above Low stakes; each rule with its enforcement path
 ## 12. Next Steps
 ```
 
@@ -236,4 +256,4 @@ This is the last doc in the chain. Its `## Next Steps` points at the wiring step
 
 Then run `references/wiring.md` §3. This is the doc whose §2 reaches the agent file — as an `@`-import on hosts that support one, or copied verbatim between markers on hosts that do not (`references/hosts.md`). Either way §2 is the part that actually executes. Everything else in the set is discoverable; §2 is unconditional.
 
-`PROGRESS_v1.md` comes after the wiring, and it needs one thing from here: the testing posture, because "done" in an acceptance criterion means whatever §7 says it means.
+`PROGRESS_v1.md` comes after the wiring, and it needs two things from here: the testing posture, because "done" in an acceptance criterion means whatever §7 says it means, and the enforcement paths in §11, because a non-functional criterion is only checkable if the check exists.

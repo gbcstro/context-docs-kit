@@ -2,7 +2,7 @@
 
 The closure is done. Now decide what the next version is, with the same
 discipline bootstrap used: one question at a time, a recommendation with each,
-real costs on consequential choices, and park what is undecided.
+real costs on consequential choices, and close what is undecided.
 
 **The failure this prevents:** vN+1 becomes "everything we didn't finish plus
 everything anyone mentioned". A version defined that way is uncloseable on the
@@ -60,7 +60,25 @@ scope you are about to agree.
 > that changed? And is there anything new that can't be traded away this time —
 > the sync work usually drags a hosting cost and a data-residency question with it.
 
-### 4. What is in, one item at a time?
+### 4. Has the operating envelope moved?
+
+A version is where load, data and stakes change without anyone deciding they
+should. Re-ask `ARCHITECTURE.md`'s Operating Envelope against reality, not memory:
+
+- **Measured versus stated.** Real traffic, table sizes, p95s, the cloud bill against the card's numbers. Has the ceiling been reached? Has a deferral trigger fired?
+- **Stakes.** Paying customers, other people's data, a regulated domain, an on-call rotation — anything that raises the stakes level raises the depth of failure-mode treatment, observability, security and rollback.
+- **The next version's load.** What does this scope do to the numbers — a sync service multiplies writes, a public API adds clients you cannot redeploy, a new tenant model touches every table.
+
+> v1 designed for ~200 users and a ~60 rps ceiling. Real peak is ~45 rps, and
+> offline sync roughly triples write volume. Does the ceiling move for v2 — and
+> is the first bottleneck still the primary's write connections?
+
+Any one-way door the new scope touches (identity, tenancy, the public contract,
+the sync model) is priced against the horizon before it is chosen
+(`references/production-readiness.md`). If the envelope changed, it is a content
+change to `ARCHITECTURE.md` and goes through a full gated pass.
+
+### 5. What is in, one item at a time?
 
 For each candidate, get to a **shippable slice** with **acceptance criteria**,
 the same altitude as v1's checklist. If the user cannot say what would prove it
@@ -73,7 +91,7 @@ Apply the pros/cons discipline to anything consequential. A new version is where
 vendors get chosen, and a vendor recorded without confirmation poisons the docs
 just as thoroughly as it did in bootstrap.
 
-### 5. What is explicitly out?
+### 6. What is explicitly out?
 
 Ask directly, and write it down. The out-of-scope list is what stops the same
 argument recurring three times, and it is the section a future reader uses to
@@ -81,13 +99,13 @@ tell "we decided against it" from "we forgot".
 
 Anything dropped at closure goes here, with its reason.
 
-### 6. What has to be true for this to close?
+### 7. What has to be true for this to close?
 
 The exit criteria. Usually "every item met and the user says so", but ask whether
 anything else gates it — a deploy, a migration run against real data, someone
 else's review. Write down what you learn.
 
-### 7. Nothing left open
+### 8. Nothing left open
 
 Sweep the whole pass. Every question is decided, provisionally decided and
 registered in the new §4, or descoped — `references/closing-questions.md`. The
@@ -103,7 +121,7 @@ stays in force, and the entry moves across unchanged.
 Three questions once scope is agreed:
 
 1. **Does any doc need real content changes?** Those go through a full gated pass, and are logged in `CHANGELOG_v<N+1>.md`.
-2. **Does the doc set change?** New scope sometimes adds a doc — `DESIGN.md` and `SCREENS.md` when a UI arrives, a `SECURITY.md` when the data gets sensitive. Splice it into the chain per the bootstrap skill's `references/optional-docs.md`.
+2. **Does the doc set change?** New scope sometimes adds a doc — `DESIGN.md` and `SCREENS.md` when a UI arrives, a `SECURITY.md` when the data gets sensitive, an `OPS.md` when stakes reach High. Splice it into the chain per the bootstrap skill's `references/optional-docs.md`.
 3. **Do `RULES.md` §4's worked examples still describe real seams?** New architecture moves seams. An example describing a structure the new version replaces teaches the wrong thing.
 
 ---

@@ -272,5 +272,118 @@ test('every skill ships the closing-questions reference', () => {
   }
 });
 
+
+console.log('\nconsistency');
+
+/** Every .md file under the shipped content, as [absolute path, body]. */
+function shippedMarkdown() {
+  const out = [];
+  const walk = (dir) => {
+    for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+      const p = path.join(dir, e.name);
+      if (e.isDirectory()) walk(p);
+      else if (e.name.endsWith('.md')) out.push([p, fs.readFileSync(p, 'utf8')]);
+    }
+  };
+  for (const d of ['skills', 'agents', 'shared']) walk(path.join(ROOT, d));
+  return out;
+}
+
+test('every numbered doc skeleton has contiguous section numbers', () => {
+  // A skeleton that skips a number (the hole an Open Questions section left
+  // behind) teaches the drafter to emit the same gap, and the critic then flags
+  // "numbering not contiguous" on a doc that followed the template exactly.
+  const offenders = [];
+  for (const [file, body] of shippedMarkdown()) {
+    const blocks = body.replace(/\r\n/g, '\n').split(/^```.*$/m).filter((_, i) => i % 2 === 1);
+    for (const block of blocks) {
+      const nums = [...block.matchAll(/^## (\d+)\. /gm)].map((m) => Number(m[1]));
+      if (nums.length < 3 || nums[0] !== 1) continue; // not a full skeleton
+      nums.forEach((n, i) => {
+        if (n !== i + 1) offenders.push(`${path.relative(ROOT, file)}: expected ${i + 1}, found ${n}`);
+      });
+    }
+  }
+  assert.deepEqual([...new Set(offenders)], [], `non-contiguous skeleton: ${[...new Set(offenders)].join('; ')}`);
+});
+
+test('no stale "park it" language survives the closing-questions rule', () => {
+  // Questions are closed, never parked. Leftover instructions to park contradict
+  // the rule and are the first thing a model follows.
+  const stale = /\bpark (it|the (price|principle)|what is undecided)\b|\bor park\b|parked question|explicitly parked|unknowns parked|park the principle/i;
+  const offenders = [];
+  for (const [file, body] of shippedMarkdown()) {
+    for (const [i, line] of body.split('\n').entries()) {
+      if (stale.test(line)) offenders.push(`${path.relative(ROOT, file)}:${i + 1}`);
+    }
+  }
+  assert.deepEqual(offenders, [], `stale parking language in: ${offenders.join(', ')}`);
+});
+
+test('every references/<file>.md a skill points at is shipped inside that skill', () => {
+  // Skills install on their own, so a pointer to a reference that lives only in a
+  // sibling skill is a dead link at runtime. Pointers that name the bootstrap
+  // skill explicitly are deliberate and exempt.
+  const offenders = [];
+  for (const skill of shippedSkills()) {
+    const refDir = path.join(ROOT, 'skills', skill, 'references');
+    const have = new Set(fs.readdirSync(refDir));
+    const walk = (d) => {
+      for (const e of fs.readdirSync(d, { withFileTypes: true })) {
+        const p = path.join(d, e.name);
+        if (e.isDirectory()) walk(p);
+        else if (e.name.endsWith('.md')) {
+          for (const [i, line] of fs.readFileSync(p, 'utf8').split('\n').entries()) {
+            if (/bootstrap skill/i.test(line)) continue;
+            for (const m of line.matchAll(/references\/([A-Za-z0-9_-]+\.md)/g)) {
+              if (!have.has(m[1])) offenders.push(`${path.relative(ROOT, p)}:${i + 1} -> ${m[1]}`);
+            }
+          }
+        }
+      }
+    };
+    walk(path.join(ROOT, 'skills', skill));
+  }
+  assert.deepEqual(offenders, [], `dangling reference: ${offenders.join('; ')}`);
+});
+
+test('every skill ships the production-readiness reference, and the bootstrap skill loads it', () => {
+  for (const skill of shippedSkills()) {
+    const ref = path.join(ROOT, 'skills', skill, 'references', 'production-readiness.md');
+    assert.ok(fs.existsSync(ref), `${skill} is missing production-readiness.md`);
+  }
+  for (const file of ['SKILL.md', 'references/architecture.md', 'references/product.md']) {
+    const body = fs.readFileSync(path.join(ROOT, 'skills', 'bootstrapping-context-docs', file), 'utf8');
+    assert.match(body, /production-readiness\.md/, `bootstrapping-context-docs/${file} never points at it`);
+  }
+});
+
+test('agent templates and skill references agree on the section list of each doc they both define', () => {
+  // The persona agent writes the doc; the reference defines it. If the two skeletons
+  // list different headings, the drafted doc and the critic's checklist disagree.
+  const pairs = [
+    ['product-strategist', 'product'],
+    ['solutions-architect', 'architecture'],
+    ['data-modeler', 'schema'],
+    ['engineering-standards', 'rules'],
+  ];
+  const norm = (h) => h.replace(/<[^>]*>/g, '').replace(/\s*<-.*$/, '').replace(/[^a-z& ]/gi, '').replace(/\s+/g, ' ').trim().toLowerCase();
+  const headings = (body) => {
+    const block = body.replace(/\r\n/g, '\n').split(/^```.*$/m).filter((_, i) => i % 2 === 1).find((b) => /^## 1\. /m.test(b));
+    return [...block.matchAll(/^## (\d+)\. (.+)$/gm)].map((m) => `${m[1]} ${norm(m[2])}`);
+  };
+  const offenders = [];
+  for (const [agent, ref] of pairs) {
+    const a = headings(fs.readFileSync(path.join(ROOT, 'agents', `${agent}.md`), 'utf8'));
+    const r = headings(fs.readFileSync(path.join(ROOT, 'skills', 'bootstrapping-context-docs', 'references', `${ref}.md`), 'utf8'));
+    // Agent templates carry a few extra qualifiers; compare the leading words only.
+    const lead = (x) => x.map((h) => h.split(' ').slice(0, 3).join(' '));
+    if (JSON.stringify(lead(a)) !== JSON.stringify(lead(r))) {
+      offenders.push(`${agent} vs ${ref}:\n         agent: ${lead(a).join(' | ')}\n         ref:   ${lead(r).join(' | ')}`);
+    }
+  }
+  assert.deepEqual(offenders, [], offenders.join('\n       '));
+});
+
 console.log(`\n${passed} passed, ${failed} failed\n`);
 process.exit(failed ? 1 : 0);
