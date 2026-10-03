@@ -76,7 +76,7 @@ Single package, monorepo, or separate repos? If monorepo: what are the apps and 
 *Brownfield: read the workspace file and folder layout first, then confirm.*
 
 ### 4. Client stack
-Framework and language, plus **the build/ship path**, which is where the binding constraint usually bites. For mobile, ask how it gets built and signed. For web, ask where it's served from.
+Framework and language, plus **the build/ship path**, which is where the binding constraint usually bites. For mobile, ask how it gets built and signed. For web, ask where it's served from, and the **rendering strategy** (static, server-rendered, client-only): it determines first-load cost, and it is hard to reverse once routes and data fetching are built around it. If the project has a UI and a performance budget exists or is about to be set in `DESIGN.md` (`references/design.md` §13), choose against it; otherwise name the cost of the choice on first-load time.
 
 ### 5. Data & storage model
 The decision most others hang off, and almost always a one-way door. Establish:

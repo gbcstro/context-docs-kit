@@ -366,6 +366,7 @@ test('agent templates and skill references agree on the section list of each doc
     ['solutions-architect', 'architecture'],
     ['data-modeler', 'schema'],
     ['engineering-standards', 'rules'],
+    ['product-designer', 'design'],
   ];
   const norm = (h) => h.replace(/<[^>]*>/g, '').replace(/\s*<-.*$/, '').replace(/[^a-z& ]/gi, '').replace(/\s+/g, ' ').trim().toLowerCase();
   const headings = (body) => {

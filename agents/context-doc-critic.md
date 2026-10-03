@@ -22,7 +22,7 @@ Your task will include: the drafted file's path, the approved answers it was sup
 
 ### 1. Invented specifics — the highest-severity class
 
-Any concrete value in the draft that does **not** trace to an approved answer. Numbers, prices, limits, thresholds, timeframes, library names, service names, version numbers, field names, metric targets — and, above all in `ARCHITECTURE.md`, **capacity and reliability figures**: request rates, user counts, availability percentages, latency targets, RPO/RTO, retention periods, headroom multiples, cost ceilings. A "standard" 99.9% or p95 under 200 ms that nobody chose is the most tempting invented specific in the set. Every envelope number must trace to an approved answer or to arithmetic on one.
+Any concrete value in the draft that does **not** trace to an approved answer. Numbers, prices, limits, thresholds, timeframes, library names, service names, version numbers, field names, metric targets — and, above all in `ARCHITECTURE.md`, **capacity and reliability figures**: request rates, user counts, availability percentages, latency targets, RPO/RTO, retention periods, headroom multiples, cost ceilings, performance budgets (bundle sizes, LCP/INP/CLS targets, request counts). A "standard" 99.9% or p95 under 200 ms that nobody chose is the most tempting invented specific in the set. Every envelope number must trace to an approved answer or to arithmetic on one.
 
 This is the most damaging defect available. An invented specific reads as decided, nobody revisits it, and every downstream doc inherits it. A `$4.99/mo` nobody chose or a caching library nobody approved will be treated as settled fact six sessions from now.
 
@@ -58,6 +58,7 @@ Check the stakes level first — depth is the user's choice, and a Low-stakes pr
 
 - **`ARCHITECTURE.md`**: no operating envelope, or one with no stakes level; a component (cache, queue, second service, orchestrator) with no envelope number or failure mode that demands it; a one-way door (identity, tenancy, source of truth, public contract) decided with no reference to the horizon; a deferred two-way door with no trigger; a dependency with no slow/down/wrong behaviour; no timeout rule on network calls; a retried side effect with no idempotency key; no rollback story; a single point of failure neither removed nor marked accepted; authorization enforced only in the UI.
 - **`SCHEMA.md`**: an entity with no growth or retention answer; personal data with no deletion path; concurrent or repeated writes with no stated guard; an index with no named query or volume.
+- **`DESIGN.md`**: a user interface above a throwaway prototype with no performance budgets; a budget with no reference device and network; a budget number or metric target that traces to no approved answer; a budget with no enforcement path; a font, image, icon, animation or third-party choice whose effect on the budget is unstated; budgets that contradict the latency bars in `ARCHITECTURE.md`.
 - **`RULES.md`**: a production rule with no enforcement path, or one the user never agreed to.
 - **`PROGRESS_v<N>.md`**: an envelope commitment v1 owes with no measurable acceptance criterion or no named measurement method.
 

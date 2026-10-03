@@ -112,7 +112,12 @@ nobody has restored is a hope.
 ### E4. Latency
 Which one to three user-visible interactions have a felt latency bar, the target
 (the user's number), and **how it is measured** — where, over what window, at what
-percentile. Background work is exempt unless a user waits on it.
+percentile. Background work is exempt unless a user waits on it. For a project with a user
+interface, the client side of latency is settled in the design pass as **performance
+budgets** — reference device and network, experience-metric targets, resource
+budgets per route class, each with an enforcement path (`DESIGN.md` §Performance
+Budgets, when the bootstrap skill's design pass is in the set). The server-side
+targets here and those budgets must not contradict each other.
 
 ### E5. The first bottleneck, and the seam
 Given E1–E4, name the first component that breaks as load grows, at roughly what
@@ -250,6 +255,7 @@ every delta.
 | E7 | `ARCHITECTURE.md` §Observability |
 | E8 | `ARCHITECTURE.md` §Security Baseline; `SCHEMA.md` §Data Lifecycle & Volume for retention and deletion |
 | E9 | `ARCHITECTURE.md` §Hosting, Deploy & Rollback; `RULES.md` §Production Standards |
+| E4 on the client | `DESIGN.md` §Performance Budgets, enforced through `RULES.md` §Production Standards |
 | E2 | `SCHEMA.md` §Data Lifecycle & Volume |
 | Every commitment v1 owes | `PROGRESS_v<N>.md` as a measurable acceptance criterion |
 

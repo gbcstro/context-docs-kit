@@ -29,7 +29,7 @@ Any concrete value that does not trace to an approved answer: numbers, prices,
 limits, thresholds, timeframes, library names, service names, versions, field
 names, metric targets — and, in `ARCHITECTURE.md` especially, **capacity and
 reliability figures**: request rates, user counts, availability percentages,
-latency targets, RPO/RTO, retention periods, headroom multiples. A "standard"
+latency targets, RPO/RTO, retention periods, headroom multiples, **performance budgets** (bundle sizes, LCP/INP/CLS targets, request counts). A "standard"
 99.9% or p95 under 200 ms that no one chose is the most tempting invented
 specific in the set. Every envelope number must trace to the user, or to
 arithmetic on the user's numbers.
@@ -87,6 +87,7 @@ a threat model. Then:
 
 - **`ARCHITECTURE.md`**: no operating envelope, or an envelope with no stakes level; a component (cache, queue, second service, orchestrator) with no envelope number or failure mode that demands it; a one-way door (identity, tenancy, source of truth, public contract) decided with no reference to the horizon; a deferred two-way door with no trigger; a dependency with no slow/down/wrong behaviour; a network call with no timeout rule; a retried side effect with no idempotency key; no rollback story; a single point of failure that is neither removed nor marked accepted; authorization enforced only in the UI.
 - **`SCHEMA.md`**: an entity with no growth or retention answer; personal data with no deletion path; concurrent or repeated writes with no stated guard; an index with no named query or volume.
+- **`DESIGN.md`**: a user interface above a throwaway prototype with no performance budgets; a budget with no reference device and network; a budget number or metric target that traces to no approved answer; a budget with no enforcement path; a font, image, icon, animation or third-party choice whose effect on the budget is unstated; budgets that contradict the latency bars in `ARCHITECTURE.md`.
 - **`RULES.md`**: a production rule with no enforcement path; a production rule the user never agreed to.
 - **`PROGRESS_v<N>.md`**: an envelope commitment v1 owes with no measurable acceptance criterion, or a criterion with no named measurement method.
 

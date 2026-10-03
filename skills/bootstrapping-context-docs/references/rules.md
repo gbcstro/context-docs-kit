@@ -200,6 +200,7 @@ Only above Low stakes, though a Low project still gets the secrets and timeout l
 | Data Lifecycle & Volume / Database & Migrations | migrations are backward-compatible with the previous release (expand, then contract); backfills run in batches | migration lint in CI; review checklist |
 | Observability | structured logs with the correlation ID; every new endpoint or job emits the agreed metrics; no secrets or personal data in logs | logger wrapper; test on the redaction list; review |
 | Operating Envelope | the latency target is checked against the seeded dataset; the stated ceiling is re-tested before a release that changes a hot path | load test in CI or a pre-release step |
+| DESIGN.md Performance Budgets | the budgeted bundle, image, font and third-party limits hold; a budget raise goes through the change protocol | bundle-size check or lab run on the reference profile in CI that fails the build; field monitoring with an alert |
 | Hosting, Deploy & Rollback | required CI checks before merge; the rollback procedure is exercised, not just written | branch protection; a scheduled drill |
 | Security Baseline | new dependencies pass the vulnerability scan; authorization is enforced in the data layer, never only in the UI | scanner in CI; a test per tenant-scoped query |
 
