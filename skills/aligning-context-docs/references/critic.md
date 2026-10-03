@@ -10,8 +10,8 @@ it finds nothing — the blind spot that produced the draft is still loaded. Fin
 the draft, stop, then read the file as if someone else wrote it and you have been
 asked to find what is wrong with it before the user sees it.
 
-**Read-only.** Produce findings. The decision about what to fix and what to park
-comes after, in the main conversation.
+**Read-only.** Produce findings. The decision about what to fix and what to close
+as a provisional decision comes after, in the main conversation.
 
 ## What you need in front of you
 
@@ -27,7 +27,12 @@ if you did not open the doc being contradicted.
 
 Any concrete value that does not trace to an approved answer: numbers, prices,
 limits, thresholds, timeframes, library names, service names, versions, field
-names, metric targets.
+names, metric targets — and, in `ARCHITECTURE.md` especially, **capacity and
+reliability figures**: request rates, user counts, availability percentages,
+latency targets, RPO/RTO, retention periods, headroom multiples, **performance budgets** (bundle sizes, LCP/INP/CLS targets, request counts). A "standard"
+99.9% or p95 under 200 ms that no one chose is the most tempting invented
+specific in the set. Every envelope number must trace to the user, or to
+arithmetic on the user's numbers.
 
 The most damaging defect available. An invented specific reads as decided, nobody
 revisits it, and every downstream doc inherits it. Quote it, locate it, and say
@@ -54,6 +59,7 @@ monetization, identity strategy, hosting.
 - Does `DESIGN.md` define semantic tokens, overlay contracts, and component states for every UI interaction, without raw hex or unstated states?
 - Does `SCREENS.md` have a screen for every feature, and is every screen reachable by a navigation path?
 - Does `RULES.md` reference docs outside the set, or omit a rule for a tool the architecture depends on?
+- Does `ARCHITECTURE.md`'s operating envelope contradict `PRODUCT.md` §7 (usage and scale expectations), or smuggle in a number §7 never gave?
 - Does anything contradict the binding constraint? That is the most serious contradiction possible.
 
 ### 4. History narration — the present-tense violation
@@ -73,20 +79,32 @@ and belongs in `CHANGELOG_v<current>.md` instead. Hits about *runtime behaviour*
 **and its resolution**? A constraint mentioned in passing, or a claim of no
 binding constraint that is not stated explicitly, is a finding.
 
-### 6. Architecture artifacts missing or unapproved
+### 6. Production-readiness gaps
 
-`ARCHITECTURE.md` only: the stack block, the repo tree, and the system diagram
-must all be present, and must match what the user actually approved in the
-presentation gate. A diagram redrawn during drafting is an invented specific in
+Read against `references/production-readiness.md`. Check the stakes level first —
+depth is the user's choice, and a Low-stakes project is not a finding for lacking
+a threat model. Then:
+
+- **`ARCHITECTURE.md`**: no operating envelope, or an envelope with no stakes level; a component (cache, queue, second service, orchestrator) with no envelope number or failure mode that demands it; a one-way door (identity, tenancy, source of truth, public contract) decided with no reference to the horizon; a deferred two-way door with no trigger; a dependency with no slow/down/wrong behaviour; a network call with no timeout rule; a retried side effect with no idempotency key; no rollback story; a single point of failure that is neither removed nor marked accepted; authorization enforced only in the UI.
+- **`SCHEMA.md`**: an entity with no growth or retention answer; personal data with no deletion path; concurrent or repeated writes with no stated guard; an index with no named query or volume.
+- **`DESIGN.md`**: a user interface above a throwaway prototype with no performance budgets; a budget with no reference device and network; a budget number or metric target that traces to no approved answer; a budget with no enforcement path; a font, image, icon, animation or third-party choice whose effect on the budget is unstated; budgets that contradict the latency bars in `ARCHITECTURE.md`.
+- **`RULES.md`**: a production rule with no enforcement path; a production rule the user never agreed to.
+- **`PROGRESS_v<N>.md`**: an envelope commitment v1 owes with no measurable acceptance criterion, or a criterion with no named measurement method.
+
+### 7. Architecture artifacts missing or unapproved
+
+`ARCHITECTURE.md` only: the stack block, the repo tree, the system diagram and the
+envelope card must all be present, and must match what the user actually approved
+in the presentation gate. A diagram redrawn during drafting is an invented specific in
 picture form.
 
-### 7. Worked examples missing
+### 8. Worked examples missing
 
 `RULES.md` only: every design principle in §4 carries the worked example the user
 accepted. A principle stated in the abstract, with no example, is a finding — it
 was either never converged on, or the example was dropped in drafting.
 
-### 8. Doc contract violations
+### 9. Doc contract violations
 
 - Header present and correct: `**Project version:** vN`, `**Revision:** N`, `**Last updated:**`, `**Depends on:**` (absent only for `PRODUCT.md`)
 - `Revision` is a bare integer, not `v3` — `v` is reserved for the project version
@@ -98,13 +116,13 @@ was either never converged on, or the example was dropped in drafting.
 - No empty or placeholder sections; no `TBD`, `TODO`, or `<fill this in>` in the body
 - Section numbering contiguous after any dropped sections
 
-### 9. Unfalsifiable content
+### 10. Unfalsifiable content
 
 Claims that cannot be checked or failed: differentiation with no named point of
 comparison, success metrics with no threshold or window, a design direction
 ("clean and modern") that rules nothing out, a rule with no enforcement path.
 
-### 10. Handoff gaps
+### 11. Handoff gaps
 
 Does this doc give the next one what it needs? A missing platform in
 `PRODUCT.md`, a missing storage decision in `ARCHITECTURE.md`, a missing entity
@@ -131,8 +149,8 @@ Most severe first:
   Resolution: remove | confirm with user | close as a registered provisional decision | fix as <specific change>
 ```
 
-**CRITICAL** — invented specific, constraint violation, upstream contradiction, silently dropped field, history narration about a decision, an unclosed question left in the doc.
-**MAJOR** — uncosted consequential decision, missing contract section, unfalsifiable core claim, missing architecture artifact, principle without its worked example.
+**CRITICAL** — invented specific (including any capacity or reliability figure with no source), constraint violation, upstream contradiction, silently dropped field, history narration about a decision, an unclosed question left in the doc, authorization enforced only in the UI on a multi-user product.
+**MAJOR** — uncosted consequential decision, missing contract section, unfalsifiable core claim, missing architecture artifact, principle without its worked example, a production-readiness gap above Low stakes (no envelope, no failure-mode treatment, no rollback, a one-way door chosen blind, a component with no number behind it).
 **MINOR** — numbering, handoff thinness.
 
 End with exactly one of:

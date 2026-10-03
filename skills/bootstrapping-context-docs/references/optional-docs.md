@@ -27,8 +27,8 @@ Add only when the concern is (a) substantial enough that it would dominate a hos
 | Doc | Add when | Depends on |
 |---|---|---|
 | `PROTOCOL.md` | a public API or wire format others build against — its contract needs versioning independent of internals | PRODUCT, ARCHITECTURE, SCHEMA |
-| `OPS.md` | non-trivial infrastructure: multiple environments, on-call, SLOs. Otherwise a `RULES.md` section suffices | ARCHITECTURE |
-| `SECURITY.md` | a real threat model, compliance regime, or untrusted-input surface | ARCHITECTURE, SCHEMA |
+| `OPS.md` | High stakes (`references/production-readiness.md`), or non-trivial infrastructure: multiple environments, on-call, availability targets that need a runbook, a capacity plan. Otherwise `ARCHITECTURE.md` §Hosting, Deploy & Rollback and `RULES.md` §Ops Runbook suffice | ARCHITECTURE, RULES |
+| `SECURITY.md` | High stakes, a real threat model, a compliance regime, or an untrusted-input surface larger than a login form. Otherwise `ARCHITECTURE.md` §Security Baseline suffices | ARCHITECTURE, SCHEMA |
 | `ML.md` | models are part of the product: training data, evaluation, drift, retraining | PRODUCT, ARCHITECTURE, SCHEMA |
 | `INTEGRATIONS.md` | several third-party systems each with its own auth, rate limits, and failure modes | ARCHITECTURE |
 | `CONTENT.md` | editorial or i18n concerns are a product surface, not just strings | PRODUCT, DESIGN |

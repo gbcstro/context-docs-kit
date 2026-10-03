@@ -1,6 +1,6 @@
 ---
 name: bootstrapping-context-docs
-description: Use when starting a new project or repo that has no context/ or foundation docs yet, when the user asks to set up a PRD, product doc, architecture doc, schema doc, design doc or coding conventions before writing code, when an existing project's context/ folder is missing or incomplete, when a project's stack and constraints have never been written down, or when scattered docs (prd.md, blueprint.md, ai-rules.md) need consolidating into a single source of truth. Do not use to fix docs that have drifted from the code (use aligning-context-docs) or to close a version and open the next one (use versioning-context-docs).
+description: Use when starting a new project or repo that has no context/ or foundation docs yet, when the user asks to set up a PRD, product doc, architecture doc, schema doc, design doc or coding conventions before writing code, when an existing project's context/ folder is missing or incomplete, when a project's stack, constraints, or scale and reliability expectations have never been written down, or when scattered docs (prd.md, blueprint.md, ai-rules.md) need consolidating into a single source of truth. Do not use to fix docs that have drifted from the code (use aligning-context-docs) or to close a version and open the next one (use versioning-context-docs).
 license: MIT
 ---
 
@@ -103,6 +103,8 @@ Confirm the set with the user before writing anything. Default is adaptive, not 
 | `SCREENS.md` | the project has a user interface | `product-designer` |
 | `RULES.md` | always | `engineering-standards` |
 
+**Set the stakes in the same exchange.** Ask once: *if this were down for an hour, lost a day of data, or leaked its data, who is hurt and how badly?* Recommend Low, Moderate or High from what you have heard and let the user correct you. Hold it loosely: `PRODUCT.md`'s usage question confirms it once the product is understood, and it can move. The answer sets the depth of every production-readiness question that follows — a weekend tool and a payments system do not get the same interview — and `OPS.md` / `SECURITY.md` follow from it. `references/production-readiness.md`.
+
 Additional docs when the project warrants them — see `references/optional-docs.md`. A CLI tool with no persistence gets three docs, not five with two stubs. Say which you are dropping and why, then let the user correct you.
 
 The pass ends with two more files that are not docs and are not optional: `context/PROGRESS/PROGRESS_v1.md` and `context/PROGRESS/CHANGELOG_v1.md`.
@@ -125,15 +127,15 @@ On a host without subagents, stages 1, 3 and 4 run inline instead of being dispa
 
 Stage 1 reads manifests, layout, migrations, CI, and pre-existing docs, and returns facts to pre-fill your questions. Skip it on a truly empty repo.
 
-Stage 3 writes the doc from **approved answers only**, with unknowns parked.
+Stage 3 writes the doc from **approved answers only**; every unknown was closed in the grill, so there is nothing to park.
 
-Stage 4 is adversarial and independent — `references/critic.md`. A persona reviewing its own draft carries the blind spots that produced it. Fix what the critic finds, or park it, before the gate.
+Stage 4 is adversarial and independent — `references/critic.md`. A persona reviewing its own draft carries the blind spots that produced it. Fix what the critic finds, or close it as a registered provisional decision, before the gate.
 
 Stage 5 is a hard stop. Do not begin the next doc until the user approves this one.
 
 ### Two passes have an extra gate
 
-- **`ARCHITECTURE.md`** — the **Architecture Presentation Gate** sits between stages 2 and 3. You present the stack, the repo tree and the system diagram, and the user approves the picture before a word of the doc is written. `references/architecture.md`.
+- **`ARCHITECTURE.md`** — the **Architecture Presentation Gate** sits between stages 2 and 3. You present the stack, the repo tree, the system diagram and the **envelope card** (stakes, load, data, durability, latency, first bottleneck, deferrals), and the user approves the pictures before a word of the doc is written. `references/architecture.md`.
 - **`RULES.md`** — design principles are settled by the **worked-example loop**, not by a question. Every principle arrives with a concrete scenario from this codebase and is agreed on the example, not the abstraction. `references/rules.md`.
 
 ## Grilling Rules
@@ -167,6 +169,21 @@ For every **consequential** decision — anything a future change would be expen
 **Calibrate depth to demonstrated fluency, not to a self-assessment.** When answers show the user already knows a domain, compress to one-line tradeoffs. When answers are hesitant or generic, expand. Never skip step 3 regardless of fluency — it costs one sentence and prevents silent regret.
 
 **Never introduce a library, service, or architectural approach the user has not explicitly confirmed.** Recording an unconfirmed vendor choice as settled is the single most damaging thing this skill can do, because every later doc inherits it.
+
+## Production Readiness — Know the Envelope, Defer the Rest
+
+"Will it hold up, and can it grow?" is answered in `ARCHITECTURE.md` with numbers
+the user gave, not with a mood. Full method in `references/production-readiness.md`;
+the shape of it:
+
+- **Sort every decision into a door.** A **one-way door** (identity, tenancy, source of truth, the public contract) is priced against the horizon the user stated and designed for it. A **two-way door** (a cache, a replica, instance size, a queue behind an interface) is deferred, with the measurable **trigger** written into `## Out of Scope`.
+- **Name what breaks first** and where the relief goes in, annotated on the system diagram, together with the load beyond which the design is not claimed to work.
+- **Every dependency gets slow / down / wrong**, every network call a timeout, every retried side effect an idempotency key, and every deploy a rollback that has been done once.
+- **Numbers are the user's, or arithmetic on the user's.** A "standard" 99.9% or p95 under 200 ms nobody chose is an invented specific — the most tempting one in this domain. Orders of magnitude are enough; a number that cannot be given is closed like any other question, toward the larger horizon for one-way doors and the smaller build for two-way doors.
+- **Nothing enters the stack without a reason on the card.** "We might need a queue at scale" is not one. "At the ceiling you gave, the 3 s email call blocks the request thread" is.
+- **Depth follows the stakes.** Low gets the one-way doors, secrets and authorization, timeouts and logs. High gets the full bank plus `SECURITY.md`, `OPS.md` and load or failure tests as acceptance criteria.
+
+The answers land in `PRODUCT.md` §Usage & Scale Expectations, `ARCHITECTURE.md` §Operating Envelope and its reliability, observability and security sections, `SCHEMA.md` §Data Lifecycle & Volume, `RULES.md` §Production Standards, and as measurable criteria in `PROGRESS_v1.md`.
 
 ## Closing Questions — No Parking
 
@@ -233,6 +250,11 @@ Then tell the user what happens next: changes inside v1 go through `aligning-con
 | "The checklist is obvious, acceptance criteria are overkill" | Without them nobody can say whether v1 is done, so v1 never ends. |
 | "v1 looks complete, I'll mark it done" | Only the user closes a version. |
 | "I'll note in the doc that this replaced the earlier approach" | History is never inline. It goes in `CHANGELOG_v1.md`; the doc stays present tense. |
+| "We'll worry about scale later" | Later is fine for two-way doors, with a trigger written down. Identity, tenancy, source of truth and the public contract are one-way: price them now. |
+| "I'll put 99.9% / p95 under 200 ms, that's standard" | An invented specific. The number is the user's, or arithmetic on theirs; otherwise close it per `closing-questions.md`. |
+| "A cache and a queue will make it scale" | Only with the sentence "at the ceiling you gave, X breaks, because Y." Otherwise it is a component with no reason, and the doc will carry it forever. |
+| "Observability and rollback are ops concerns, not architecture" | A deploy with no undo and a service nobody can see into are architecture decisions that were skipped. Ask. |
+| "It's a hobby project, skip the failure-mode and security questions" | Set the stakes and let the depth follow — but secrets, authorization and timeouts stay at every level. |
 | "This `@context/RULES.md` line works everywhere" | Only on hosts with import support. Check `references/hosts.md` or the rules silently never apply. |
 
 ## Reference Index
@@ -245,6 +267,7 @@ Load only what the current pass needs.
 | `references/wiring.md` | second, and again at the end |
 | `references/doc-contract.md` | before drafting any doc |
 | `references/closing-questions.md` | any time the user cannot answer, and before every gate |
+| `references/production-readiness.md` | doc-set proposal (stakes), the `PRODUCT.md` usage questions, the `ARCHITECTURE.md` envelope, `SCHEMA.md` lifecycle, `RULES.md` production standards |
 | `references/product.md` | PRODUCT.md pass |
 | `references/architecture.md` | ARCHITECTURE.md pass |
 | `references/schema.md` | SCHEMA.md pass |

@@ -46,16 +46,29 @@ every downstream doc.
 | `package.json`, `pyproject.toml`, `go.mod`, `Cargo.toml`, `*.csproj` | §1 stack block — every dependency of consequence named, every named one present |
 | lockfile diffs since the doc's `Last updated` | libraries added without a doc change |
 | the real directory layout | §3 repo tree — is the approved tree still the tree on disk? |
-| `docker-compose.yml`, `terraform/`, `infrastructure/` | §4 system diagram, §12 hosting — services running that no component in the diagram represents |
-| `.github/workflows/`, CI config | §12 deploy path, and §2's constraint resolution if the constraint was a build-path one |
+| `docker-compose.yml`, `terraform/`, `infrastructure/` | §4 system diagram and the Hosting, Deploy & Rollback section — services running that no component in the diagram represents |
+| `.github/workflows/`, CI config | the Hosting, Deploy & Rollback section, and §2's constraint resolution if the constraint was a build-path one; the CI gates the doc says must pass |
 | `.env.example`, secret names | external services nobody documented |
-| ORM and migration tooling in use | §8 |
+| ORM and migration tooling in use | the Database & Migrations section |
+| outbound HTTP/RPC call sites, client wrappers, SDK usage | the Reliability & Failure Modes section — a call to a dependency the table never mentions, or one with no timeout |
+| request handlers, job and queue code | the Operating Envelope — a synchronous call to a slow dependency on a hot path; in-process state in a handler the doc calls stateless; a job with no idempotency key where retries are stated |
+| logging setup, health endpoint, metrics and alert config | the Observability section — is what the doc promises actually emitted, and still alerting? |
+| auth middleware, query layer | the Authentication & Authorization section — is tenant scoping enforced where the doc says, or only in the UI? |
 
 **The highest-value check in the whole scan:** a service in compose or a
 dependency in the manifest that appears nowhere in the doc. That is an
 architectural decision made inline — exactly what `RULES.md` §2 rule 2 exists to
 prevent — and it is where the doc becomes actively misleading rather than merely
 incomplete.
+
+**Check the envelope against reality** (`references/production-readiness.md`). The
+Operating Envelope is a set of numbers the design was judged against. Where real
+measurements exist — traffic, table sizes, p95s, the cloud bill — compare them to
+the doc. A ceiling that has been reached, a deferred two-way door whose trigger has
+fired, or a stakes level that has risen (paying users arrived, personal data was
+added) is a finding even when no line of code is wrong. Report it as MAJOR, with
+the measurement as evidence, and let the user decide whether the doc or the design
+moves.
 
 **Also check §2, the binding constraint.** Constraints expire: a team grows, a
 budget arrives, a Mac gets bought. A resolved constraint whose mechanism is still
@@ -76,7 +89,10 @@ high blast radius, because it is the thing a new contributor trusts first.
 | `migrations/`, `*.sql`, migration history | columns, types, nullability, defaults |
 | index definitions | §on indexes |
 | foreign keys and `onDelete` behaviour | stated delete behaviour — this is the one most often silently wrong |
-| `PRODUCT.md` §4 field lists | every product field has a home: column, derived value, or parked question |
+| `PRODUCT.md` §4 field lists | every product field has a home: a column, a derived value, or an explicit descope |
+| retention, deletion and cleanup jobs, erasure endpoints | the Data Lifecycle & Volume section — a retention rule nothing enforces, or personal data with no deletion path in code |
+| unique constraints, version columns, idempotency-key handling | the stated integrity guards — a "never duplicates" claim with no constraint behind it |
+| the newest migrations | change safety: a column dropped or renamed in one step, a long-locking migration on a large table |
 
 **What drift looks like here:** a migration applied that the doc never absorbed.
 Check the migration directory against the doc's `Last updated` — anything newer
@@ -126,8 +142,10 @@ check that they still agree with each other.
 | empty state, error state, loading state patterns | standard component empty/loading/error styles and skeletons |
 | CSS transitions, keyframe animations, motion libraries | the animation system (duration tokens, easing curves, per-component table, reduced-motion handling) |
 | icon usage and library | icon set, default sizes, stroke weight, color inheritance |
+| bundle analyzer output, `size-limit` or equivalent config, build artifact sizes, Lighthouse or web-vitals config and any field data | the Performance Budgets section — is each budget still the one enforced, is the enforcement check still in CI, and does the current build or measurement fit within it? |
+| font loading, image components and pipeline, lazy-loading and code-splitting boundaries, third-party script tags | the design levers the budget section names — an unbudgeted font family, an eager-loaded hero image, a new tag-manager script, a heavy overlay in the main bundle |
 
-**What drift looks like here:** raw hex values scattered in components instead of semantic tokens, broken WCAG AA contrast ratios, navbar components missing mobile collapse or active indicators, ad-hoc tooltip or popover implementations that bypass the spec'd placement and z-index rules, dropdown menus without keyboard navigation or ARIA, confirmation dialogs that don't match the destructive styling contract, toast notifications with inconsistent auto-dismiss timing or positioning, new button variants or form input states invented without updating the component spec, and animation durations or easing that diverge from the token system.
+**What drift looks like here:** raw hex values scattered in components instead of semantic tokens, broken WCAG AA contrast ratios, navbar components missing mobile collapse or active indicators, ad-hoc tooltip or popover implementations that bypass the spec'd placement and z-index rules, dropdown menus without keyboard navigation or ARIA, confirmation dialogs that don't match the destructive styling contract, toast notifications with inconsistent auto-dismiss timing or positioning, new button variants or form input states invented without updating the component spec, and animation durations or easing that diverge from the token system. For performance budgets: a build that exceeds a budget while CI still passes (the check was loosened or removed), budgets that were raised in a config file without going through the change protocol, a third-party script nobody budgeted, and a design lever the doc rules out (for example fonts beyond the stated families) back in the bundle.
 
 ---
 
@@ -156,6 +174,7 @@ check that they still agree with each other.
 | test files and coverage | §7 testing conventions — is the stated standard the standard being held? |
 | `.gitignore`, tracked files | §8 secrets. **Report a tracked secret immediately and prominently, before anything else in the report.** |
 | the migration commands actually used | §9 |
+| the CI gates, lint rules and tests that enforce each Production Standards rule | §11 — a rule whose check has gone is decoration that still claims to be enforced |
 | the code at the seams §4's examples describe | do the worked examples still compile and still describe the real structure? |
 
 **Two checks unique to this doc:**
@@ -168,7 +187,7 @@ unenforced rule honestly labelled.
 structures. When the code moves, an example can end up describing a seam that no
 longer exists — and an example that is wrong teaches the wrong thing more
 effectively than no example at all. Re-render it against the current code and
-show the user, or park the principle.
+show the user, or drop the principle from the doc and register it in `PROGRESS_v<N>.md` §4.
 
 ---
 
@@ -180,6 +199,7 @@ show the user, or park the principle.
 | each item's `Source:` pointer | does that doc section still say what the item claims? |
 | the docs' current state | does §1's doc-set table still list the right revisions? |
 | unticked items | is anything already done? |
+| non-functional criteria (load, latency, restore, failure behaviour) | is the named measurement method still runnable — the load script, the drill — and when did it last run? |
 | ticked items | is anything **no longer** true — a regression, or a feature removed? |
 | `§4` provisional decisions | is each still the decision in force in the doc it names? has the code settled one — or quietly departed from one? |
 
@@ -199,11 +219,14 @@ as CRITICAL, not as a stale register entry.
 Report by severity, not by doc:
 
 **CRITICAL** — a doc asserts something the code contradicts; a tracked secret; a
-ticked criterion that has regressed; a delete behaviour mismatch.
+ticked criterion that has regressed; a delete behaviour mismatch; authorization
+enforced only in the UI where the doc says the data layer.
 
 **MAJOR** — a library, service or entity in the code that no doc mentions; an
 enforcement path that has disappeared; an architecture artifact that no longer
-matches disk; a worked example that no longer compiles.
+matches disk; a worked example that no longer compiles; the operating envelope
+exceeded or a deferral trigger fired; a dependency call with no timeout where the
+doc requires one.
 
 **MINOR** — stale wording; an unticked item that is met; numbering; a doc-set
 table with outdated revisions; a §4 entry whose question is settled in practice

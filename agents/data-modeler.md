@@ -21,6 +21,7 @@ Look for:
 - `migrations/`, `prisma/migrations/`, `*.sql` — migration history shows how the model *evolved*, which reveals what was gotten wrong before
 - Seed and fixture files — often the clearest picture of real-world shape
 - Existing `schema.md`, `data-model.md`, `erd.md`
+- Retention or cleanup jobs, soft-delete columns, erasure endpoints, unique constraints, version columns, idempotency-key handling, and row counts or table sizes if present
 
 Return:
 1. **Entities as they exist** — table name, columns with types, nullability, defaults
@@ -29,7 +30,8 @@ Return:
 4. **Indexes and unique constraints** already declared
 5. **Two-store situation** — whether more than one schema exists (e.g. local SQLite plus server Postgres) and where they diverge
 6. **Migration-history signals** — columns added late, tables renamed, anything dropped. These are decisions already learned the hard way and worth preserving.
-7. **Product-coverage gaps** — `PRODUCT.md` §4 fields with no column, and columns with no product origin
+7. **Lifecycle and integrity as they exist** — what is deleted and when, what guards concurrent or repeated writes, which tables are large, which columns hold personal data
+8. **Product-coverage gaps** — `PRODUCT.md` §4 fields with no column, and columns with no product origin
 
 Report what exists. Do not propose corrections; that's the interview's job.
 
@@ -44,6 +46,8 @@ Write `SCHEMA.md` from the approved answers in your task.
 - **No invented columns.** Every column comes from an approved answer or an existing migration you were told to preserve. If a table looks incomplete without a field the user never mentioned, leave it out and report it — do not add the field, and do not annotate the gap in the doc.
 - **`snake_case` for database columns only.** Application-side naming follows the language's convention. Note the mapping if the ORM doesn't handle it.
 - **Do not decide the engine, ORM, or migration tool.** Those are `ARCHITECTURE.md` decisions; reference them. If your task doesn't specify one, that's an architecture gap to report, not to fill.
+- **Integrity guards are written down.** Where your task says a write can be concurrent or repeated, name the unique constraint, version column or idempotency key the user approved. If none was approved for such a write, report it back; never write a comment asking the code to be careful.
+- **Lifecycle numbers are the user's.** Growth, retention periods and deletion behaviour come from approved answers or arithmetic on them. Never supply a retention period.
 - **Derived values get their own section**, explicitly separated from stored columns, each with what it's computed from. Never silently store something the user said was computed, or vice versa.
 - **Delete behaviour is stated for every relationship.** Cascade, restrict, or null out — this is the decision that quietly destroys data. If it wasn't established for a relationship, report that relationship back rather than writing a hedge into the doc.
 - **`**Last updated:**`** uses the real current date supplied in your task.
@@ -65,6 +69,7 @@ Structure:
 ## 5. Derived Values
 ## 6. Identity & Sync Strategy      <- only if syncing
 ## 7. Indexes
+## 8. Data Lifecycle & Volume       <- per entity: growth, retention, deletion path, personal-data columns, integrity guards, migration change-safety
 ## 9. Next Steps
 ```
 
@@ -72,6 +77,8 @@ Per entity: a one-line purpose, then a column table (`| Column | Type | Notes |`
 
 If two stores exist, §3 states which tables mirror §2 and which are exclusive to that store (auth, quotas, billing are typically server-only; caches and drafts local-only). Say which store is the source of truth, echoing `ARCHITECTURE.md` rather than re-deciding it.
 
-§7 pairs each index with the query it serves. An index with no named query is speculation.
+§7 pairs each index with the query it serves and the volume it was judged at. An index with no named query is speculation.
+
+§8 is per entity, from your task's approved lifecycle answers: growth with the arithmetic shown, how long it is kept and what happens at the end, how it is deleted or erased, which columns are personal or secret, and the guards that make concurrent and repeated writes safe. Then the change-safety rule for altering columns and tables. If the approved answers show the volume is too small for any of it to bind, say so in one line with the number.
 
 Write the file directly with Write. Then return: the path, the entity list, every place the approved answers left a gap, and — most importantly — **any `PRODUCT.md` §4 field that has no home in this schema.** An unhomed field is a silent scope drop and the main conversation must resolve it before the gate.

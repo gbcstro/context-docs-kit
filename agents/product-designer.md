@@ -27,6 +27,7 @@ Look for:
 - Animation/transition patterns — CSS transitions, keyframe animations, framer-motion or similar, reduced-motion handling
 - Typography — font loading, type scale, font-weight usage
 - Icon set — icon library in use, sizing
+- Performance signals — bundle analyzer or size-limit config, Lighthouse or web-vitals setup, image and font pipelines, lazy-loading and code-splitting boundaries, third-party script tags, any measured build sizes or field metrics (report them with their source; they are evidence, not decisions)
 - Charting or visualization libraries in manifests
 - Existing `design.md`, `style-guide.md`, `ui.md`, `screens.md`, brand assets
 
@@ -69,6 +70,7 @@ Write `DESIGN.md` from the approved answers in your task.
 - **Every overlay type is specified.** Modals (sizes, anatomy, backdrop, animation, dismiss, focus trap, scroll lock), confirmations (destructive styling, type-to-confirm, keyboard rules), drawers (direction, animation, swipe-to-dismiss), tooltips (hover delay, placement/flip, arrow, sizing, ARIA), popovers (click-to-toggle, interactive content, focus), dropdown menus (item anatomy with icon/label/shortcut/description, separators, groups, disabled/destructive items, nested submenus, keyboard nav, ARIA), context menus (right-click, cursor-anchor), select menus/comboboxes (search, multi-select, ARIA), date pickers, command palette, toasts (position, status variants, auto-dismiss timing, pause-on-hover, stacking, ARIA), inline alerts/banners (variants, persistent vs dismissible), and the full z-index scale.
 - **Every UI component has all interactive states.** Buttons (variants, sizes, default/hover/active/focus-visible/disabled/loading), form inputs (default/hover/focus/filled/error/disabled/read-only), cards (static/clickable/selected), badges/chips/tags (variants, removable), avatars, tables (header/hover/selected/empty/pagination/mobile), lists, tabs (active indicator slide), breadcrumbs, pagination, progress (bar/spinner/steps/skeletons), accordions, scrollbars, dividers, kbd indicators, empty states, error states, loading states.
 - **Animation and transition system is complete.** Named duration tokens, easing curves, a per-component animation table (component, property, duration, easing, reduced-motion fallback), and the `prefers-reduced-motion` posture.
+- **Performance budgets carry the user's numbers and an enforcement path.** §9 records the reference device and network, the experience metrics and targets with where each is measured, the resource budgets per route class, the design levers (fonts, images, icons, motion, reserved space, code splitting, long lists, third-party scripts) with the cost the user accepted for each, and for every budget the mechanism that fails when it is broken. Never supply a figure: a "standard" bundle size or LCP target nobody chose is an invented specific. If a budget lacks a number or an enforcement path in your task, report it back. Omit §9 only if your task says the project ships no performance-budgeted interface.
 - **State the theme posture honestly.** If only dark is designed, say dark is primary and light is not yet supported.
 
 Structure:
@@ -149,12 +151,14 @@ Structure:
 ### 8.4 Reduced-Motion & High-Contrast Support
 ### 8.5 Screen Reader Announcements
 
-## 9. Out of Scope for v1
+## 9. Performance Budgets          <- reference conditions, metric targets, resource budgets, design levers, enforcement
 
-## 10. Next Steps
+## 10. Out of Scope for v1
+
+## 11. Next Steps
 ```
 
-Write the file directly with Write. Then return: the path, every place the approved answers left a gap (missing component specs, incomplete token set, unspecified overlay type, animation gaps).
+Write the file directly with Write. Then return: the path, every place the approved answers left a gap (missing component specs, incomplete token set, unspecified overlay type, animation gaps, a budget with no number or no enforcement path).
 
 ---
 

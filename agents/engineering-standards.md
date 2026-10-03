@@ -25,6 +25,7 @@ Look for:
 - Git history — commit message style in practice, branch naming, whether PRs are used
 - Test files and runners — what is actually tested, and at what level
 - `.env.example` presence, and whether `.env` is gitignored
+- Required CI checks, branch protection config, migration linting, dependency or vulnerability scanning, load-test or failure-test scripts, lint rules banning raw HTTP clients or `console.log`
 
 Return:
 1. **Enforced conventions** — the rule and the mechanism enforcing it (lint, CI, hook, formatter)
@@ -32,7 +33,8 @@ Return:
 3. **Actual git practice** from history: commit style, branching, PR usage
 4. **Testing reality** — what has tests, what doesn't, which runner
 5. **Secrets posture** — is `.env` gitignored, does `.env.example` exist, any credentials visible in tracked files. **Report a tracked secret immediately and prominently.**
-6. **Pre-existing AI rules** — anything in an agent file or `ai-rules.md` worth carrying forward
+6. **Production enforcement as it exists** — which of timeouts, migration safety, log redaction, dependency scanning, load checks and rollback drills have a mechanism today, and which are only stated
+7. **Pre-existing AI rules** — anything in an agent file or `ai-rules.md` worth carrying forward
 
 Distinguish enforced from aspirational throughout. A documented rule with no check is the most common finding and the most useful.
 
@@ -50,6 +52,7 @@ Write `RULES.md` from the approved answers in your task.
 4. **No speculative scope.** Don't add features beyond `PRODUCT.md`, or beyond the current version's checklist in `context/PROGRESS/PROGRESS_v<current>.md`, without checking first. The checklist is what this version is committed to; anything outside it is a conversation, not a task.
 5. **Ask, don't guess.** When a requirement is ambiguous, ask rather than silently choosing an interpretation.
 6. **Wireframe before building UI** — include only if `DESIGN.md` or `SCREENS.md` exists in the set.
+7. **Check changes against the envelope** — include only when the stakes in `ARCHITECTURE.md` §Operating Envelope are above Low. Before changing a hot path, a call to an external dependency, a migration, or anything covered by a retention or deletion rule, read `ARCHITECTURE.md` §Operating Envelope and §Reliability & Failure Modes and the matching part of `SCHEMA.md`; if the change would break a number or a failure-mode rule, say so and ask rather than shipping it.
 
 Add project-specific rules only where the approved answers supply them.
 
@@ -58,7 +61,7 @@ Add project-specific rules only where the approved answers supply them.
 - **Nothing is left open.** Your task's approved answers are the only source. If a section needs a fact you were not given, that is a defect in the task, not a licence to invent and not a hole to leave: report it back rather than writing `TBD`, `to be decided`, or an `## Open Questions` section. **There is no `## Open Questions` section in any doc.** Values marked in your task as *provisional* are decisions the user made — write them as plain, present-tense decisions with no hedging; the main conversation registers them in `PROGRESS_v<N>.md` §4.
 
 - **Every §4 principle carries the worked example the user accepted.** Your task supplies them as principle + seam + accepted example. Write all three. A principle without its example does not go in the doc at all. The example is what the user agreed to; the principle name is just its label.
-- **No invented obligations.** Every rule outside the six above must come from an approved answer. Inventing a coverage threshold or a review process the user never agreed to produces a doc they'll immediately violate, which destroys the authority of the rules that *were* agreed.
+- **No invented obligations.** Every rule outside the numbered §2 rules above must come from an approved answer. That includes every Production Standards rule: write only the rows of production rules your task supplies, each with the enforcement path the user approved (lint rule, CI check, test, review step, or an honestly labelled judgment call). Inventing a coverage threshold or a review process the user never agreed to produces a doc they'll immediately violate, which destroys the authority of the rules that *were* agreed.
 - **Write the standard the project will actually hold.** If the approved answer is "manual verification for mobile, unit tests for backend services", write exactly that. An aspirational standard broken in week two discredits the whole document.
 - **Skip what a formatter handles.** If Prettier enforces it, the rule is "run the formatter", not a paragraph on brace placement.
 - **§8 (secrets) is never omitted**, even for a solo hobby project.
@@ -84,6 +87,7 @@ Structure:
 ## 8. Environment & Secrets
 ## 9. Database Migrations
 ## 10. Ops Runbook            <- only if the project has infrastructure
+## 11. Production Standards   <- only above Low stakes; each rule with its enforcement path
 ## 12. Next Steps
 ```
 
@@ -94,6 +98,8 @@ Structure:
 §4 ties principles to *this* codebase's actual seams rather than reciting SOLID. Each entry is three things: the principle, the seam it applies to, and the worked example — a before/after snippet or a concrete scenario — that the user accepted during the loop. Two principles written this way beat eight names. Include the pragmatism caveat: applied where it adds clarity or testability, not as a checklist on every trivial function.
 
 §9 includes the lockstep rule: a schema change isn't complete until `SCHEMA.md` reflects it.
+
+§11, when present, turns the production decisions in `ARCHITECTURE.md` and `SCHEMA.md` into rules — timeouts and retries, migration compatibility, logging and redaction, load checks, CI gates, rollback, dependency scanning, authorization at the data layer — each paired with its enforcement path. A rule whose only enforcement is "be careful" is written as a judgment call and labelled so.
 
 §12 points at the agent-file wiring step, not another doc — this is the end of the chain. The wiring is followed by `PROGRESS_v1.md`, which draws its definition of "done" from your §7.
 

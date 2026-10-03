@@ -124,11 +124,13 @@ That's more work than parking a question, not less. The point is that the cost m
 
 Docs are written one at a time in dependency order, each behind an approval gate. On a repo that already has code it reads the code first, so you confirm what's there instead of restating it from memory.
 
-Two passes go further than a question:
+Three passes go further than a question:
 
 **Architecture is presented, not described.** Before a word of `ARCHITECTURE.md` is written, you get the stack block, an ASCII repo tree and a system diagram with the binding constraint annotated where it bites — and you approve the picture. A paragraph gets nodded at; a diagram gets corrected. On an existing repo you get two: what's there, what's proposed, and every delta named.
 
 **Principles are agreed on examples, not names.** Everyone says yes to "single responsibility" and nobody means the same thing. So `RULES.md` §4 runs a loop: a principle tied to a named seam in *your* codebase, then a worked example — a before/after in your real language and paths, showing the actual consequence — and you accept, adjust or reject **the example**. Adjust and it re-renders with your correction. Three rounds without agreement and the principle simply isn't written down; that absence is the decision. A principle with no accepted example never enters the doc.
+
+**Scale and reliability are numbers, not moods.** Before the stack is chosen, the architecture pass writes down the **operating envelope**: how much load now and at the ceiling you expect, how much data, how much downtime and loss you can survive, which interactions have a latency bar, and **what breaks first**. Every number is yours or arithmetic on yours — a "standard" 99.9% nobody chose is treated as an invented fact. Decisions are sorted by reversal cost: **one-way doors** (identity, tenancy, source of truth, the public contract) are designed for the horizon you gave; **two-way doors** (a cache, a replica, instance size) are deferred with a measurable trigger written into the doc. No cache, queue or second service enters the stack without the sentence "at the ceiling you gave, X breaks, because Y". On interfaces, the design pass adds **performance budgets** — reference device and network, experience-metric targets, resource budgets per route class, and the design levers (fonts, images, icons, motion, third-party scripts) that spend them — each with a mechanism that fails the build when broken. Every dependency gets a slow / down / wrong answer, every deploy a rollback, and the commitments v1 owes become measurable acceptance criteria. Depth follows the **stakes** you set — a weekend tool and a payments system do not get the same interview.
 
 ## Versions, and why the docs stay readable
 
@@ -153,6 +155,7 @@ Then the cascade, which is the part that usually gets skipped: a change is not f
 
 | Mechanism | What it does |
 |---|---|
+| **Operating envelope** — stakes, load, data, failure modes, rollback | Scale and reliability become checked numbers and named triggers, and the commitments v1 owes become measurable criteria |
 | **Dependency chain** — `Depends on:` in each header | Decisions flow downhill, so docs are written in an order where nothing depends on an unwritten doc |
 | **No open questions, anywhere** | Every question closes before its doc is drafted; what can't be settled becomes a registered provisional decision |
 | **`Project version` + `Revision`** | Two separate axes: `v1` is the product, `Revision: 3` is the file. `v` never means both |
@@ -163,7 +166,7 @@ Agent-file wiring is the step most often skipped, and the one that decides wheth
 
 ## The doc set is adaptive
 
-`PRODUCT.md`, `ARCHITECTURE.md` and `RULES.md` always. `SCHEMA.md` only if something is persisted. `DESIGN.md` and `SCREENS.md` only if there's a user interface. Extra docs (`PROTOCOL.md`, `SECURITY.md`, `ML.md`) when the project warrants them.
+`PRODUCT.md`, `ARCHITECTURE.md` and `RULES.md` always. `SCHEMA.md` only if something is persisted. `DESIGN.md` and `SCREENS.md` only if there's a user interface. Extra docs (`PROTOCOL.md`, `OPS.md`, `SECURITY.md`, `ML.md`) when the project warrants them — `OPS.md` and `SECURITY.md` follow from high stakes.
 
 A CLI tool with no persistence gets three docs, not five with two stubs — a stub doc is worse than a missing one, because it implies the concern was considered.
 
@@ -173,12 +176,12 @@ Each doc has a lens and its own list of things it won't let slide:
 
 | Persona | Doc | Won't let slide |
 |---|---|---|
-| `product-strategist` | `PRODUCT.md` | Differentiation with no named competitor; feature names without field lists; success metrics you can't fail |
-| `solutions-architect` | `ARCHITECTURE.md` | A stack proposed before the binding constraint is known; a vendor recorded without confirmation; a system described only in prose |
-| `data-modeler` | `SCHEMA.md` | Entities invented rather than derived from the product's field lists; unstated delete behaviour |
-| `product-designer` | `DESIGN.md`, `SCREENS.md` | Raw hex instead of semantic tokens; hand-waved navbar/overlay specs; missing tooltip/popover/menu/confirmation/toast contracts; components without all interactive states; animations without durations and reduced-motion posture; screens without complete inventory and layout wireframes; orphan screens; missing empty/loading/error states |
-| `engineering-standards` | `RULES.md` | Omitting the AI-assistant rules section; rules with no enforcement path; a principle with no worked example |
-| `context-doc-critic` | all | Reviews every draft before it reaches you — independently, because an author can't see its own blind spots |
+| `product-strategist` | `PRODUCT.md` | Differentiation with no named competitor; feature names without field lists; success metrics you can't fail; usage with no numbers |
+| `solutions-architect` | `ARCHITECTURE.md` | A stack proposed before the binding constraint is known; a vendor recorded without confirmation; a system described only in prose; scale as a mood; a one-way door decided blind; a component with no number behind it; no failure-mode or rollback answer |
+| `data-modeler` | `SCHEMA.md` | Entities invented rather than derived from the product's field lists; unstated delete behaviour; concurrent writes with no guard; data with no growth, retention or erasure answer |
+| `product-designer` | `DESIGN.md`, `SCREENS.md` | Raw hex instead of semantic tokens; hand-waved navbar/overlay specs; missing tooltip/popover/menu/confirmation/toast contracts; components without all interactive states; a design that spends a performance budget nobody set (no reference device, no numbers, no enforcement); animations without durations and reduced-motion posture; screens without complete inventory and layout wireframes; orphan screens; missing empty/loading/error states |
+| `engineering-standards` | `RULES.md` | Omitting the AI-assistant rules section; rules with no enforcement path; a principle with no worked example; production decisions that never become enforceable rules |
+| `context-doc-critic` | all | Reviews every draft before it reaches you — independently, because an author can't see its own blind spots. Treats an unsourced capacity or reliability figure as an invented fact |
 
 On Claude Code these run as subagents. Elsewhere the same personas run inline in the main conversation — the sequence doesn't change, and the review still happens in its own turn, because a writer checking a sentence as it writes it finds nothing.
 
@@ -196,6 +199,7 @@ Bootstrap ends when the skill exits. §2 is what stops the docs drifting on ever
 bin/cli.mjs                    install / uninstall / list
 src/                           targets, installer, manifest, shared-reference sync
 shared/references/             canonical copies of everything more than one skill needs
+                               (doc contract, closing questions, drift scan, critic, production readiness, ...)
 skills/
   bootstrapping-context-docs/  process, gates, grilling, architecture gate, worked-example loop
   aligning-context-docs/       three-way drift scan, in-version change protocol, cascade
@@ -214,7 +218,9 @@ Shared references live once in `shared/references/` and are copied into each ski
 git clone https://github.com/gbcstro/context-docs-kit.git
 cd context-docs-kit
 npx . install --link          # symlink the skills so edits are live
-npm test                      # installer behaviour + shared-reference drift
+npm test                      # installer behaviour, shared-reference drift, and consistency
+                              # (contiguous skeleton numbering, no stale "park it" language,
+                              #  no dangling reference links, agent/reference skeleton parity)
 ```
 
 `--link` symlinks the skill directories back to the repo, so editing `SKILL.md` needs no re-sync. Agent files are always copied — re-run after editing one.

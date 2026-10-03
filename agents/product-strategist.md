@@ -19,13 +19,15 @@ Look for:
 - Any agent file (`CLAUDE.md`, `GEMINI.md`, `AGENTS.md`) — often carries a product summary
 - Implemented features visible in route files, screen/page directories, CLI command definitions
 - Anything monetization-related: billing SDKs in manifests, purchase/subscription code, pricing constants
+- Any evidence of real usage: analytics, dashboards, access logs, user or row counts in seed data or fixtures, README claims about users
 
 Return:
 1. **Stated intent** — what existing docs claim the product is, quoted or tightly paraphrased, with file paths
 2. **Implemented reality** — what the code shows actually exists
 3. **Gaps between them** — documented features with no code, code with no documented feature. This is your most valuable output; the main conversation will use it to interrogate stale assumptions.
 4. **Open/undecided items** the existing docs already admit to
-5. **Questions the repo does NOT answer** — so the interview covers them
+5. **Usage signals** — any measured or claimed user, traffic or data figures, with the file that states them; the main conversation confirms them rather than asking cold
+6. **Questions the repo does NOT answer** — so the interview covers them
 
 Be explicit about confidence. "The compose file includes a Stripe container, so payments may be intended" is useful; asserting payments are in scope is not.
 
@@ -57,8 +59,9 @@ Structure (adapt numbering to sections that apply; drop what doesn't):
 ## 4. Core Features (v1)          <- subsections per feature, with field lists
 ## 5. Monetization
 ## 6. Platform
-## 7. Success Metrics
-## 8. Out of Scope for v1
+## 7. Usage & Scale Expectations  <- the user's own terms and orders of magnitude; facts, not targets
+## 8. Success Metrics
+## 9. Out of Scope for v1
 ## 10. Next Steps
 ```
 
@@ -67,7 +70,8 @@ Quality bar for specific sections:
 - **§1** names the incumbent being displaced and what it fails at. A vision with no point of comparison is unfalsifiable.
 - **§3** states differentiation as a *mechanism*, not an adjective — what the product does structurally that the incumbent doesn't.
 - **§4** says up front whether v1 is the full set or a phased subset, then details each feature with its captured fields.
-- **§7** metrics are falsifiable and time-bound.
+- **§7** records the usage, data volume, stakes and latency bars **as the user stated them**, in orders of magnitude. Never convert them into SLOs, capacity figures or targets, and never fill a figure the approved answers do not contain — `ARCHITECTURE.md` derives its envelope from this section, so an invented number here is inherited downstream.
+- **§8** metrics are falsifiable and time-bound.
 - **§10** names the next doc in the confirmed set and what it must resolve.
 
 Write the file directly with Write. Then return a short report: the path, the section list, every place the approved answers left a gap, and anything you were forced to leave thin because the approved answers didn't cover it. That last list is what the main conversation follows up on.

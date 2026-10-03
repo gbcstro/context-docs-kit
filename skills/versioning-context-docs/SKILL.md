@@ -185,7 +185,7 @@ in the current version's changelog — not retro-edited into history.
 ## Step 5 — Grill for the next version's scope
 
 Same discipline as bootstrap: one question at a time, a recommendation with each,
-real costs on consequential decisions, and park what is undecided rather than
+real costs on consequential decisions, and close what is undecided rather than
 inventing it. `references/next-version.md` has the question bank.
 
 Start from what the closure produced — the carried items are already scope, and
@@ -215,7 +215,7 @@ version.
 
 Two docs are worth checking specifically:
 
-- **`ARCHITECTURE.md`** — does the new scope invalidate §2's binding constraint, or add a component the diagram does not show? A new version is the natural moment to re-ask whether the constraint still binds.
+- **`ARCHITECTURE.md`** — does the new scope invalidate §2's binding constraint, or add a component the diagram does not show? A new version is the natural moment to re-ask whether the constraint still binds. It is also when the **operating envelope** most often moves: more users, more data, paying customers, personal data. Re-ask it (`references/next-version.md` question 4); a stakes level that has risen drags `RULES.md` Production Standards and `PROGRESS` non-functional criteria with it.
 - **`RULES.md`** — do §4's worked examples still describe real seams after the new scope lands?
 
 ## Step 7 — Open vN+1
@@ -277,5 +277,6 @@ Then report the whole transition in one block:
 | `references/drift-scan.md` | step 2, before closing anything |
 | `references/closing-questions.md` | step 3's register accounting, and any vN+1 question that will not settle |
 | `references/next-version.md` | step 5, the scope grill |
+| `references/production-readiness.md` | step 5 question 4, when the envelope or stakes moved |
 | `references/agent-file.md` | step 8 |
 | `references/critic.md` | any doc that gets a full pass in step 6 |

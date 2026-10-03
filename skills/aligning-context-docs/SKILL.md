@@ -110,6 +110,10 @@ not assume which side loses.
 
 `references/drift-scan.md` has the per-doc scan: what to read, and what a
 mismatch looks like for each of PRODUCT, ARCHITECTURE, SCHEMA, DESIGN and RULES.
+It includes the **production-readiness** checks — does the code still fit the
+operating envelope, failure-mode rules and Production Standards the docs commit
+to, and has a measured number crossed a ceiling or fired a deferral trigger
+(`references/production-readiness.md`). Where real measurements exist, read them.
 
 ## Step 3 — The drift report
 
@@ -179,9 +183,11 @@ For each downstream doc, ask the specific question, not a general one:
 | Changed | Then check |
 |---|---|
 | `PRODUCT.md` feature or field | does `SCHEMA.md` still have a home for every field? does `SCREENS.md` still have a screen? |
+| `PRODUCT.md` usage, scale or stakes expectations | does `ARCHITECTURE.md`'s Operating Envelope still derive from it? is the stakes level still right, and do `RULES.md` Production Standards and `PROGRESS` non-functional criteria still match it? |
 | `ARCHITECTURE.md` store, ORM or migration tool | does `SCHEMA.md` assume the old one? does `RULES.md` §9 name the old migration command? |
+| `ARCHITECTURE.md` Operating Envelope or Reliability & Failure Modes | does `SCHEMA.md`'s Data Lifecycle & Volume still match the volume? does `RULES.md` Production Standards still enforce the timeout, retry and idempotency rules? do `PROGRESS` non-functional criteria still name the right targets? |
 | `ARCHITECTURE.md` repo layout | does `RULES.md` §3 describe the old layout? is the tree in §3 still the tree on disk? |
-| `SCHEMA.md` entity or column | does `PRODUCT.md` describe a field that no longer exists? does `SCREENS.md` show it? |
+| `SCHEMA.md` entity or column | does `PRODUCT.md` describe a field that no longer exists? does `SCREENS.md` show it? does the Data Lifecycle section still cover it? |
 | `DESIGN.md` token, component or overlay | do all wireframes and screens in `SCREENS.md` use the updated components and tokens? |
 | `SCREENS.md` screen or flow | is every screen still reachable? does `PRODUCT.md` still claim the feature? |
 | `RULES.md` §2 | **the agent file needs refreshing** — see step 7 |
@@ -278,6 +284,7 @@ explicitly. Doing it quietly, item by item, is how a version stops ever ending.
 | `references/doc-contract.md` | before editing any doc header |
 | `references/history-discipline.md` | the protocol itself — the core of this skill |
 | `references/drift-scan.md` | step 2, the per-doc three-way diff |
+| `references/production-readiness.md` | step 2, when the drift concerns scale, reliability, security or deploy safety |
 | `references/agent-file.md` | step 7, if the agent file needs refreshing |
 | `references/closing-questions.md` | any time a fix cannot be settled outright |
 | `references/critic.md` | after a substantial rewrite, to check the result like a fresh draft |
