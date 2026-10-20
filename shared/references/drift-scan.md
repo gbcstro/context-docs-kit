@@ -22,10 +22,16 @@ looked at `ARCHITECTURE.md`, and finding it twice wastes the user's attention.
 
 | Read | Compare against |
 |---|---|
-| the app's routes, screens, commands, CLI verbs | §4 feature list — is every shipped capability described? |
+| `README.md`, package metadata, landing copy | §1 product identity, positioning, core purpose, and domain glossary |
+| auth middleware, RBAC guards, organization/tenancy scoping | §2.3 user roles & capability matrix |
+| the app's routes, navigation surfaces, screens, CLI verbs | §4.1 functional surface map — does every key surface exist? |
+| onboarding routes, first-run screens, core workflows | §4.2 end-to-end user journeys — does the actual user path match? |
+| feature actions, validation schemas, calculations, state machines | §4.3+ feature specs — are capabilities, business rules, and state transitions implemented as specified? |
+| inputs, forms, API payloads, serializers | §4.3+ field contracts — do captured data fields and derived values match? |
 | feature flags, config toggles | features claimed as shipped that are actually gated off |
-| pricing/billing code, payment SDK usage | §5 monetization |
-| analytics events, metric collection | §7 success metrics — is anything actually measured? |
+| pricing/billing code, payment SDKs, tier/quota limit checks | §5 monetization, tier entitlements & usage quotas |
+| platform targets, offline/sync handlers, notification & export services | §6 platform, ergonomics & touchpoints |
+| analytics events, telemetry, metric collection | §7 success metrics — is anything actually measured? |
 | the current checklist | does every §4 feature in scope for this version have an item? |
 
 **What drift looks like here:** a feature in the product that the PRD never
@@ -33,9 +39,11 @@ mentions (usually scope that crept in), or a §4 feature with no code, no
 checklist item and no register entry (usually scope that quietly died). Both
 matter; the second is easier to miss.
 
-Field lists are the highest-value part of §4, because `SCHEMA.md` derives from
-them. A field renamed in code and not in the PRD propagates a wrong name into
-every downstream doc.
+Domain vocabulary, user roles, and field lists are the highest-value parts of
+`PRODUCT.md`. A domain concept or field renamed in code and not in the PRD
+propagates a wrong name into `SCHEMA.md`, `ARCHITECTURE.md`, and every
+downstream doc. Business rules or tier limits modified in code without an update
+to §4 or §5 leave the product doc describing fantasy logic.
 
 ---
 
@@ -43,28 +51,38 @@ every downstream doc.
 
 | Read | Compare against |
 |---|---|
-| `package.json`, `pyproject.toml`, `go.mod`, `Cargo.toml`, `*.csproj` | §1 stack block — every dependency of consequence named, every named one present |
+| `package.json`, `pyproject.toml`, `go.mod`, `Cargo.toml`, `*.csproj` | §1.1 stack block & §1.3 approved libraries registry — every dependency of consequence named, every named one present |
 | lockfile diffs since the doc's `Last updated` | libraries added without a doc change |
-| the real directory layout | §3 repo tree — is the approved tree still the tree on disk? |
-| `docker-compose.yml`, `terraform/`, `infrastructure/` | §4 system diagram, §12 hosting — services running that no component in the diagram represents |
-| `.github/workflows/`, CI config | §12 deploy path, and §2's constraint resolution if the constraint was a build-path one |
-| `.env.example`, secret names | external services nobody documented |
-| ORM and migration tooling in use | §8 |
+| workspace configs (`pnpm-workspace.yaml`, `turbo.json`, `nx.json`), real directory layout, and internal imports | §3.1 repo strategy, §3.2 approved repo tree, §3.3 package placement rules, and §3.4 module dependency direction rules |
+| runtime services, processes, and RPC/event wiring | §4.1 system design principles (CAP/PACELC/ACID vs. BASE), §4.2 system diagram, §4.3 component ownership boundaries, and §4.4 inter-component communication matrix |
+| client routing, rendering mode, state stores, and build/bundle scripts | §5 client & frontend architecture |
+| API route handlers, OpenAPI/GraphQL/tRPC/gRPC schemas, response envelopes, pagination, validation, rate limiters, and WebSockets/SSE | §6 API structure & backend architecture |
+| DB client, connection pooler config, ORM, migration tooling, sync/conflict code, and full-text/vector search indexes | §7 database & data storage architecture |
+| Redis/Valkey/Memcached/CDN/client caching code, key prefixes, TTLs, and mutation invalidation hooks | §8 caching architecture |
+| queue brokers (BullMQ, SQS, RabbitMQ, Kafka, Inngest), pub/sub topics, worker concurrency, retries, DLQs, and cron schedules | §9 queues, pub/sub, background workers & event architecture |
+| S3/R2/GCS/Supabase storage SDKs, presigned upload/download flows, MIME/size checks, media processing, quota enforcement, and CDN headers | §10 file storage, media processing & CDN architecture |
+| inbound/outbound webhook routes, HMAC signature verification, event deduplication, third-party SDKs, and email/push/SMS dispatchers | §11 webhooks, third-party integrations & notification architecture |
+| auth provider SDKs, JWT/session cookie config, refresh rotation, RBAC/ABAC/RLS guards, CORS/CSP/CSRF middleware, and `.env.example` | §12 authentication, authorization & security architecture |
+| `Dockerfile*`, `docker-compose*.yml`, cloud compute manifests, VPC/ingress/load-balancer configs | §13 containers, cloud infrastructure & networking |
+| `terraform/`, `*.tf`, `opentofu/`, `pulumi/`, `sst.config.*`, `cdk.json`, `fly.toml`, `render.yaml`, `.github/workflows/`, CI/CD & rollback scripts | §14 Infrastructure as Code (IaC), environments & CI/CD deployment architecture, plus §2's constraint resolution if build/infra-related |
+| API/DB timeout settings, auto-scaling configs, replica/pooling setup, backup schedules, and load test thresholds | §15 target response times (`p50`/`p95`/`p99`), throughput budgets, scaling triggers, and HA/RPO/RTO targets |
+| logger config, OpenTelemetry/Sentry setup, `/healthz` & `/readyz` routes, and test runner configs | §16 observability, error handling & testing architecture |
 
-**The highest-value check in the whole scan:** a service in compose or a
-dependency in the manifest that appears nowhere in the doc. That is an
-architectural decision made inline — exactly what `RULES.md` §2 rule 2 exists to
-prevent — and it is where the doc becomes actively misleading rather than merely
-incomplete.
+**The highest-value check in the whole scan:** a service in compose/IaC, a
+queue/cache/storage client, or a dependency in the manifest that appears nowhere
+in the doc. That is an architectural decision made inline — exactly what
+`RULES.md` §2 rule 2 exists to prevent — and it is where the doc becomes
+actively misleading rather than merely incomplete.
 
 **Also check §2, the binding constraint.** Constraints expire: a team grows, a
 budget arrives, a Mac gets bought. A resolved constraint whose mechanism is still
 described as necessary sends every future decision down a path nobody needs
 anymore. Ask; do not assume it still binds.
 
-**And check the artifacts.** §3's tree and §4's diagram were approved as pictures
-at the bootstrap gate. A tree that no longer matches `ls` is drift with a
-high blast radius, because it is the thing a new contributor trusts first.
+**And check the artifacts.** §3.2's tree and §4.2's diagram were approved as
+pictures at the bootstrap gate. A tree that no longer matches `ls`, or a diagram
+missing a new queue, cache, or storage bucket, is drift with a high blast radius,
+because it is the thing a new contributor trusts first.
 
 ---
 
@@ -95,54 +113,18 @@ check that they still agree with each other.
 
 | Read | Compare against |
 |---|---|
-| the design token file, theme config, CSS variables | the color palette, semantic token taxonomy, surface hierarchy, and pairing/contrast rules |
+| the design token file, theme config, CSS variables | color palette ramps, semantic token taxonomy, surface hierarchy, and contrast/pairing rules |
 | font loading, type scale config, typography constants | the typography ramp (Display through Code), font families, weights, and line heights |
-| spacing/padding/margin constants, radius values | the spacing scale, radius scale, and elevation/shadow tokens |
-| navigation bar, header, sidebar, and layout frame components | the app shell architecture, navbar anatomy, sidebar (if any), and mobile collapse behavior |
-| modal / dialog components, confirmation dialogs | the modal dialog spec (sizes, backdrop, focus trap, dismiss, animation) and confirmation/destructive dialog spec |
-| drawer / sheet components | the slide-over drawer and bottom sheet specs |
-| tooltip components or libraries | the tooltip spec (trigger delay, placement/flip, arrow, sizing, ARIA) |
-| popover components | the popover spec (click-to-toggle, interactive content, focus, ARIA) |
-| dropdown menu / action menu components | the dropdown menu spec (item anatomy, groups, submenus, keyboard nav, ARIA) |
-| context menu / right-click handlers | the context menu spec (cursor-anchor, same anatomy as dropdown) |
-| select / combobox / autocomplete components | the select menu and combobox spec (search, multi-select, ARIA) |
-| date picker components | the date/calendar picker spec |
-| command palette / spotlight / search modal | the command palette spec (Cmd+K, result groups, z-index) |
-| toast / notification components | the toast spec (position, auto-dismiss, pause-on-hover, stacking, status variants, ARIA) |
-| alert / banner components | the inline alert and banner notification spec (variants, dismiss rules) |
-| z-index values across all files | the calibrated z-index scale (base through tooltip) |
-| button components | button variants, sizes, and *all six+ states* (default, hover, active, focus-visible, disabled, loading) |
-| form input / control components | input, textarea, select, checkbox, radio, toggle, slider, file upload — each with all states |
-| card / container components | card variants (static, clickable, selected), surface treatment |
-| badge / chip / tag / status components | status variants, removable chips, dot indicators |
-| avatar components | sizes, fallback initials, status dot, avatar groups |
-| table / data grid components | header, hover/selected rows, pagination, mobile card-stack, bulk selection |
-| list / list item components | item anatomy, hover/active, dividers |
-| tab / segmented control components | active indicator, states, scroll overflow, ARIA |
-| breadcrumb components | separator, truncation, current page aria |
-| pagination components | variant, active/disabled states |
-| progress bar, spinner, stepper, skeleton components | all loading and progress variants |
-| accordion / collapsible components | expand/collapse behavior, ARIA |
-| empty state, error state, loading state patterns | standard component empty/loading/error styles and skeletons |
-| CSS transitions, keyframe animations, motion libraries | the animation system (duration tokens, easing curves, per-component table, reduced-motion handling) |
+| spacing/padding/margin constants, radius values | spacing scale, border radius scale, and elevation/shadow tokens |
+| layout grid, responsive breakpoint config, container rules | responsive breakpoints, container max-widths, and layout grid system |
+| navigation bar, header, sidebar, and layout frame components | app shell architecture, navbar anatomy, sidebar (if any), and mobile navigation behavior |
+| UI components (buttons, inputs, cards, tables, badges, avatars) | component specs — variants, sizes, and interactive states (default, hover, active, focus-visible, disabled, loading) |
+| modal, drawer, dropdown, tooltip, popover, toast, alert components | overlay system contracts (backdrop, dismiss, focus trap, stacking/z-index hierarchy) |
+| empty state, error state, loading state patterns | standard component empty states, skeleton shimmer loader patterns, and error fallbacks |
+| CSS transitions, keyframe animations, motion libraries | animation system (duration tokens, easing curves, per-component table, reduced-motion handling) |
 | icon usage and library | icon set, default sizes, stroke weight, color inheritance |
 
-**What drift looks like here:** raw hex values scattered in components instead of semantic tokens, broken WCAG AA contrast ratios, navbar components missing mobile collapse or active indicators, ad-hoc tooltip or popover implementations that bypass the spec'd placement and z-index rules, dropdown menus without keyboard navigation or ARIA, confirmation dialogs that don't match the destructive styling contract, toast notifications with inconsistent auto-dismiss timing or positioning, new button variants or form input states invented without updating the component spec, and animation durations or easing that diverge from the token system.
-
----
-
-## SCREENS.md
-
-| Read | Compare against |
-|---|---|
-| route definitions, router configuration, screen/page files | the complete screen inventory (§1.1) and route map — every route has an entry |
-| navigation config, navbar/sidebar link lists | the navigation graph and hierarchy — every screen is reachable by a link, CTA, or explicit flow |
-| screen / page layout components | the ASCII wireframes in §3 — layout framing, component placement, and CTA positions match |
-| screen-level empty, loading, and error states | per-screen state specifications in §3 — every screen handles zero-data, skeleton loading, and fetch failure |
-| modal, drawer, and dialog invocation sites | modal and drawer flows in §4 — every trigger connects to the specified overlay flow |
-| user journey / flow implementations | the core user flows in §2 — step-by-step sequences match the documented flow |
-
-**What drift looks like here:** screens that exist in the codebase but are not in the inventory (§1.1) — usually added ad-hoc one at a time — orphan routes with no navigation path leading to them, screens with missing empty or error handling, wireframes that depict layouts different from what was implemented, and modal/drawer flows triggered from screens without an entry in §4.
+**What drift looks like here:** raw hex values scattered in components instead of semantic tokens, broken WCAG AA contrast ratios, navbar components missing mobile collapse or active indicators, components with missing interactive or loading/error states, overlay implementations that bypass placement or z-index rules, dropdown menus without keyboard navigation or ARIA, toast notifications with inconsistent timing or positioning, and animation durations or easing that diverge from the token system.
 
 ---
 
@@ -209,7 +191,7 @@ matches disk; a worked example that no longer compiles.
 table with outdated revisions; a §4 entry whose question is settled in practice
 but not yet retired.
 
-Any `## Open Questions` section, `TBD`, or `to be decided` surviving in a doc is
+Any `Open Questions` section, `TBD`, or `to be decided` surviving in a doc is
 **MAJOR** — a hole left where a decision belongs, per
 `references/closing-questions.md`.
 

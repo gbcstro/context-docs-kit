@@ -32,11 +32,10 @@ doc(s) before working in that area:
 
 | Doc | Covers |
 |---|---|
-| [`context/PRODUCT.md`](./context/PRODUCT.md) | Features, monetization, success metrics — the what and why |
-| [`context/ARCHITECTURE.md`](./context/ARCHITECTURE.md) | Tech stack, repo layout, system diagram, infra, build pipeline |
+| [`context/PRODUCT.md`](./context/PRODUCT.md) | Product identity, purpose, target users & roles, user journeys, feature specs & business rules, monetization, success metrics |
+| [`context/ARCHITECTURE.md`](./context/ARCHITECTURE.md) | Tech stack, libraries, repo architecture, APIs, DB, caching, queues/workers, file storage, webhooks, auth, containers, cloud/IaC, response time targets & scaling |
 | [`context/SCHEMA.md`](./context/SCHEMA.md) | Data model |
-| [`context/DESIGN.md`](./context/DESIGN.md) | Frontend design system, tokens, UI components, overlays, animations |
-| [`context/SCREENS.md`](./context/SCREENS.md) | Screen inventory, route map, wireframes, screen states, user flows |
+| [`context/DESIGN.md`](./context/DESIGN.md) | Theme colors, typography, layout/spacing, UI components to be built, motion & accessibility |
 | [`context/RULES.md`](./context/RULES.md) | Coding conventions, git workflow, AI assistant rules |
 | [`context/PROGRESS/`](./context/PROGRESS/) | `PROGRESS_v<N>.md` is the current version's scope and checklist; `CHANGELOG_v<N>.md` records why anything changed during it |
 ```
@@ -51,8 +50,8 @@ Include only the docs that actually exist. The "Covers" column must describe *th
 - **Current version:** v1 — scope and checklist in `context/PROGRESS/PROGRESS_v1.md`
 - **Repo layout:** <apps and packages, one line each>
 - **Frontend:** <framework, key libraries>
-- **Backend:** <framework, ORM, database>
-- **Hosting:** <where it runs>
+- **Backend:** <framework, API style, ORM, database, cache, queues>
+- **Infra & IaC:** <containers, cloud host, IaC tool, file storage>
 - **Defining constraint:** <the binding constraint from ARCHITECTURE.md §2>
 ```
 

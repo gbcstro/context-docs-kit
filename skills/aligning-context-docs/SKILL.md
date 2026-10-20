@@ -171,19 +171,17 @@ disagreeing.
 Walk the chain **downhill** from every doc you touched:
 
 ```
-PRODUCT -> ARCHITECTURE -> SCHEMA -> DESIGN -> SCREENS -> RULES
+PRODUCT -> ARCHITECTURE -> SCHEMA -> DESIGN -> RULES
 ```
 
 For each downstream doc, ask the specific question, not a general one:
 
 | Changed | Then check |
 |---|---|
-| `PRODUCT.md` feature or field | does `SCHEMA.md` still have a home for every field? does `SCREENS.md` still have a screen? |
-| `ARCHITECTURE.md` store, ORM or migration tool | does `SCHEMA.md` assume the old one? does `RULES.md` §9 name the old migration command? |
-| `ARCHITECTURE.md` repo layout | does `RULES.md` §3 describe the old layout? is the tree in §3 still the tree on disk? |
-| `SCHEMA.md` entity or column | does `PRODUCT.md` describe a field that no longer exists? does `SCREENS.md` show it? |
-| `DESIGN.md` token, component or overlay | do all wireframes and screens in `SCREENS.md` use the updated components and tokens? |
-| `SCREENS.md` screen or flow | is every screen still reachable? does `PRODUCT.md` still claim the feature? |
+| `PRODUCT.md` feature or field | does `ARCHITECTURE.md` cover any required infra (uploads, webhooks, queues, notifications)? does `SCHEMA.md` still have a home for every field? |
+| `ARCHITECTURE.md` store, ORM, migration tool, queues, webhooks or tenancy | does `SCHEMA.md` assume the old store/ORM or omit required outbox/webhook/tenancy tables? does `RULES.md` §9 name the old migration command? |
+| `ARCHITECTURE.md` repo layout, module boundaries, IaC or testing stack | does `RULES.md` §3 describe the old layout, §4 reference moved seams, or §7/§10 reference old test/ops commands? is the tree in §3.2 still the tree on disk? |
+| `SCHEMA.md` entity or column | does `PRODUCT.md` describe a field that no longer exists? |
 | `RULES.md` §2 | **the agent file needs refreshing** — see step 7 |
 
 Each cascaded doc gets its own `Revision` bump. **One changelog entry covers the

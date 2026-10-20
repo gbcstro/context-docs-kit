@@ -170,7 +170,7 @@ Closed 2026-06-01. Eight of eleven items met.
 
 **Carried to v2:** offline sync, CSV export — criteria unchanged.
 **Dropped:** weekly email digest. Notifications left the product's scope
-entirely once the local-first design was confirmed; PRODUCT.md §9 records it
+entirely once the local-first design was confirmed; PRODUCT.md §8 records it
 as out of scope.
 ```
 
