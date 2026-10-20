@@ -6,17 +6,16 @@
 
 ## Which file
 
-`references/hosts.md` settles this. To restate the rule: **use the agent file the repo already has**, and do not introduce a second convention alongside an existing one.
+`references/hosts.md` settles this. To restate the rule: **standardize on `AGENTS.md` across all coding tools.** When creating an agent file, always create `AGENTS.md` so that all coding tools (Claude Code, Codex, Gemini CLI, Antigravity, Cursor, Copilot, etc.) can use the exact same file instead of identifying each one like `CLAUDE.md`, `GEMINI.md`, etc.
 
 | Present | Wire into |
 |---|---|
-| `CLAUDE.md` | `CLAUDE.md` |
-| `GEMINI.md` | `GEMINI.md` |
 | `AGENTS.md`, `.agents/AGENTS.md` | that file |
-| several of the above | the one belonging to the detected host; say in one line that the others exist and were left alone |
-| none | create the file matching the detected host — `CLAUDE.md`, `AGENTS.md`, or `GEMINI.md` |
+| none | create `AGENTS.md` |
+| legacy tool file only (`CLAUDE.md` or `GEMINI.md`) | `AGENTS.md` (or the existing file if the project explicitly prefers keeping it) |
+| several of the above | wire into `AGENTS.md`; say in one line that the legacy tool files were left alone |
 
-In a monorepo with per-package agent files (e.g. `apps/web/GEMINI.md`), wire the **root** file only. Per-package files stay scoped to their package.
+In a monorepo with per-package agent files (e.g. `apps/web/AGENTS.md`), wire the **root** file only. Per-package files stay scoped to their package.
 
 ## What to merge in
 
@@ -37,7 +36,7 @@ doc(s) before working in that area:
 | [`context/SCHEMA.md`](./context/SCHEMA.md) | Data model |
 | [`context/DESIGN.md`](./context/DESIGN.md) | Theme colors, typography, layout/spacing, UI components to be built, motion & accessibility |
 | [`context/RULES.md`](./context/RULES.md) | Coding conventions, git workflow, AI assistant rules |
-| [`context/PROGRESS/`](./context/PROGRESS/) | `PROGRESS_v<N>.md` is the current version's scope and checklist; `CHANGELOG_v<N>.md` records why anything changed during it |
+| [`context/PROGRESS/`](./context/PROGRESS/) | `PROGRESS_v<N>.md` is current scope & checklist; `CHANGELOG_v<N>.md` logs task completions, sessions, and decision shifts (compacted after 30 days) |
 ```
 
 Include only the docs that actually exist. The "Covers" column must describe *this* project's docs, not be copied boilerplate.
@@ -59,17 +58,9 @@ The **defining constraint** bullet matters most — it is the fact that most oft
 
 **C. The rules, so conventions apply unconditionally** rather than only when an agent chooses to read them.
 
-This is the one piece that differs by host. Check `references/hosts.md` and use the right form — the wrong one is inert text, and the rules then silently never apply.
+Because `AGENTS.md` is shared across all coding tools, inlining `RULES.md` §2 between markers is the universal format that works across every tool (Claude Code, Codex, Gemini CLI, Antigravity, Cursor, etc.). Tools without `@file` import support (Codex, Antigravity) cannot resolve an `@context/RULES.md` line, whereas all tools read inlined markdown text between markers.
 
-*Hosts with `@file` import support (Claude Code, Gemini CLI):*
-
-```markdown
-## Rules
-
-@context/RULES.md
-```
-
-*Hosts without it (Codex, Antigravity)* — copy `RULES.md` §2, and only §2, between markers:
+*Universal format (recommended for cross-tool compatibility, required without import support):*
 
 ```markdown
 ## Rules
@@ -77,6 +68,14 @@ This is the one piece that differs by host. Check `references/hosts.md` and use 
 <!-- context-docs-kit:rules:start -->
 <RULES.md §2, verbatim>
 <!-- context-docs-kit:rules:end -->
+```
+
+*Hosts with `@file` import support (Claude Code, Gemini CLI, when not sharing with tools lacking import support):*
+
+```markdown
+## Rules
+
+@context/RULES.md
 ```
 
 The markers are not decoration: `aligning-context-docs` refreshes what is between them when §2 changes, and without them it would append a second, contradicting copy.
@@ -93,7 +92,7 @@ State plainly what you changed:
 > Facts, and RULES §2 inlined between markers — Codex has no `@`-import, so a
 > `@context/RULES.md` line would have done nothing. Existing sections untouched.
 
-Then note the one thing that keeps the set alive: `RULES.md` §2 requires future work to read these docs and update them when decisions change. Without that section, the docs start drifting on the next change.
+Then note the things that keep the set alive and code quality senior-level: `RULES.md` §2 requires future work to read these docs, search for reusable assets before creating new ones, code like senior engineers adhering to pragmatic principles and official framework documentation, test and verify thoroughly, always log completed tasks and conversations to the changelog (compacting entries older than 30 days), and update the docs when decisions change. Without that section, the docs start drifting on the next change and code quality degrades.
 
 ## Refreshing an already-wired file
 

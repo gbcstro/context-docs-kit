@@ -16,7 +16,7 @@ Gather facts that let the main conversation avoid asking what the repo already a
 
 Look for:
 - Existing product docs under `.docs/`, `docs/`, root: `prd.md`, `product.md`, `requirements.md`, `blueprint.md`, `spec.md`, `README.md`
-- Any agent file (`CLAUDE.md`, `GEMINI.md`, `AGENTS.md`) — often carries a product summary, positioning, and core commands
+- Any agent file (`AGENTS.md` or legacy `CLAUDE.md`, `GEMINI.md`) — often carries a product summary, positioning, and core commands
 - Implemented functional surfaces and features visible in route files, screen/page directories, CLI command trees, controllers, and handlers
 - Core domain vocabulary, entity models, and types in `src/`, `packages/`, or `models/`
 - Authentication, authorization guards, and tenancy checks: single-user vs. multi-user, user roles, permission checks, organization/workspace scopes

@@ -9,10 +9,12 @@ import os from 'node:os';
 import path from 'node:path';
 import assert from 'node:assert/strict';
 import { fileURLToPath } from 'node:url';
+import { execFileSync } from 'node:child_process';
 
-import { parseTargets, resolvePlan, TARGET_NAMES } from '../src/targets.mjs';
+import { parseTargets, resolvePlan, TARGET_NAMES, TARGETS } from '../src/targets.mjs';
 import { planInstall, applyInstall, planUninstall, applyUninstall, shippedSkills, shippedAgents } from '../src/install.mjs';
 import { sync } from '../src/sync-shared.mjs';
+import { compactChangelog, compactChangelogFile } from '../src/compact-changelog.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -70,6 +72,12 @@ test('only claude installs persona agents', () => {
     const [group] = resolvePlan([name], { home: '/home/u' });
     const expected = name === 'claude';
     assert.equal(Boolean(group.agentsDir), expected, `${name} agentsDir`);
+  }
+});
+
+test('all targets use AGENTS.md as the agent file', () => {
+  for (const name of TARGET_NAMES) {
+    assert.equal(TARGETS[name].agentFile, 'AGENTS.md', `${name} agentFile`);
   }
 });
 
@@ -270,6 +278,119 @@ test('every skill ships the closing-questions reference', () => {
     const body = fs.readFileSync(path.join(ROOT, 'skills', skill, 'SKILL.md'), 'utf8');
     assert.match(body, /closing-questions\.md/, `${skill}/SKILL.md never points at it`);
   }
+});
+
+console.log('\nchangelog discipline & compaction');
+
+test('compactChangelog keeps recent entries and compacts entries older than 30 days', () => {
+  const sample = `# Sample — v1 Change Log
+
+## 2026-01-15 — Task: Setup Auth
+**Completed:** Implemented JWT login and password hashing.
+**Why:** User authentication requirement.
+**Affects:** src/auth.ts, test/auth.test.ts.
+
+## 2026-03-25 — Task: Checkout UI
+**Completed:** Added billing checkout page.
+**Why:** Monetization.
+**Affects:** src/checkout.tsx.
+`;
+
+  const now = new Date('2026-04-01T00:00:00Z');
+  const result = compactChangelog(sample, { days: 30, now });
+
+  assert.equal(result.compactedCount, 1, 'expected 1 entry compacted');
+  assert.equal(result.activeCount, 1, 'expected 1 entry active');
+  assert.match(result.content, /## Active Log \(Last 30 Days\)/);
+  assert.match(result.content, /## 2026-03-25 — Task: Checkout UI/);
+  assert.match(result.content, /## Compacted History \(> 30 days\)/);
+  assert.match(result.content, /### 2026-01 \(Compacted\)/);
+  assert.match(result.content, /- \*\*2026-01-15 \(Task: Setup Auth\):\*\* Implemented JWT login and password hashing/);
+});
+
+test('compactChangelog handles multiple runs and merges months gracefully', () => {
+  const sample = `# Sample — v1 Change Log
+
+## 2026-01-10 — Task: Database setup
+**Completed:** Setup Postgres migrations.
+**Why:** Persistent storage.
+**Affects:** src/db/schema.ts.
+
+## 2026-01-20 — Task: User model
+**Completed:** Added user table.
+**Why:** User storage.
+**Affects:** src/db/user.ts.
+`;
+
+  const now = new Date('2026-04-01T00:00:00Z');
+  const res1 = compactChangelog(sample, { days: 30, now });
+  assert.equal(res1.compactedCount, 2);
+
+  // Run compaction again on the already-compacted content
+  const res2 = compactChangelog(res1.content, { days: 30, now });
+  assert.equal(res2.compactedCount, 0, 'subsequent run should compact 0 new entries');
+  assert.equal(res2.activeCount, 0);
+
+  // Check that the two January entries are grouped under a single 2026-01 header
+  const monthMatches = res2.content.match(/### 2026-01 \(Compacted\)/g);
+  assert.equal(monthMatches.length, 1, 'expected single month heading');
+  assert.match(res2.content, /Database setup/);
+  assert.match(res2.content, /User model/);
+});
+
+test('compactChangelog respects custom day thresholds', () => {
+  const sample = `# Sample — v1 Change Log
+
+## 2026-03-20 — Task: Feature A
+**Completed:** Built feature A.
+**Why:** Needed.
+**Affects:** src/a.ts.
+`;
+  const now = new Date('2026-04-01T00:00:00Z'); // 12 days later
+  const res30 = compactChangelog(sample, { days: 30, now });
+  assert.equal(res30.compactedCount, 0, '12 days old should not compact with days=30');
+
+  const res10 = compactChangelog(sample, { days: 10, now });
+  assert.equal(res10.compactedCount, 1, '12 days old should compact with days=10');
+});
+
+test('RULES.md references and engineering-standards agent enforce Rule 11 and changelog discipline', () => {
+  const rulesPath = path.join(ROOT, 'skills', 'bootstrapping-context-docs', 'references', 'rules.md');
+  const rulesContent = fs.readFileSync(rulesPath, 'utf8');
+  assert.match(rulesContent, /11\.\s+\*\*Always log when a task or conversation is done\.\*\*/);
+  assert.match(rulesContent, /compact.*30 days/i);
+
+  const agentPath = path.join(ROOT, 'agents', 'engineering-standards.md');
+  const agentContent = fs.readFileSync(agentPath, 'utf8');
+  assert.match(agentContent, /11\.\s+\*\*Always log when a task or conversation is done\.\*\*/);
+  assert.match(agentContent, /compact.*30 days/i);
+
+  const historyPath = path.join(ROOT, 'shared', 'references', 'history-discipline.md');
+  const historyContent = fs.readFileSync(historyPath, 'utf8');
+  assert.match(historyContent, /The 30-Day Compaction Protocol/);
+  assert.match(historyContent, /Always log when a task or conversation is done/);
+});
+
+test('CLI compact-changelog command works and respects --dry-run', () => {
+  const home = tmpHome();
+  const changelogPath = path.join(home, 'CHANGELOG.md');
+  const sample = `# Sample — v1 Change Log\n\n## 2025-01-01 — Task: Old task\n**Completed:** Setup.\n**Why:** Init.\n**Affects:** root.\n`;
+  fs.writeFileSync(changelogPath, sample, 'utf8');
+
+  // Dry run
+  const binPath = path.join(ROOT, 'bin', 'cli.mjs');
+  const dryOutput = execFileSync(process.execPath, [binPath, 'compact-changelog', '--file', changelogPath, '--dry-run']).toString();
+  assert.match(dryOutput, /Dry run - nothing was written/);
+  assert.equal(fs.readFileSync(changelogPath, 'utf8'), sample);
+
+  // Real run
+  const realOutput = execFileSync(process.execPath, [binPath, 'compact-changelog', '--file', changelogPath]).toString();
+  assert.match(realOutput, /Updated .* successfully/);
+  const updated = fs.readFileSync(changelogPath, 'utf8');
+  assert.match(updated, /## Compacted History \(> 30 days\)/);
+  assert.match(updated, /### 2025-01 \(Compacted\)/);
+
+  fs.rmSync(home, { recursive: true, force: true });
 });
 
 console.log(`\n${passed} passed, ${failed} failed\n`);

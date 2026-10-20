@@ -83,7 +83,7 @@ none present                     -> the set predates PROGRESS/. Say so, offer to
 ```
 
 Read `PROGRESS_v<N>.md` (scope, checklist, §4 provisional decisions) and `CHANGELOG_v<N>.md`
-(what has already changed this version — do not re-report a change that is
+(active entries and compacted history — do not re-report a change that is
 already logged). Then read every `context/*.md` header and note each doc's
 `Revision`.
 
@@ -157,7 +157,7 @@ For each accepted fix, in full, per `references/history-discipline.md`:
 
 1. **Rewrite the doc into the new decision.** Delete the old text — do not annotate, contrast, or explain it. The doc reads as if it had always said this.
 2. **Bump `Revision` and `Last updated`.** `Project version` does not move.
-3. **Append to `CHANGELOG_v<N>.md`** — changed, why, affects.
+3. **Append to `CHANGELOG_v<N>.md`** — changed, why, affects. Check for and compact any changelog entries older than 30 days into monthly rollups under `## Compacted History (> 30 days)` (or run `npx context-docs-kit compact-changelog`).
 4. **Cascade** along `Depends on` before you finish.
 5. **Re-check `PROGRESS_v<N>.md`** if scope, criteria or a §4 provisional decision moved. A decision that is now settled leaves §4 in this same pass.
 6. **Run the banned-phrase check.**

@@ -56,6 +56,8 @@ npx context-docs-kit install --target all
 
 `npx context-docs-kit list` shows what is installed where. `npx context-docs-kit uninstall` removes it — and only ever removes what it installed, tracked in a manifest at each install root, so a hand-written skill sitting in the same directory is never touched.
 
+`npx context-docs-kit compact-changelog [--days 30]` compacts changelog entries older than 30 days into monthly rollups, keeping the active log clean.
+
 </details>
 
 Restart your assistant afterwards.
@@ -140,12 +142,15 @@ context/
   PROGRESS/
     PROGRESS_v1.md      v1's scope, checklist, acceptance criteria,
                         and the register of provisional decisions
-    CHANGELOG_v1.md     why anything changed during v1
+    CHANGELOG_v1.md     completed tasks, session logs, and why anything
+                        changed during v1 (compacted after 30 days)
 ```
 
 **`PROGRESS_v1.md` is written from every approved doc** at the end of the bootstrap, and it is a commitment, not a summary: the shippable slices v1 owes, each with acceptance criteria you could actually check, each pointing at the doc section it came from. Boxes get ticked as work lands, with evidence — the file or test that satisfies the criterion. It is always `v1` on a first run, and **only you close it**.
 
 **The docs never explain themselves.** When a decision changes and the version doesn't move, the doc is rewritten so it reads as if it had always said this — no "previously", no "we switched from X" — and the reason goes in `CHANGELOG_v1.md`, with a list of every doc the change touched. That list is what makes a decision's blast radius findable later, and it's why the docs stay readable: a doc arguing with its own history buries the one fact you opened it for.
+
+**Always log on completion, compact after 30 days.** Whenever an AI assistant or contributor finishes a task, resolves a bug, or ends a conversation session, it logs what was completed to `CHANGELOG_v<current>.md` before declaring completion. To avoid bloating LLM context with old granular entries, entries older than 30 days are automatically compacted into concise monthly summary rollups.
 
 Then the cascade, which is the part that usually gets skipped: a change is not finished until every doc downstream of it agrees. `aligning-context-docs` walks the `Depends on` chain and fixes them in the same pass.
 
@@ -157,7 +162,7 @@ Then the cascade, which is the part that usually gets skipped: a change is not f
 | **No open questions, anywhere** | Every question closes before its doc is drafted; what can't be settled becomes a registered provisional decision |
 | **`Project version` + `Revision`** | Two separate axes: `v1` is the product, `Revision: 3` is the file. `v` never means both |
 | **Agent-file wiring** — docs map + rules | Without it the folder is inert. Excellent docs nobody opens change nothing |
-| **`PROGRESS_vN` + `CHANGELOG_vN`** | Docs stay present-tense; scope is committed with criteria; reasons stay findable |
+| **`PROGRESS_vN` + `CHANGELOG_vN`** | Docs stay present-tense; scope is committed with criteria; completed tasks & reasons stay findable; compacted after 30 days |
 
 Agent-file wiring is the step most often skipped, and the one that decides whether any of this has an effect. The kit uses `@context/RULES.md` on hosts that support imports, and copies §2 verbatim between markers on hosts that don't — so the rules apply on Codex and Antigravity too, instead of sitting there as an inert line.
 
@@ -186,7 +191,7 @@ On Claude Code these run as subagents. Elsewhere the same personas run inline in
 
 ## Why `RULES.md` matters most
 
-Its §2 is addressed to the AI, not to you: *read before writing*, *no undocumented architecture decisions*, *keep the docs living, not frozen*, *no speculative scope beyond the current version's checklist*, *ask, don't guess*, *wireframe before building UI*.
+Its §2 is addressed to the AI, not to you: *read before writing*, *no undocumented architecture decisions*, *keep the docs living, not frozen*, *no speculative scope beyond the current version's checklist*, *ask, don't guess*, *wireframe before building UI*, *reuse before creating*, *code like a senior engineer (pragmatic principles per scenario)*, *follow official documentation per language & framework*, *test and verify thoroughly*, and *always log completed tasks and conversations to the changelog (compacting entries older than 30 days)*.
 
 Bootstrap ends when the skill exits. §2 is what stops the docs drifting on every change after that — and it's the one section that reaches your agent file unconditionally, rather than only when someone chooses to read it. That makes `RULES.md` the loop-closer, not the throwaway fifth file.
 

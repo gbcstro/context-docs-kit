@@ -174,7 +174,7 @@ entirely once the local-first design was confirmed; PRODUCT.md §8 records it
 as out of scope.
 ```
 
-**`CHANGELOG_v<N>.md`:** append one final line noting the version closed and
+**`CHANGELOG_v<N>.md`:** run the 30-day compaction protocol so any older entries are cleanly rolled up into monthly summaries, then append one final line noting the version closed and
 its date. **Never write to this file again.** Everything after this point belongs
 to vN+1's changelog.
 
@@ -234,8 +234,7 @@ Two docs are worth checking specifically:
 
 Gate it with the user like any other doc.
 
-**`context/PROGRESS/CHANGELOG_v<N+1>.md`** — created with its title line and
-nothing else.
+**`context/PROGRESS/CHANGELOG_v<N+1>.md`** — created with its title, an `## Active Log (Last 30 Days)` section, and a `## Compacted History (> 30 days)` section.
 
 ## Step 8 — Refresh the agent file and report
 

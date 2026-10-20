@@ -116,7 +116,7 @@ Two failure modes to avoid:
 - **Inventing items.** Every checklist item traces to an approved doc section, and the pointer is written down. An item with no source is scope nobody agreed to.
 - **Dropping altitude.** Items are shippable slices, not tasks. "Habit CRUD" with three acceptance criteria, not "add a column to the habits table".
 
-**`context/PROGRESS/CHANGELOG_v1.md`** — created with its title line and nothing else. A first draft is not a revision of anything, so there is nothing to log yet.
+**`context/PROGRESS/CHANGELOG_v1.md`** — created with its title, an `## Active Log (Last 30 Days)` section, and a `## Compacted History (> 30 days)` section. A first draft is not a revision of anything, so initial bootstrap logs nothing yet. Future completed tasks, conversations, and in-version changes are logged here, with entries older than 30 days compacted into monthly summaries.
 
 Always `v1`. Even if the project has shipped before, what shipped was never tracked here.
 
@@ -126,5 +126,6 @@ Tell the user, in two lines, what the other two skills are for:
 
 > Changes inside v1 — a decision reversed, a doc that no longer matches the
 > code — go through `aligning-context-docs`, which rewrites the doc and puts the
-> reason in `CHANGELOG_v1.md`. When every box in `PROGRESS_v1.md` is checked and
-> you say v1 is done, `versioning-context-docs` closes it and opens v2.
+> reason in `CHANGELOG_v1.md`. Whenever tasks or conversations finish, log them there too.
+> When every box in `PROGRESS_v1.md` is checked and you say v1 is done, `versioning-context-docs`
+> closes it and opens v2.

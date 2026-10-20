@@ -75,13 +75,17 @@ Grep the draft for: `previously`, `used to`, `we switched`, `changed from`, `as 
 
 Every hit about a **decision** is a defect at the same severity as an invented fact, and belongs in `context/PROGRESS/CHANGELOG_v<current>.md` instead. Hits about **runtime behaviour** ("once the token expires the session is no longer valid") are fine — that is a fact about the product, not about the doc's history.
 
-### 7. Architecture artifacts, system completeness, and worked examples
+### 7. Architecture artifacts, system completeness, and RULES.md standards
 
 `ARCHITECTURE.md`:
 - The stack block (§1.1), repo tree (§3.2), and system diagram (§4.2) must all be present, and must match what the user approved at the presentation gate. A diagram redrawn during drafting is an invented specific in picture form.
 - Where applicable to the project, verify that concrete mechanics are specified rather than hand-waved: module dependency direction rules (§3.4), API envelope/pagination/rate-limiting (§6), DB connection pooling/migrations/conflict resolution (§7), cache TTLs and exact invalidation triggers (§8), queue retries/idempotency/DLQ (§9), file upload presigned vs. proxy flow and quotas (§10), webhook signature verification and deduplication (§11), auth token lifecycle and tenant isolation (§12), container/cloud/IaC state management (§13–14), and concrete target response times (`p50`/`p95`/`p99`), scaling triggers, RPO/RTO, and rollback mechanics (§14–15).
 
-`RULES.md`: every design principle in §4 carries the worked example the user accepted. A principle stated in the abstract is a finding — the example was either never converged on or was dropped in drafting.
+`RULES.md`:
+- Verify §2 carries the eleven canonical AI rules, specifically including: searching before creating (reuse-first), coding like a senior engineer with pragmatic principles per scenario, adhering to official documentation and modern idioms for the stack, thorough testing/verification discipline, and always logging completed tasks and conversations to the changelog (compacting entries older than 30 days).
+- Every design principle in §4 carries the seam, the scenario boundary (where it applies vs. where it would be over-engineering), and the worked example the user accepted. A principle stated in the abstract, or with no scenario boundary or example, is a finding — the boundary/example was either never converged on or was dropped in drafting.
+- §5 explicitly defines language/framework target versions, authoritative documentation sources, linter/typechecker strictness, modern idioms, and banned antipatterns.
+- §7 defines explicit testing tiers (unit, integration, manual), mocking boundaries (mocking external I/O only; testing real logic directly), edge case expectations, and runnable verification commands.
 
 ### 8. Unfalsifiable content
 

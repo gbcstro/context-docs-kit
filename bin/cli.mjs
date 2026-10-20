@@ -5,6 +5,7 @@ import readline from 'node:readline';
 
 import { parseTargets, TARGET_NAMES, TARGETS, DEFAULT_TARGET } from '../src/targets.mjs';
 import { planInstall, applyInstall, planUninstall, applyUninstall, inspect, packageVersion } from '../src/install.mjs';
+import { compactChangelogFile, findCurrentChangelog } from '../src/compact-changelog.mjs';
 
 const USAGE = `
 context-docs-kit ${packageVersion()}
@@ -13,15 +14,18 @@ context-docs-kit ${packageVersion()}
   Agent Skill into Claude Code, Codex, Gemini CLI or Antigravity.
 
 Usage
-  npx context-docs-kit install   [options]
-  npx context-docs-kit uninstall [options]
+  npx context-docs-kit install           [options]
+  npx context-docs-kit uninstall         [options]
   npx context-docs-kit list
+  npx context-docs-kit compact-changelog [options]
 
 Options
   --target <list>   ${TARGET_NAMES.join(', ')}, or all      (default: ${DEFAULT_TARGET})
   --project         install into this repo instead of your home directory
   --link            symlink the skills instead of copying them (for developing the kit)
   --force           replace files this tool did not install
+  --days <number>   cutoff age in days for compact-changelog (default: 30)
+  --file <path>     specific changelog path for compact-changelog
   --dry-run         print what would happen, write nothing
   -h, --help        this text
   -v, --version     print the version
@@ -31,6 +35,8 @@ Examples
   npx context-docs-kit install --target codex
   npx context-docs-kit install --target claude,gemini
   npx context-docs-kit install --target all --project
+  npx context-docs-kit compact-changelog
+  npx context-docs-kit compact-changelog --days 30
 `.trimStart();
 
 const ACTION_LABEL = {
@@ -181,6 +187,33 @@ function cmdList() {
   }
 }
 
+function cmdCompactChangelog(values) {
+  const filePath = values.file || findCurrentChangelog();
+  if (!filePath) {
+    return fail('no changelog found in context/PROGRESS/ or current directory. Specify one with --file <path>');
+  }
+
+  const days = values.days ? Number.parseInt(values.days, 10) : 30;
+  if (Number.isNaN(days) || days < 1) {
+    return fail(`invalid --days value: ${values.days}`);
+  }
+
+  const dryRun = Boolean(values['dry-run']);
+  const result = compactChangelogFile(filePath, { days, dryRun });
+
+  console.log(`\nCompacting ${filePath} (entries older than ${days} days):`);
+  console.log(`  Compacted: ${result.compactedCount} entry/entries`);
+  console.log(`  Active:    ${result.activeCount} entry/entries`);
+
+  if (dryRun) {
+    console.log('\nDry run - nothing was written.');
+  } else if (result.compactedCount > 0) {
+    console.log(`\nUpdated ${filePath} successfully.`);
+  } else {
+    console.log('\nAll entries are within the active window. No compaction needed.');
+  }
+}
+
 async function main() {
   let parsed;
   try {
@@ -191,6 +224,8 @@ async function main() {
         project: { type: 'boolean' },
         link: { type: 'boolean' },
         force: { type: 'boolean' },
+        days: { type: 'string' },
+        file: { type: 'string' },
         'dry-run': { type: 'boolean' },
         help: { type: 'boolean', short: 'h' },
         version: { type: 'boolean', short: 'v' },
@@ -217,6 +252,9 @@ async function main() {
       case 'list':
       case 'ls':
         return cmdList();
+      case 'compact-changelog':
+      case 'compact':
+        return cmdCompactChangelog(values);
       default:
         return fail(`unknown command: ${command}\n${USAGE}`);
     }

@@ -22,7 +22,7 @@ export const TARGETS = {
     // runs those stages inline (see references/hosts.md).
     userAgents: (home) => path.join(home, '.claude', 'agents'),
     projectAgents: (repo) => path.join(repo, '.claude', 'agents'),
-    agentFile: 'CLAUDE.md',
+    agentFile: 'AGENTS.md',
     supportsImport: true,
   },
   codex: {
@@ -40,7 +40,7 @@ export const TARGETS = {
     projectSkills: (repo) => path.join(repo, '.gemini', 'skills'),
     userAgents: null,
     projectAgents: null,
-    agentFile: 'GEMINI.md',
+    agentFile: 'AGENTS.md',
     supportsImport: true,
   },
   antigravity: {

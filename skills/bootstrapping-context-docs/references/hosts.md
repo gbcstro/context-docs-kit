@@ -10,20 +10,20 @@ first question**, because two of them change what you write into the user's repo
 
 | Host | Agent file | `@file` import | Named persona subagents |
 |---|---|---|---|
-| Claude Code | `CLAUDE.md` | yes | yes |
+| Claude Code | `AGENTS.md` | yes | yes |
 | Codex | `AGENTS.md` | **no** | no |
-| Gemini CLI | `GEMINI.md` | yes | no |
+| Gemini CLI | `AGENTS.md` | yes | no |
 | Antigravity | `AGENTS.md` | **no** | no |
 
 ## How to tell which host you are on
 
 Do not ask the user. Detect it, and only ask if detection is genuinely ambiguous.
 
-1. **Which agent file does the repo already have?** `CLAUDE.md`, `GEMINI.md`, `AGENTS.md`. Use what is there; never introduce a second convention alongside an existing one.
-2. **Where was this skill loaded from?** `~/.claude/skills` → Claude Code. `~/.agents/skills` or `<repo>/.agents/skills` → Codex or Antigravity. `~/.gemini/skills` or `.gemini/skills` → Gemini CLI. `~/.gemini/config/skills` → Antigravity.
-3. **Can you dispatch a named subagent?** If you have no tool that dispatches one, you do not have them, regardless of host.
+1. **Where was this skill loaded from?** `~/.claude/skills` → Claude Code. `~/.agents/skills` or `<repo>/.agents/skills` → Codex or Antigravity. `~/.gemini/skills` or `.gemini/skills` → Gemini CLI. `~/.gemini/config/skills` → Antigravity.
+2. **Can you dispatch a named subagent?** If you have no tool that dispatches one, you do not have them, regardless of host.
+3. **Are there legacy tool-specific files?** A pre-existing `CLAUDE.md` or `GEMINI.md` provides a hint if the install location is ambiguous, but the standard agent file to use and create is always `AGENTS.md`.
 
-If the repo has no agent file and you cannot tell, ask once — one question, with the four options — and record the answer for the rest of the session.
+If you cannot tell, ask once — one question, with the four options — and record the answer for the rest of the session.
 
 ## Degradation 1 — no persona subagents
 
@@ -48,20 +48,15 @@ it finds nothing.
 
 ## Degradation 2 — no `@file` import
 
-On Claude Code and Gemini CLI, `RULES.md` §2 is pulled into every conversation
+On Claude Code and Gemini CLI, `RULES.md` §2 can be pulled into every conversation
 with a one-line import. On Codex and Antigravity there is no import, so an
 `@context/RULES.md` line is inert text and the rules silently never apply.
 
-**With import support:**
+Because `AGENTS.md` is shared across all coding tools, **inlining §2 between markers is
+the universal approach** so that every tool (Codex, Antigravity, Claude Code, Gemini CLI,
+Cursor, etc.) receives the rules unconditionally:
 
-```markdown
-## Rules
-
-@context/RULES.md
-```
-
-**Without import support** — inline §2 verbatim, between markers so
-`aligning-context-docs` can refresh it in place instead of appending a second copy:
+**Without import support (and universal format across all coding tools):**
 
 ```markdown
 ## Rules
@@ -71,6 +66,14 @@ with a one-line import. On Codex and Antigravity there is no import, so an
 <!-- context-docs-kit:rules:end -->
 ```
 
+**With import support (only when targeting hosts with `@file` import support exclusively):**
+
+```markdown
+## Rules
+
+@context/RULES.md
+```
+
 Copy §2 and only §2. The rest of `RULES.md` stays discoverable through the
 Context Docs Map; inlining the whole file burns context in every conversation.
 
@@ -78,10 +81,10 @@ When the markers already exist, replace what is between them. Never append.
 
 ## Degradation 3 — the agent file's name
 
-Use the file the repo already has. If there is none, create the one that matches
-the detected host from the table above. In a monorepo with per-package agent
-files, wire the **root** file only.
+Always use `AGENTS.md`. **When created, create only `AGENTS.md` to be used by all coding tools**
+instead of identifying each one like `CLAUDE.md`, `GEMINI.md`, etc. In a monorepo with per-package
+agent files, wire the **root** file only.
 
-If the repo has several (a `CLAUDE.md` and an `AGENTS.md`, say), wire the one
-belonging to the detected host, and say in one line that the others exist and
+If the repo already has `AGENTS.md`, wire into it. If the repo has several files (such as a legacy
+`CLAUDE.md` and an `AGENTS.md`), wire into `AGENTS.md` and say in one line that the others exist and
 were left alone.
