@@ -1,7 +1,7 @@
 {
   "name": "context-docs-kit",
   "version": "2.0.0",
-  "description": "Bootstraps and maintains a project's context/ foundation docs (product, architecture, schema, design, rules) by interviewing you one question at a time. Installs as an Agent Skill into Claude Code, Codex, Gemini CLI or Antigravity.",
+  "description": "Bootstraps and maintains a project's context/ foundation docs (product, architecture, schema, design, rules) by interviewing you one question at a time, integrated with the 6-pillar Startup & Company Skill Ecosystem. Installs into Claude Code, Codex, Gemini CLI or Antigravity.",
   "type": "module",
   "license": "MIT",
   "author": "Gabriel Castro",
@@ -25,7 +25,9 @@
     "documentation",
     "prd",
     "architecture",
-    "ai-agents"
+    "ai-agents",
+    "startup",
+    "remotion"
   ],
   "bin": {
     "context-docs-kit": "bin/cli.mjs"
@@ -39,12 +41,33 @@
     "README.md",
     "LICENSE"
   ],
+  "skills": [
+    "anthropics/skills@doc-coauthoring",
+    "anthropics/skills@internal-comms",
+    "obra/superpowers@using-superpowers",
+    "anthropics/skills@webapp-testing",
+    "anthropics/skills@skill-creator",
+    "DietrichGebert/ponytail",
+    "https://github.com/mattpocock/skills#grill-me",
+    "Leonxlnx/taste-skill@design-taste-frontend",
+    "anthropics/skills@frontend-design",
+    "anthropics/skills@brand-guidelines",
+    "coreyhaines31/marketingskills",
+    "https://github.com/affaan-m/ECC#brand-discovery",
+    "https://github.com/remotion-dev/skills#remotion-best-practices",
+    "https://github.com/NousResearch/hermes-agent#brag",
+    "heygen-com/hyperframes",
+    "https://github.com/mattpocock/skills#writing-beats"
+  ],
   "engines": {
     "node": ">=18"
   },
   "scripts": {
     "sync": "node src/sync-shared.mjs",
     "test": "node test/run.mjs",
-    "prepack": "node src/sync-shared.mjs --check"
+    "prepack": "node src/sync-shared.mjs --check",
+    "ecosystem:list": "node bin/cli.mjs ecosystem list",
+    "ecosystem:install": "node bin/cli.mjs ecosystem install",
+    "ecosystem:update": "node bin/cli.mjs update"
   }
 }

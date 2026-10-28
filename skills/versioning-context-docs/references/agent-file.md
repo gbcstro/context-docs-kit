@@ -56,7 +56,23 @@ Include only the docs that actually exist. The "Covers" column must describe *th
 
 The **defining constraint** bullet matters most — it is the fact that most often prevents a wrong suggestion, and the one an agent is least likely to infer. The **current version** bullet is what stops an agent inventing scope: it points at the file that says what this version is committed to.
 
-**C. The rules, so conventions apply unconditionally** rather than only when an agent chooses to read them.
+**C. Team Skill Ecosystem & Media Routing** — maps the project's workstreams to the integrated ecosystem skills (see `references/ecosystem.md`) so every contributor's assistant invokes the right specialized skill chain and keeps the suite updated via `npx context-docs-kit update`:
+
+```markdown
+## Team Skill Ecosystem
+
+Keep all team skills updated to their latest upstream versions with `npx context-docs-kit update`.
+
+| Workstream | Active Skills & Tools | How to Chain |
+|---|---|---|
+| **Product, Brand & Growth (Unified)** | `grill-me`, `brand-discovery`, `brand-guidelines`, `marketingskills`, `doc-coauthoring`, `internal-comms` | Interrogate positioning & audience (`grill-me` + `brand-discovery`), define CRO/SEO/GTM in `PRODUCT.md` (`marketingskills`), co-author specs (`doc-coauthoring`), and publish 3P updates (`internal-comms`) |
+| **Engineering & QA Workflow** | `using-superpowers`, `ponytail`, `webapp-testing`, `skill-creator`, `grill-me` | Plan & execute TDD slices (`using-superpowers` + `ponytail`), verify web UI in Playwright before ticking `PROGRESS_v<N>.md` (`webapp-testing`), package recurring workflows (`skill-creator`) |
+| **UI, Brand & Frontend Craft** | `brand-guidelines` → `design-taste-frontend` → `frontend-design` → `impeccable` | Enforce `DESIGN.md` tokens & brand spine (`brand-guidelines`), run anti-slop pre-flight (`design-taste-frontend`), build components after chat wireframe gate (`frontend-design`), run final craft audit (`impeccable`) |
+| **SocMed & Website Video / Media** | `brag` → `writing-beats` → `remotion-best-practices` / `hyperframes` → `marketingskills` | Read `PRODUCT.md` + `DESIGN.md` + `CHANGELOG_v<N>.md` (`brag`), gate a Beat Sheet in chat (`writing-beats`), render code video (`remotion-best-practices`) or AI presenter video (`hyperframes`), draft launch copy (`marketingskills`) |
+| **Token Efficiency** | `@caveman-ai/cli@latest`, `compact-changelog` | High-signal low-token communication and 30-day changelog compaction (`npx context-docs-kit compact-changelog`) |
+```
+
+**D. The rules, so conventions apply unconditionally** rather than only when an agent chooses to read them.
 
 Because `AGENTS.md` is shared across all coding tools, inlining `RULES.md` §2 between markers is the universal format that works across every tool (Claude Code, Codex, Gemini CLI, Antigravity, Cursor, etc.). Tools without `@file` import support (Codex, Antigravity) cannot resolve an `@context/RULES.md` line, whereas all tools read inlined markdown text between markers.
 
@@ -101,5 +117,6 @@ When you are updating rather than wiring for the first time, **merge, never over
 - **`RULES.md` §2 changed** — with import support there is nothing to do; the import picks it up. Without it, replace the text **between** the `context-docs-kit:rules` markers. Never append a second copy. If the markers are missing on an import-less host, the rules were never wired: add the block and say so.
 - **A key fact changed** — stack, layout, hosting, binding constraint, current version. Update those bullets and leave the rest.
 - **The doc set changed** — a doc added or dropped. Update the map table.
+- **Ongoing project missing the `## Team Skill Ecosystem` section or updated `RULES.md` §2** — when running `aligning-context-docs` on a project wired by an earlier version of `context-docs-kit`, merge in **C. Team Skill Ecosystem & Media Routing** and refresh `RULES.md` §2 (between the `context-docs-kit:rules` markers) so the project immediately gains the 6-pillar skill routing and 4-step video/media pipeline.
 
 Everything outside those blocks is the user's, including sections that look like they overlap. Preserve them verbatim.

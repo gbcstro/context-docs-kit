@@ -50,6 +50,8 @@ npx context-docs-kit install --target all
 |---|---|
 | `--target <list>` | `claude`, `codex`, `gemini`, `antigravity`, or `all` (default: `claude`) |
 | `--project` | install into this repo instead of your home directory, so the team shares it |
+| `--ecosystem` | install the 6-pillar Startup & Company Skill Ecosystem alongside `context-docs-kit` |
+| `--bundle <list>` | install a specific team preset (`full-team`, `product`/`growth`, `engineering`, `design`, `video`), category, or skill ID |
 | `--link` | symlink instead of copy, for working on the kit itself |
 | `--force` | replace files this tool did not install |
 | `--dry-run` | print what would happen, write nothing |
@@ -57,6 +59,8 @@ npx context-docs-kit install --target all
 `npx context-docs-kit list` shows what is installed where. `npx context-docs-kit uninstall` removes it — and only ever removes what it installed, tracked in a manifest at each install root, so a hand-written skill sitting in the same directory is never touched.
 
 `npx context-docs-kit compact-changelog [--days 30]` compacts changelog entries older than 30 days into monthly rollups, keeping the active log clean.
+
+`npx context-docs-kit update` updates `context-docs-kit` core skills, runs `npx skills update -y` across all upstream skill repositories, and refreshes `@latest` CLI integrations (`impeccable`, `@caveman-ai/cli`).
 
 </details>
 
@@ -194,6 +198,42 @@ On Claude Code these run as subagents. Elsewhere the same personas run inline in
 Its §2 is addressed to the AI, not to you: *read before writing*, *no undocumented architecture decisions*, *keep the docs living, not frozen*, *no speculative scope beyond the current version's checklist*, *ask, don't guess*, *wireframe before building UI*, *reuse before creating*, *code like a senior engineer (pragmatic principles per scenario)*, *follow official documentation per language & framework*, *test and verify thoroughly*, and *always log completed tasks and conversations to the changelog (compacting entries older than 30 days)*.
 
 Bootstrap ends when the skill exits. §2 is what stops the docs drifting on every change after that — and it's the one section that reaches your agent file unconditionally, rather than only when someone chooses to read it. That makes `RULES.md` the loop-closer, not the throwaway fifth file.
+
+## Startup & Company Team Skill Ecosystem
+
+`context-docs-kit` acts as the conductor and shared source of truth (`context/`) for an always-updated ecosystem of 18 external skills and CLI tools across 6 company pillars:
+
+```bash
+# Install context-docs-kit + all 18 startup/company ecosystem skills across all assistants
+npx context-docs-kit install --target all --ecosystem
+
+# Or install by team pod (--bundle)
+npx context-docs-kit install --bundle full-team      # All 6 categories (18 integrations)
+npx context-docs-kit install --bundle product        # Unified Product, Brand & Growth pod (same as --bundle growth)
+npx context-docs-kit install --bundle engineering    # Dev workflow, Playwright QA, docs, brag, caveman
+npx context-docs-kit install --bundle design         # 4-layer UI craft, brand, Remotion, QA
+npx context-docs-kit install --bundle video          # Social media & website video production suite
+
+# Always keep context-docs-kit + all upstream skills updated
+npx context-docs-kit update
+```
+
+| Pillar | Integrated Skills & Tools | How `context-docs-kit` Orchestrates Them |
+|---|---|---|
+| **Documentation & Internal Comms** | `anthropics/skills@doc-coauthoring`, `anthropics/skills@internal-comms` | Co-authors `PRODUCT.md`, `ARCHITECTURE.md`, and RFCs; turns `CHANGELOG_vN.md` & `PROGRESS_vN.md` into 3P updates and release notes |
+| **Dev Workflow & QA** | `obra/superpowers@using-superpowers`, `anthropics/skills@webapp-testing`, `anthropics/skills@skill-creator`, `DietrichGebert/ponytail`, `mattpocock/skills` (`grill-me`) | Single-question interrogation (`grill-me`), TDD execution (`using-superpowers`, `ponytail`), live Playwright browser verification (`webapp-testing`), and custom repo skills (`skill-creator`) |
+| **UI Principles, Brand & Craft** | `anthropics/skills@brand-guidelines` -> `Leonxlnx/taste-skill@design-taste-frontend` -> `anthropics/skills@frontend-design` -> `npx impeccable install` | Sequenced 4-layer pipeline around `DESIGN.md` and `RULES.md` §2 Rule 6 |
+| **Marketing, SEO & Brand (Unified with Product)** | `coreyhaines31/marketingskills`, `affaan-m/ECC` (`brand-discovery`) | Unified directly into `PRODUCT.md` and the `product`/`growth` pod: brand voice, positioning, CRO, copywriting, technical/programmatic SEO, and GTM launch playbooks |
+| **Token Efficiency** | `npx @caveman-ai/cli@latest` + `compact-changelog` | High-signal low-token communication paired with present-tense docs and 30-day changelog compaction |
+| **Video Generation, Social/Web Media & Brag** | `NousResearch/hermes-agent` (`brag`) -> `mattpocock/skills` (`writing-beats`) -> `remotion-dev/skills` (`remotion-best-practices`) / `heygen-com/hyperframes` | 4-step pipeline for social media reels (`16:9` / `9:16`), website hero walkthroughs, AI avatar explainers, and sprint brag docs |
+
+### Creating Videos & Media for Social Media or Websites
+
+When you ask your assistant to create a launch video, social media reel, or website hero demo, `RULES.md` §2 Rule 6 and `AGENTS.md` automatically run a 4-step pipeline:
+1. **Harvest `context/` Truth:** Reads `PRODUCT.md` (brand voice, incumbent pain, differentiation, CRO hook), `DESIGN.md` (exact semantic color tokens, fonts, radii, motion curves), and `CHANGELOG_vN.md` / `PROGRESS_vN.md` (via `brag`).
+2. **Beat-Sheet Gate (`writing-beats`):** Presents a 30–60s narrative Beat Sheet (*Hook -> Mechanism -> Live Proof -> CTA*) in chat for your approval before rendering.
+3. **Render by Target Channel:** Uses `remotion-best-practices` + `design-taste-frontend` + `frontend-design` for programmatic React/UI videos (website embeds or `16:9` / `9:16` social reels), or `hyperframes` for HeyGen AI presenter/storyboard videos.
+4. **Companion Copy (`marketingskills`):** Writes the matching X thread, LinkedIn post, or landing page copy aligned with the video beats.
 
 ## Layout
 

@@ -201,7 +201,7 @@ Every tick is **proposed, never silent**, and every tick names what satisfies it
 >   Both met. Tick it?
 
 An acceptance criterion with no evidence is not met, however finished the feature
-looks. If a criterion cannot be evidenced, say which one and why — that is
+looks. For web UI acceptance criteria, run live browser verification via `webapp-testing` (Playwright) so the evidence includes real UI behavior. If a criterion cannot be evidenced, say which one and why — that is
 usually the most useful finding in the whole pass, because it is the gap between
 "we built it" and "we can show it works".
 
@@ -278,4 +278,6 @@ explicitly. Doing it quietly, item by item, is how a version stops ever ending.
 | `references/drift-scan.md` | step 2, the per-doc three-way diff |
 | `references/agent-file.md` | step 7, if the agent file needs refreshing |
 | `references/closing-questions.md` | any time a fix cannot be settled outright |
+| `references/ecosystem.md` | routing drift resolution, Playwright QA (`webapp-testing`), and team comms (`internal-comms`) |
+| `references/critic.md` | after a substantial rewrite, to check the result like a fresh draft |
 | `references/critic.md` | after a substantial rewrite, to check the result like a fresh draft |

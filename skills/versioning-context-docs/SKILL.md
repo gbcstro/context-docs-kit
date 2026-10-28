@@ -277,4 +277,6 @@ Then report the whole transition in one block:
 | `references/closing-questions.md` | step 3's register accounting, and any vN+1 question that will not settle |
 | `references/next-version.md` | step 5, the scope grill |
 | `references/agent-file.md` | step 8 |
+| `references/ecosystem.md` | step 4 & step 8: release comms (`internal-comms`), sprint/version brag docs (`brag`), and launch videos (`writing-beats` -> `remotion-best-practices` / `hyperframes`) |
+| `references/critic.md` | any doc that gets a full pass in step 6 |
 | `references/critic.md` | any doc that gets a full pass in step 6 |

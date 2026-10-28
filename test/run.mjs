@@ -15,6 +15,14 @@ import { parseTargets, resolvePlan, TARGET_NAMES, TARGETS } from '../src/targets
 import { planInstall, applyInstall, planUninstall, applyUninstall, shippedSkills, shippedAgents } from '../src/install.mjs';
 import { sync } from '../src/sync-shared.mjs';
 import { compactChangelog, compactChangelogFile } from '../src/compact-changelog.mjs';
+import {
+  ECOSYSTEM_CATEGORIES,
+  ECOSYSTEM_ITEMS,
+  TEAM_PRESETS,
+  resolveEcosystemSelection,
+  buildEcosystemInstallCommands,
+  buildEcosystemUpdateCommands,
+} from '../src/ecosystem.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -391,6 +399,100 @@ test('CLI compact-changelog command works and respects --dry-run', () => {
   assert.match(updated, /### 2025-01 \(Compacted\)/);
 
   fs.rmSync(home, { recursive: true, force: true });
+});
+
+console.log('\necosystem & startup team integration');
+
+test('ecosystem registers all 6 categories and 18 upstream integrations', () => {
+  assert.equal(Object.keys(ECOSYSTEM_CATEGORIES).length, 6);
+  assert.equal(ECOSYSTEM_ITEMS.length, 18);
+  const fullTeam = resolveEcosystemSelection('full-team');
+  assert.equal(fullTeam.length, 18);
+  assert.deepEqual(
+    resolveEcosystemSelection('startup').map((i) => i.id),
+    fullTeam.map((i) => i.id),
+  );
+  assert.deepEqual(
+    resolveEcosystemSelection('company').map((i) => i.id),
+    fullTeam.map((i) => i.id),
+  );
+});
+
+test('product and growth presets use the exact same unified skill stack', () => {
+  const productSkills = resolveEcosystemSelection('product').map((i) => i.id);
+  const growthSkills = resolveEcosystemSelection('growth').map((i) => i.id);
+  const pgSkills = resolveEcosystemSelection('product-growth').map((i) => i.id);
+
+  assert.deepEqual(productSkills, growthSkills, 'product and growth presets must be identical');
+  assert.deepEqual(productSkills, pgSkills, 'product-growth preset must match');
+  for (const required of [
+    'grill-me',
+    'doc-coauthoring',
+    'internal-comms',
+    'brand-discovery',
+    'brand-guidelines',
+    'marketingskills',
+    'writing-beats',
+    'remotion-best-practices',
+    'hyperframes',
+    'brag',
+    'caveman',
+  ]) {
+    assert.ok(productSkills.includes(required), `missing ${required} in unified product/growth preset`);
+  }
+});
+
+test('buildEcosystemInstallCommands builds skills-cli and custom-cli commands accurately', () => {
+  const items = resolveEcosystemSelection('grill-me,impeccable,caveman');
+  const globalCmds = buildEcosystemInstallCommands(items, { targets: ['claude', 'antigravity'], project: false });
+  assert.equal(globalCmds.length, 3);
+
+  const grillCmd = globalCmds.find((c) => c.id === 'grill-me');
+  assert.match(grillCmd.fullCommand, /npx skills add https:\/\/github\.com\/mattpocock\/skills --skill grill-me -g -a claude-code -a antigravity -y/);
+
+  const impCmd = globalCmds.find((c) => c.id === 'impeccable');
+  assert.equal(impCmd.fullCommand, 'npx --yes impeccable install');
+
+  const cavemanCmd = globalCmds.find((c) => c.id === 'caveman');
+  assert.equal(cavemanCmd.fullCommand, 'npx --yes @caveman-ai/cli@latest');
+
+  const projCmds = buildEcosystemInstallCommands(items, { targets: ['codex'], project: true });
+  const projGrill = projCmds.find((c) => c.id === 'grill-me');
+  assert.ok(!projGrill.args.includes('-g'), 'project scope should not include -g');
+  assert.ok(projGrill.args.includes('codex'));
+});
+
+test('buildEcosystemUpdateCommands updates skills and @latest custom CLIs', () => {
+  const cmds = buildEcosystemUpdateCommands({ project: false, includeCustomCli: true });
+  assert.equal(cmds.length, 3);
+  assert.equal(cmds[0].fullCommand, 'npx skills update -g -y');
+  assert.equal(cmds[1].fullCommand, 'npx --yes impeccable@latest install');
+  assert.equal(cmds[2].fullCommand, 'npx --yes @caveman-ai/cli@latest');
+});
+
+test('every skill ships references/ecosystem.md and points to it in SKILL.md', () => {
+  for (const skill of shippedSkills()) {
+    const ref = path.join(ROOT, 'skills', skill, 'references', 'ecosystem.md');
+    assert.ok(fs.existsSync(ref), `${skill} is missing ecosystem.md`);
+    const body = fs.readFileSync(path.join(ROOT, 'skills', skill, 'SKILL.md'), 'utf8');
+    assert.match(body, /ecosystem\.md/, `${skill}/SKILL.md never points at ecosystem.md`);
+  }
+});
+
+test('CLI ecosystem list, ecosystem install --dry-run, and update --dry-run work', () => {
+  const binPath = path.join(ROOT, 'bin', 'cli.mjs');
+  const listOut = execFileSync(process.execPath, [binPath, 'ecosystem', 'list']).toString();
+  assert.match(listOut, /Unified Product & Growth stack/);
+  assert.match(listOut, /remotion-best-practices/);
+  assert.match(listOut, /writing-beats/);
+
+  const installDry = execFileSync(process.execPath, [binPath, 'ecosystem', 'install', '--bundle', 'product', '--dry-run']).toString();
+  assert.match(installDry, /\[dry-run\] npx skills add/);
+
+  const updateDry = execFileSync(process.execPath, [binPath, 'update', '--dry-run']).toString();
+  assert.match(updateDry, /npx skills update/);
+  assert.match(updateDry, /impeccable@latest install/);
+  assert.match(updateDry, /@caveman-ai\/cli@latest/);
 });
 
 console.log(`\n${passed} passed, ${failed} failed\n`);

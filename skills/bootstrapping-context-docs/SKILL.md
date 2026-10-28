@@ -144,7 +144,7 @@ Stage 5 is a hard stop. Do not begin the next doc until the user approves this o
 5. **Elicit the hardest constraint early**, and give it its own top-level section in `ARCHITECTURE.md`. A binding constraint ("no Mac available", "must run air-gapped", "one engineer, part-time") reshapes every downstream choice and belongs in writing, not in your head.
 6. **Show, don't state, when a decision has a shape.** A principle, a repo layout, a data flow, a screen — render it and let the user react to the artifact. People correct a concrete thing accurately and nod at an abstract one vaguely.
 
-If the user has a `grill-me` skill available, its interviewing style applies here too.
+If the user has the `grill-me` skill (`mattpocock/skills`) and `doc-coauthoring` skill (`anthropics/skills`) installed, apply `grill-me`'s single-question decision-tree walk during Stage 2 and `doc-coauthoring`'s structured collaborative drafting discipline during Stage 3. See `references/ecosystem.md` for the full 6-pillar startup/company skill ecosystem.
 
 ## Pros/Cons Discipline
 
@@ -249,6 +249,7 @@ Load only what the current pass needs.
 | `references/schema.md` | SCHEMA.md pass |
 | `references/design.md` | DESIGN.md pass |
 | `references/rules.md` | RULES.md pass |
+| `references/ecosystem.md` | mapping the 6-pillar startup/company skill ecosystem & video/media workflow into docs and `AGENTS.md` |
 | `references/critic.md` | stage 4 of every pass |
 | `references/optional-docs.md` | doc-set proposal, if the core five don't fit |
 | `references/history-discipline.md` | closing the pass, and any revision to a doc already approved |
