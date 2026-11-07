@@ -303,7 +303,8 @@ export const ECOSYSTEM_ITEMS = [
  * `npx skills add gbcstro/context-docs-kit` cannot pull these in — the skills
  * CLI has no dependency resolution and runs no install hooks — so they reach the
  * user through three other paths, all driven by this one list:
- *   1. `npx context-docs-kit install` / `update` install whichever are missing.
+ *   1. `npx context-docs-kit install` / `update` offer whichever are missing,
+ *      and install them only on a yes (or --yes in CI).
  *   2. The skills' own preflight (shared/references/dependencies.md) offers the
  *      install when a skill runs and finds one absent.
  *   3. package.json `skills` (read by `npx skills experimental_sync`) and the

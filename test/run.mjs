@@ -628,6 +628,14 @@ test('plugin dependencies are allowlisted, and install installs companions unles
   assert.match(out, /Companion skills \(12 missing/);
   assert.match(out, /\[dry-run\] npx skills add https:\/\/github\.com\/mattpocock\/skills --skill grill-me -g -a claude-code -y/);
   assert.doesNotMatch(run('--skip-companions'), /Companion skills/);
+
+  // A real (non-dry) install with no terminal must not fetch third-party code unasked.
+  const real = execFileSync(process.execPath, [path.join(ROOT, 'bin', 'cli.mjs'), 'install', '--target', 'claude'], {
+    env: { ...process.env, HOME: home, USERPROFILE: home },
+    stdio: ['pipe', 'pipe', 'pipe'],
+  }).toString();
+  assert.match(real, /Skipped: no terminal to confirm on\. Re-run with --yes/);
+  assert.doesNotMatch(real, /-> Running/);
 });
 
 console.log(`\n${passed} passed, ${failed} failed\n`);

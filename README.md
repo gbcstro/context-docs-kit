@@ -36,7 +36,7 @@ Restart your assistant after any install.
 
 The same from a shell: `claude plugin marketplace add <repo>` for each, then `claude plugin install context-docs-kit@context-docs-kit`. If you added the kit before its dependencies, add the missing marketplaces and run `/reload-plugins`. Claude Code then installs what it can resolve.
 
-**Option 2: the kit's CLI.** Installs the skills to `~/.claude/skills`, the persona subagents to `~/.claude/agents`, and any missing companion skills:
+**Option 2: the kit's CLI.** Installs the skills, the persona subagents to `~/.claude/agents`, and offers to install any missing companion skills:
 
 ```bash
 npx context-docs-kit install                # your user account
@@ -54,7 +54,7 @@ This installs the skills only. On first run, the skill offers to install any mis
 
 ### Codex
 
-**Option 1: the kit's CLI (recommended).** This is the only route that gives Codex the named persona subagents. It renders each persona as a Codex custom agent (TOML), and installs any missing companion skills:
+**Option 1: the kit's CLI (recommended).** This is the only route that gives Codex the named persona subagents. It renders each persona as a Codex custom agent (TOML), and offers to install any missing companion skills:
 
 ```bash
 npx context-docs-kit install --target codex             # ~/.agents/skills + ~/.codex/agents
@@ -91,12 +91,12 @@ npx skills add gbcstro/context-docs-kit -a gemini-cli     # or -a antigravity
 
 Every `RULES.md` the kit writes routes work to 12 companion skills (§2.1): `superpowers`, `ponytail`, `grill-me`, `impeccable`, `design-taste-frontend`, `frontend-design`, `brand-guidelines`, `webapp-testing`, `doc-coauthoring`, `internal-comms`, `skill-creator` and `caveman`.
 
-`npx skills add` and `npx skills update` **cannot install them**. The skills CLI copies skill folders only: it has no dependency resolution and runs no install hooks. So they arrive another way:
+`npx skills add` and `npx skills update` **cannot install them**. The skills CLI copies skill folders only: it has no dependency resolution and runs no install hooks. So they arrive another way, and never without your say-so: they are third-party code, installed at their latest upstream version rather than pinned:
 
 | You installed with | Companions |
 |---|---|
 | Claude Code plugin | Plugin dependencies: installed with the kit once their marketplaces are added. |
-| `npx context-docs-kit install` / `update` | Installed automatically when missing (`--skip-companions` to opt out). |
+| `npx context-docs-kit install` / `update` | Lists the missing ones with their sources and asks once (`[Y/n]`). With no terminal (CI, scripts) they are skipped unless you pass `--yes`. `--skip-companions` turns the offer off. |
 | `npx skills add`, or the Codex plugin | The first time a context-docs skill runs, it checks for them and offers to install any that are missing, once, with your OK. Or run `npx context-docs-kit install --target <host>` to install them all now. |
 | npm (`npm i -D context-docs-kit`) | `npx skills experimental_sync -y` reads the kit's `skills` list and installs them. Add it as a `prepare` script to keep them in step with `npm update`. |
 
@@ -106,7 +106,7 @@ Every `RULES.md` the kit writes routes work to 12 companion skills (§2.1): `sup
 |---|---|
 | Claude Code plugin | `/plugin update context-docs-kit@context-docs-kit` |
 | Codex plugin | `codex plugin marketplace upgrade`, then reinstall from `/plugins` |
-| the kit's CLI | `npx context-docs-kit update`: updates the kit's skills and persona agents, installs any missing companions, runs `npx skills update -y`, and refreshes the `@latest` CLIs (`impeccable`, `@caveman-ai/cli`) |
+| the kit's CLI | `npx context-docs-kit update`: updates the kit's skills and persona agents, offers any missing companions, runs `npx skills update -y`, and refreshes the `@latest` CLIs (`impeccable`, `@caveman-ai/cli`) |
 | `skills` CLI | `npx skills update` (the kit, and any companions installed the same way) |
 
 <details>
@@ -116,7 +116,8 @@ Every `RULES.md` the kit writes routes work to 12 companion skills (§2.1): `sup
 |---|---|
 | `--target <list>` | `claude`, `codex`, `gemini`, `antigravity`, or `all` (default: `claude`) |
 | `--project` | install into this repo instead of your home directory, so the team shares it |
-| `--skip-companions` | don't install the 12 companion skills `RULES.md` §2.1 routes to (installed by default when missing) |
+| `--skip-companions` | don't offer the 12 companion skills `RULES.md` §2.1 routes to |
+| `-y`, `--yes` | install missing companion skills without asking (needed in CI and scripts, where there is no terminal to ask on) |
 | `--ecosystem` | install the 6-pillar Startup & Company Skill Ecosystem alongside `context-docs-kit` |
 | `--bundle <list>` | install a specific team preset (`full-team`, `product`/`growth`, `engineering`, `design`, `video`), category, or skill ID |
 | `--copy` | write a full copy into each host's directory instead of linking it to `.agents/skills` (for filesystems without links) |

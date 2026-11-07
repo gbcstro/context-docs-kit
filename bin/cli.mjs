@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import { parseArgs } from 'node:util';
+import os from 'node:os';
 import path from 'node:path';
 import readline from 'node:readline';
 
@@ -37,8 +38,10 @@ Usage
 Options
   --target <list>   ${TARGET_NAMES.join(', ')}, or all      (default: ${DEFAULT_TARGET})
   --project         install/update in this repo instead of your home directory
-  --skip-companions do not install the ${COMPANION_SKILLS.length} companion skills RULES.md §2.1 routes to
-                    (installed by default by install and update when missing)
+  --skip-companions do not offer the ${COMPANION_SKILLS.length} companion skills RULES.md §2.1 routes to
+                    (install and update list missing ones and ask before installing)
+  -y, --yes         install missing companion skills without asking (scripts and CI;
+                    without a terminal and without --yes they are skipped)
   --ecosystem       install the full startup/company ecosystem alongside context-docs-kit
   --bundle <list>   team preset, category, or skill IDs (default with --ecosystem: full-team)
                     presets: ${Object.keys(TEAM_PRESETS).join(', ')}
@@ -161,11 +164,28 @@ function runEcosystemInstallStep(targets, values) {
 }
 
 /**
- * Install whichever companion skills (COMPANION_SKILLS) are missing for these
- * targets and scope. `npx skills add` cannot do this for us, so install and
- * update both run it unless --skip-companions is passed.
+ * Ask before installing companions: they are third-party code, fetched at
+ * their latest upstream version. No terminal to ask on means no, unless the
+ * caller passed --yes.
  */
-function runCompanionStep(targets, values) {
+async function confirmCompanions(count, values) {
+  if (values.yes) return true;
+  if (!process.stdin.isTTY || !process.stdout.isTTY) return false;
+
+  const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+  const answer = await new Promise((resolve) =>
+    rl.question(`Install ${count} missing companion skill(s) from these third-party sources? [Y/n] `, resolve),
+  );
+  rl.close();
+  return ['', 'y', 'yes'].includes(answer.trim().toLowerCase());
+}
+
+/**
+ * Offer to install whichever companion skills (COMPANION_SKILLS) are missing
+ * for these targets and scope. `npx skills add` cannot do this for us, so
+ * install and update both offer it unless --skip-companions is passed.
+ */
+async function runCompanionStep(targets, values) {
   if (values['skip-companions']) return;
   const project = Boolean(values.project);
   const missing = findMissingCompanions(targets, { project });
@@ -176,9 +196,35 @@ function runCompanionStep(targets, values) {
     return;
   }
 
-  console.log(`Companion skills (${missing.length} missing - required by RULES.md §2.1):`);
+  console.log(
+    `Companion skills (${missing.length} missing - required by RULES.md §2.1).
+` +
+      'These come from third-party repositories and npm, at their latest version:',
+  );
+  for (const item of missing) console.log(`  - ${item.id.padEnd(22)} ${item.command}`);
+
   const commands = buildEcosystemInstallCommands(missing, { targets, project, nonInteractive: true });
-  executeEcosystemCommands(commands, { dryRun: Boolean(values['dry-run']) });
+  if (values['dry-run']) {
+    executeEcosystemCommands(commands, { dryRun: true });
+    console.log('');
+    return;
+  }
+
+  if (!(await confirmCompanions(missing.length, values))) {
+    const retry = `npx context-docs-kit install --target ${targets.join(',')}${project ? ' --project' : ''} --yes`;
+    console.log(
+      process.stdin.isTTY && !values.yes
+        ? `Skipped. Install them later with: ${retry}
+`
+        : `Skipped: no terminal to confirm on. Re-run with --yes to install them: ${retry}
+`,
+    );
+    return;
+  }
+
+  // Project installs must run in the repo (skills add writes to ./.agents/skills);
+  // global ones run from home, away from whatever the current directory holds.
+  executeEcosystemCommands(commands, { cwd: project ? process.cwd() : os.homedir() });
   console.log('');
 }
 
@@ -202,7 +248,7 @@ async function cmdInstall(values) {
     applyInstall(plan, { link: opts.link });
   }
 
-  runCompanionStep(targets, values);
+  await runCompanionStep(targets, values);
 
   if (values.ecosystem || values.bundle) {
     runEcosystemInstallStep(targets, values);
@@ -313,7 +359,7 @@ function cmdEcosystem(positionals, values) {
   return fail(`unknown ecosystem subcommand: ${sub} (expected list, install, or update)`);
 }
 
-function cmdUpdate(values) {
+async function cmdUpdate(values) {
   const dryRun = Boolean(values['dry-run']);
   const installedRows = inspect().filter((r) => r.installed.length);
 
@@ -349,16 +395,16 @@ function cmdUpdate(values) {
 
   console.log('2. Installing missing companion skills:');
   if (values.target) {
-    runCompanionStep(parseTargets(values.target), values);
+    await runCompanionStep(parseTargets(values.target), values);
   } else if (installedRows.length) {
     for (const scope of ['user', 'project']) {
       const scopeRows = installedRows.filter((r) => r.scope === scope);
       if (!scopeRows.length) continue;
       const targets = [...new Set(scopeRows.map((r) => r.target))];
-      runCompanionStep(targets, { ...values, project: scope === 'project' });
+      await runCompanionStep(targets, { ...values, project: scope === 'project' });
     }
   } else {
-    runCompanionStep([DEFAULT_TARGET], values);
+    await runCompanionStep([DEFAULT_TARGET], values);
   }
 
   console.log('3. Updating integrated startup/company ecosystem skills to latest upstream versions:');
@@ -413,6 +459,7 @@ async function main() {
         project: { type: 'boolean' },
         ecosystem: { type: 'boolean' },
         'skip-companions': { type: 'boolean' },
+        yes: { type: 'boolean', short: 'y' },
         bundle: { type: 'string' },
         link: { type: 'boolean' },
         copy: { type: 'boolean' },
@@ -442,7 +489,7 @@ async function main() {
       case 'update':
       case 'up':
       case 'upgrade':
-        return cmdUpdate(values);
+        return await cmdUpdate(values);
       case 'ecosystem':
       case 'eco':
       case 'skills':
