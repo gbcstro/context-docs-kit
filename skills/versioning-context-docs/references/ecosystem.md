@@ -17,7 +17,7 @@
 ### B. Dev Workflow, Testing & Interrogation
 | Skill / Tool | Upstream Command | Role in `context-docs-kit` |
 |---|---|---|
-| **`using-superpowers`** | `npx skills add obra/superpowers@using-superpowers` | Enforces disciplined engineering execution: micro-step implementation plans, strict TDD (red-green-refactor), and root-cause debugging against `PROGRESS_v<N>.md` checklist slices. |
+| **`using-superpowers`** | `npx skills add obra/superpowers` | Enforces disciplined engineering execution: micro-step implementation plans, strict TDD (red-green-refactor), and root-cause debugging against `PROGRESS_v<N>.md` checklist slices. |
 | **`webapp-testing`** | `npx skills add anthropics/skills@webapp-testing` | Drives live Playwright browser verification of web UI surfaces. Required by `RULES.md` §2 Rule 10 and `aligning-context-docs` Step 6 to supply concrete browser evidence before ticking web acceptance criteria. |
 | **`skill-creator`** | `npx skills add anthropics/skills@skill-creator` | Encapsulates recurring project workflows, migration runbooks, or domain conventions discovered in `RULES.md` into project-scoped skills under `.agents/skills/`. |
 | **`ponytail`** | `npx skills add DietrichGebert/ponytail` | Orchestrates developer workflow and context continuity across multi-step implementation sessions. |

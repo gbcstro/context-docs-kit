@@ -4,55 +4,123 @@ Three Agent Skills that build a project's `context/` foundation docs — product
 
 Every project should start with these docs. The problem is that generated docs and decided docs look identical and behave nothing alike: a template is full of gaps nobody can see. A grilled doc has none — every question in it was closed before it was written. This kit exists to produce the second kind, and to stop the first kind quietly replacing it six weeks later.
 
-Runs on **Claude Code, Codex, Gemini CLI and Antigravity**.
+Runs on **Claude Code, Codex, Gemini CLI and Antigravity**, and installs as a plugin on Claude Code and Codex.
 
 ---
 
 ## Install
 
-### Using `skills` (Recommended)
+| Assistant | Recommended | Gets you |
+|---|---|---|
+| **Claude Code** | the plugin | skills, persona subagents, and all 12 companion skills as plugin dependencies |
+| **Codex** | `npx context-docs-kit install --target codex` | skills, persona subagents (as Codex custom agents), and all 12 companion skills |
+| Gemini CLI / Antigravity | `npx context-docs-kit install --target gemini` (or `antigravity`) | skills and companion skills |
 
-Install directly into your assistant via [`skills`](https://skills.sh):
+Restart your assistant after any install.
 
-```bash
-# Install into the current project (.agents/skills/)
-npx skills add gbcstro/context-docs-kit
+### Claude Code
 
-# Or install globally across all projects on your machine
-npx skills add gbcstro/context-docs-kit -g
+**Option 1: plugin (recommended).** The companion skills are plugin dependencies from other marketplaces. Claude Code only installs a dependency whose marketplace you have added, and keeps the kit disabled until they all resolve, so add those marketplaces first:
 
-# Install all skills non-interactively
-npx skills add gbcstro/context-docs-kit --all
+```
+/plugin marketplace add obra/superpowers-marketplace
+/plugin marketplace add DietrichGebert/ponytail
+/plugin marketplace add mattpocock/skills
+/plugin marketplace add anthropics/skills
+/plugin marketplace add Leonxlnx/taste-skill
+/plugin marketplace add pbakaus/impeccable
+/plugin marketplace add JuliusBrussee/caveman
+/plugin marketplace add gbcstro/context-docs-kit
+/plugin install context-docs-kit@context-docs-kit
 ```
 
-To update skills when new versions land:
+The same from a shell: `claude plugin marketplace add <repo>` for each, then `claude plugin install context-docs-kit@context-docs-kit`. If you added the kit before its dependencies, add the missing marketplaces and run `/reload-plugins`. Claude Code then installs what it can resolve.
+
+**Option 2: the kit's CLI.** Installs the skills to `~/.claude/skills`, the persona subagents to `~/.claude/agents`, and any missing companion skills:
 
 ```bash
-npx skills update
+npx context-docs-kit install                # your user account
+npx context-docs-kit install --project      # this repo (.claude/), shared with the team
 ```
+
+**Option 3: the `skills` CLI.**
+
+```bash
+npx skills add gbcstro/context-docs-kit -a claude-code        # this project
+npx skills add gbcstro/context-docs-kit -a claude-code -g     # all projects
+```
+
+This installs the skills only. On first run, the skill offers to install any missing companion skills, and runs its scan, draft and review stages as general-purpose subagents briefed from the persona files it ships with.
+
+### Codex
+
+**Option 1: the kit's CLI (recommended).** This is the only route that gives Codex the named persona subagents. It renders each persona as a Codex custom agent (TOML), and installs any missing companion skills:
+
+```bash
+npx context-docs-kit install --target codex             # ~/.agents/skills + ~/.codex/agents
+npx context-docs-kit install --target codex --project   # .agents/skills + .codex/agents, shared with the team
+```
+
+**Option 2: Codex plugin.** Codex reads the kit's marketplace directly:
+
+```bash
+codex plugin marketplace add gbcstro/context-docs-kit
+codex plugin add context-docs-kit@context-docs-kit
+```
+
+Or run `/plugins` inside Codex and pick it from the `context-docs-kit` tab. Codex plugins carry skills only: the skill offers to install missing companions on first run, and briefs Codex's built-in `default` agent with each persona instead of using named ones.
+
+**Option 3: the `skills` CLI.**
+
+```bash
+npx skills add gbcstro/context-docs-kit -a codex        # .agents/skills
+npx skills add gbcstro/context-docs-kit -a codex -g     # ~/.agents/skills
+```
+
+Same as the plugin: skills only, with companions offered on first run.
+
+### Gemini CLI and Antigravity
+
+```bash
+npx context-docs-kit install --target gemini
+npx context-docs-kit install --target antigravity
+npx skills add gbcstro/context-docs-kit -a gemini-cli     # or -a antigravity
+```
+
+### Companion skills
+
+Every `RULES.md` the kit writes routes work to 12 companion skills (§2.1): `superpowers`, `ponytail`, `grill-me`, `impeccable`, `design-taste-frontend`, `frontend-design`, `brand-guidelines`, `webapp-testing`, `doc-coauthoring`, `internal-comms`, `skill-creator` and `caveman`.
+
+`npx skills add` and `npx skills update` **cannot install them**. The skills CLI copies skill folders only: it has no dependency resolution and runs no install hooks. So they arrive another way:
+
+| You installed with | Companions |
+|---|---|
+| Claude Code plugin | Plugin dependencies: installed with the kit once their marketplaces are added. |
+| `npx context-docs-kit install` / `update` | Installed automatically when missing (`--skip-companions` to opt out). |
+| `npx skills add`, or the Codex plugin | The first time a context-docs skill runs, it checks for them and offers to install any that are missing, once, with your OK. Or run `npx context-docs-kit install --target <host>` to install them all now. |
+| npm (`npm i -D context-docs-kit`) | `npx skills experimental_sync -y` reads the kit's `skills` list and installs them. Add it as a `prepare` script to keep them in step with `npm update`. |
+
+### Updating
+
+| Installed with | Update |
+|---|---|
+| Claude Code plugin | `/plugin update context-docs-kit@context-docs-kit` |
+| Codex plugin | `codex plugin marketplace upgrade`, then reinstall from `/plugins` |
+| the kit's CLI | `npx context-docs-kit update`: updates the kit's skills and persona agents, installs any missing companions, runs `npx skills update -y`, and refreshes the `@latest` CLIs (`impeccable`, `@caveman-ai/cli`) |
+| `skills` CLI | `npx skills update` (the kit, and any companions installed the same way) |
 
 <details>
-<summary>Alternative: using context-docs-kit CLI</summary>
-
-```bash
-npx context-docs-kit install
-```
-
-Installs for Claude Code by default. Pick a different assistant, or several:
-
-```bash
-npx context-docs-kit install --target codex
-npx context-docs-kit install --target claude,gemini
-npx context-docs-kit install --target all
-```
+<summary>CLI reference</summary>
 
 | Flag | Effect |
 |---|---|
 | `--target <list>` | `claude`, `codex`, `gemini`, `antigravity`, or `all` (default: `claude`) |
 | `--project` | install into this repo instead of your home directory, so the team shares it |
+| `--skip-companions` | don't install the 12 companion skills `RULES.md` §2.1 routes to (installed by default when missing) |
 | `--ecosystem` | install the 6-pillar Startup & Company Skill Ecosystem alongside `context-docs-kit` |
 | `--bundle <list>` | install a specific team preset (`full-team`, `product`/`growth`, `engineering`, `design`, `video`), category, or skill ID |
-| `--link` | symlink instead of copy, for working on the kit itself |
+| `--copy` | write a full copy into each host's directory instead of linking it to `.agents/skills` (for filesystems without links) |
+| `--link` | link the `.agents/skills` store back to this package, for working on the kit itself |
 | `--force` | replace files this tool did not install |
 | `--dry-run` | print what would happen, write nothing |
 
@@ -60,33 +128,24 @@ npx context-docs-kit install --target all
 
 `npx context-docs-kit compact-changelog [--days 30]` compacts changelog entries older than 30 days into monthly rollups, keeping the active log clean.
 
-`npx context-docs-kit update` updates `context-docs-kit` core skills, runs `npx skills update -y` across all upstream skill repositories, and refreshes `@latest` CLI integrations (`impeccable`, `@caveman-ai/cli`).
-
 </details>
-
-Restart your assistant afterwards.
 
 <details>
 <summary>Where the files go</summary>
 
-| Host | User install | Project install (`--project`) |
-|---|---|---|
-| Claude Code | `~/.claude/skills` + `~/.claude/agents` | `.claude/skills` + `.claude/agents` |
-| Codex | `~/.agents/skills` | `.agents/skills` |
-| Gemini CLI | `~/.gemini/skills` | `.gemini/skills` |
-| Antigravity | `~/.gemini/config/skills` | `.agents/skills` |
+Every skill is stored **once**, in `.agents/skills` (`~/.agents/skills` for a user install, `<repo>/.agents/skills` with `--project`). That is the same shared location the `skills` CLI uses, and Codex reads it directly. Every other assistant's skills folder gets a link to it (a junction on Windows, so no admin rights are needed), so installing for four assistants costs the disk space of one.
 
-Codex and Antigravity share `.agents/skills` at project scope, so that install happens once and counts for both.
+| Host | Skills (user install) | Skills (`--project`) | Persona agents (copied) |
+|---|---|---|---|
+| *(store)* | `~/.agents/skills` | `.agents/skills` | |
+| Claude Code | `~/.claude/skills` → links to the store | `.claude/skills` → links | `.claude/agents/*.md` |
+| Codex | reads the store directly | reads the store directly | `.codex/agents/*.toml` |
+| Gemini CLI | `~/.gemini/skills` → links | `.gemini/skills` → links | |
+| Antigravity | `~/.gemini/config/skills` → links | reads the store directly | |
 
-</details>
+The store's manifest records which assistants depend on it, so `uninstall --target claude` removes Claude's links and keeps the store while Codex still uses it. An install made before the store existed is converted to links on the next `install` or `update`; pass `--copy` to keep full copies instead.
 
-<details>
-<summary>As a Claude Code plugin instead</summary>
-
-```
-/plugin marketplace add gbcstro/context-docs-kit
-/plugin install context-docs-kit
-```
+Persona agents are always copied: they are a few KB each, and the Codex ones are generated from `agents/*.md` (edit the markdown, never the TOML).
 
 </details>
 
@@ -189,7 +248,7 @@ Each doc has a lens and its own list of things it won't let slide:
 | `engineering-standards` | `RULES.md` | Omitting the AI-assistant rules section; rules with no enforcement path; a principle with no worked example |
 | `context-doc-critic` | all | Reviews every draft before it reaches you — independently, because an author can't see its own blind spots |
 
-On Claude Code these run as subagents. Elsewhere the same personas run inline in the main conversation — the sequence doesn't change, and the review still happens in its own turn, because a writer checking a sentence as it writes it finds nothing.
+On Claude Code and Codex these run as named subagents (Markdown agents on Claude Code, TOML custom agents on Codex). Where the named agents are not installed, a general-purpose subagent is briefed from the persona file the skill ships with; where there are no subagents at all, the same personas run inline in the main conversation — the sequence doesn't change, and the review still happens in its own turn, because a writer checking a sentence as it writes it finds nothing.
 
 **One structural note.** Subagents can't ask you anything, so the interview always happens in the main conversation. Five stages per doc, and only two involve you — the grilling and the approval gate.
 
@@ -221,7 +280,7 @@ npx context-docs-kit update
 | Pillar | Integrated Skills & Tools | How `context-docs-kit` Orchestrates Them |
 |---|---|---|
 | **Documentation & Internal Comms** | `anthropics/skills@doc-coauthoring`, `anthropics/skills@internal-comms` | Co-authors `PRODUCT.md`, `ARCHITECTURE.md`, and RFCs; turns `CHANGELOG_vN.md` & `PROGRESS_vN.md` into 3P updates and release notes |
-| **Dev Workflow & QA** | `obra/superpowers@using-superpowers`, `anthropics/skills@webapp-testing`, `anthropics/skills@skill-creator`, `DietrichGebert/ponytail`, `mattpocock/skills` (`grill-me`) | Single-question interrogation (`grill-me`), TDD execution (`using-superpowers`, `ponytail`), live Playwright browser verification (`webapp-testing`), and custom repo skills (`skill-creator`) |
+| **Dev Workflow & QA** | `obra/superpowers`, `anthropics/skills@webapp-testing`, `anthropics/skills@skill-creator`, `DietrichGebert/ponytail`, `mattpocock/skills` (`grill-me`) | Single-question interrogation (`grill-me`), TDD execution (`using-superpowers`, `ponytail`), live Playwright browser verification (`webapp-testing`), and custom repo skills (`skill-creator`) |
 | **UI Principles, Brand & Craft** | `anthropics/skills@brand-guidelines` -> `Leonxlnx/taste-skill@design-taste-frontend` -> `anthropics/skills@frontend-design` -> `npx impeccable install` | Sequenced 4-layer pipeline around `DESIGN.md` and `RULES.md` §2 Rule 6 |
 | **Marketing, SEO & Brand (Unified with Product)** | `coreyhaines31/marketingskills`, `affaan-m/ECC` (`brand-discovery`) | Unified directly into `PRODUCT.md` and the `product`/`growth` pod: brand voice, positioning, CRO, copywriting, technical/programmatic SEO, and GTM launch playbooks |
 | **Token Efficiency** | `npx @caveman-ai/cli@latest` + `compact-changelog` | High-signal low-token communication paired with present-tense docs and 30-day changelog compaction |
@@ -245,13 +304,14 @@ skills/
   bootstrapping-context-docs/  process, gates, grilling, architecture gate, worked-example loop
   aligning-context-docs/       three-way drift scan, in-version change protocol, cascade
   versioning-context-docs/     close a version, account for every item, open the next
-agents/                        five doc personas + the critic (Claude Code)
-.claude-plugin/                plugin + marketplace manifests
+agents/                        five doc personas + the critic (source; rendered to TOML for Codex)
+.claude-plugin/                Claude Code plugin + marketplace manifests (Codex reads the marketplace too)
+.codex-plugin/                 Codex plugin manifest
 ```
 
 Reference files are loaded per pass, not up front — the `DESIGN.md` questions have no business being in context while you're still deciding what the product is.
 
-Shared references live once in `shared/references/` and are copied into each skill by `npm run sync`; `npm test` fails if a copy has drifted.
+Shared references live once in `shared/references/`, and personas once in `agents/`. `npm run sync` copies both into each skill (`references/`, `agents/`); `npm test` fails if a copy has drifted.
 
 ## Development
 
@@ -262,7 +322,7 @@ npx . install --link          # symlink the skills so edits are live
 npm test                      # installer behaviour + shared-reference drift
 ```
 
-`--link` symlinks the skill directories back to the repo, so editing `SKILL.md` needs no re-sync. Agent files are always copied — re-run after editing one.
+`--link` links the `.agents/skills` store back to the repo (and every host to the store), so editing `SKILL.md` needs no re-sync. Agent files are always copied — re-run after editing one.
 
 ## License
 

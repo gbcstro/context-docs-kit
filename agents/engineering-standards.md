@@ -47,7 +47,37 @@ Write `RULES.md` from the approved answers in your task.
 
 **Write §2 first, before anything else.** It is the section that keeps the whole doc set alive.
 
-§2 contains these eleven rules, adapted to this project's specifics and vocabulary — keep the substance:
+§2 has three subsections. **§2.1 and §2.2 are written verbatim, always** — do not adapt, trim, or drop rows, even for a project with no UI:
+
+```markdown
+### 2.1 Skill Usage (Mandatory)
+
+Invoke the matching skill from `.agents/skills/` **before** acting:
+
+| Scenario | Skills |
+|---|---|
+| Task start, planning, debugging, TDD | `using-superpowers` (brainstorming, systematic-debugging, test-driven-development, verification-before-completion) |
+| Writing, fixing, refactoring, reviewing code | `ponytail` (`ponytail-review`, `ponytail-audit` for reviews) |
+| New feature, vague requirement, plan, or design | `grill-me` (auto-invoked — see below) |
+| UI, design, frontend | `impeccable` first, then `design-taste-frontend`, `frontend-design`, `brand-guidelines` |
+| Verifying live web UI | `webapp-testing` |
+| Specs, RFCs, ADRs | `doc-coauthoring` |
+| Release notes, status updates | `internal-comms` |
+| Context docs drift or version close | `aligning-context-docs`, `versioning-context-docs` |
+| New repeatable workflow | `skill-creator` |
+
+**Auto-invoke `grill-me`.** Before starting any new feature, plan, or design or architecture decision, and whenever a requirement is ambiguous, run `grill-me` without being asked: one question at a time until every branch is resolved, then act. Skip it only for trivial, fully specified changes (typo, rename, a bug with a known fix).
+
+### 2.2 Output Style: Caveman (Always On)
+
+AI chat output uses `caveman` mode: terse, no filler, technical terms exact, code blocks and quoted errors unchanged. Exceptions: security warnings, irreversible-action confirmations, clarification requests. Committed docs, code comments, and commit messages stay in normal prose.
+
+### 2.3 Operating Rules
+
+<the eleven rules below, adapted>
+```
+
+§2.3 contains these eleven rules, adapted to this project's specifics and vocabulary — keep the substance:
 
 1. **Read before writing.** Read the relevant `context/*.md` before implementing in that area rather than assuming. Name which doc covers which concern.
 2. **No undocumented architecture decisions.** Never introduce a library, service, or architectural approach absent from `ARCHITECTURE.md`/`SCHEMA.md` without flagging it and getting confirmation — *held to the same standard every existing choice was held to.* Include that clause; it's what makes the rule read as parity rather than bureaucracy.
@@ -69,7 +99,7 @@ Add project-specific rules only where the approved answers supply them.
 - **Nothing is left open.** Your task's approved answers are the only source. If a section needs a fact you were not given, that is a defect in the task, not a licence to invent and not a hole to leave: report it back rather than writing `TBD`, `to be decided`, or an `## Open Questions` section. **There is no `## Open Questions` section in any doc.** Values marked in your task as *provisional* are decisions the user made — write them as plain, present-tense decisions with no hedging; the main conversation registers them in `PROGRESS_v<N>.md` §4.
 
 - **Every §4 principle carries the worked example the user accepted.** Your task supplies them as principle + seam + scenario boundary + accepted example. Write all of them. A principle without its example does not go in the doc at all. The example is what the user agreed to; the principle name is just its label.
-- **No invented obligations.** Every rule outside the eleven above must come from an approved answer. Inventing a coverage threshold or a review process the user never agreed to produces a doc they'll immediately violate, which destroys the authority of the rules that *were* agreed.
+- **No invented obligations.** Every rule outside §2.1, §2.2 and the eleven §2.3 rules above must come from an approved answer. Inventing a coverage threshold or a review process the user never agreed to produces a doc they'll immediately violate, which destroys the authority of the rules that *were* agreed.
 - **Write the standard the project will actually hold.** If the approved answer is "manual verification for mobile, unit tests for backend services", write exactly that. An aspirational standard broken in week two discredits the whole document.
 - **Skip what a formatter handles.** If Prettier enforces it, the rule is "run the formatter", not a paragraph on brace placement.
 - **§8 (secrets) is never omitted**, even for a solo hobby project.
@@ -86,7 +116,7 @@ Structure:
 **Depends on:** [PRODUCT.md](./PRODUCT.md), [ARCHITECTURE.md](./ARCHITECTURE.md), [SCHEMA.md](./SCHEMA.md), [DESIGN.md](./DESIGN.md)
 
 ## 1. Purpose
-## 2. AI Assistant Rules
+## 2. AI Assistant Rules       <- ### 2.1 Skill Usage, ### 2.2 Output Style, ### 2.3 Operating Rules
 ## 3. Code Organization
 ## 4. Design Principles      <- each with its seam, scenario boundary, and accepted worked example
 ## 5. Language & Style       <- target versions, official docs sources, modern idioms, strictness
@@ -112,4 +142,4 @@ Structure:
 
 §12 points at the agent-file wiring step, not another doc — this is the end of the chain. The wiring is followed by `PROGRESS_v1.md`, which draws its definition of "done" from your §7.
 
-Write the file directly with Write. Then return: the path, the section list, the §2 rules as written, every place the approved answers left a gap, and any section you had to leave thin because the approved answers didn't cover it.
+Write the file directly with Write. Then return: the path, the section list, the §2.3 rules as written, every place the approved answers left a gap, and any section you had to leave thin because the approved answers didn't cover it.

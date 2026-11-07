@@ -36,6 +36,7 @@ nothing moves silently.
 1. **`references/hosts.md`** — host, subagents, whether the agent file supports `@file` imports.
 2. **`references/history-discipline.md`** — the shape of `PROGRESS_vN.md` and `CHANGELOG_vN.md`, and the In-Version Change Protocol you will still be applying for any doc that changes.
 3. **`references/doc-contract.md`** — the header, and which field moves here. **`Project version` moves only in this skill.** Nothing else in the kit is allowed to touch it.
+4. **`references/dependencies.md`** — the companion-skill preflight. `npx skills add` cannot install the skills `RULES.md` §2.1 routes to, so check for them now and, if any are missing, offer the install once.
 
 ## Flow
 

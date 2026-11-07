@@ -1,0 +1,19 @@
+{
+  "name": "context-docs-kit",
+  "version": "2.0.0",
+  "description": "Three skills that build and maintain a project's context/ foundation docs: bootstrapping-context-docs interviews you into a doc set, aligning-context-docs pulls the docs back in line with the code, and versioning-context-docs closes one version and opens the next.",
+  "author": {
+    "name": "Gabriel Castro"
+  },
+  "homepage": "https://github.com/gbcstro/context-docs-kit",
+  "repository": "https://github.com/gbcstro/context-docs-kit",
+  "license": "MIT",
+  "keywords": ["context-engineering", "documentation", "prd", "architecture", "agent-skills"],
+  "interface": {
+    "displayName": "Context Docs Kit",
+    "shortDescription": "Interview-driven product, architecture, schema, design and rules docs",
+    "longDescription": "Builds a project's context/ foundation docs by interviewing you one question at a time, then keeps them aligned with the code and versioned with acceptance criteria.",
+    "developerName": "Gabriel Castro",
+    "category": "Productivity"
+  }
+}

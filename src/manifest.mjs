@@ -25,12 +25,16 @@ export function readManifest(root) {
   }
 }
 
-export function writeManifest(root, { version, entries }) {
+export function writeManifest(root, { version, entries, mode, targets }) {
   fs.mkdirSync(root, { recursive: true });
   const body = {
     tool: 'context-docs-kit',
     version,
     installedAt: new Date().toISOString(),
+    // How the skills got here (copy, symlink into the store, or --link), and
+    // for the shared store, which targets depend on it.
+    ...(mode ? { mode } : {}),
+    ...(targets ? { targets } : {}),
     entries: [...entries].sort((a, b) => a.name.localeCompare(b.name)),
   };
   fs.writeFileSync(manifestPath(root), `${JSON.stringify(body, null, 2)}\n`);

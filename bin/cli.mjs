@@ -10,6 +10,8 @@ import {
   ECOSYSTEM_CATEGORIES,
   ECOSYSTEM_ITEMS,
   TEAM_PRESETS,
+  COMPANION_SKILLS,
+  findMissingCompanions,
   resolveEcosystemSelection,
   buildEcosystemInstallCommands,
   buildEcosystemUpdateCommands,
@@ -35,11 +37,15 @@ Usage
 Options
   --target <list>   ${TARGET_NAMES.join(', ')}, or all      (default: ${DEFAULT_TARGET})
   --project         install/update in this repo instead of your home directory
+  --skip-companions do not install the ${COMPANION_SKILLS.length} companion skills RULES.md §2.1 routes to
+                    (installed by default by install and update when missing)
   --ecosystem       install the full startup/company ecosystem alongside context-docs-kit
   --bundle <list>   team preset, category, or skill IDs (default with --ecosystem: full-team)
                     presets: ${Object.keys(TEAM_PRESETS).join(', ')}
                     categories: ${Object.keys(ECOSYSTEM_CATEGORIES).join(', ')}
-  --link            symlink the skills instead of copying them (for developing the kit)
+  --copy            copy the skills into every host's directory instead of keeping one
+                    copy in .agents/skills and symlinking each host to it (the default)
+  --link            link the .agents/skills store back to this package (for developing the kit)
   --force           replace files this tool did not install
   --days <number>   cutoff age in days for compact-changelog (default: 30)
   --file <path>     specific changelog path for compact-changelog
@@ -50,6 +56,7 @@ Options
 Examples
   npx context-docs-kit install
   npx context-docs-kit install --target all --ecosystem
+  npx context-docs-kit install --skip-companions
   npx context-docs-kit install --target all --bundle startup --project
   npx context-docs-kit install --bundle product,design
   npx context-docs-kit update
@@ -107,7 +114,9 @@ async function promptTargets() {
 }
 
 function reportGroup(group, { dryRun }) {
-  const hosts = group.targets.map((n) => TARGETS[n].label).join(' + ');
+  const hosts = group.targets.length
+    ? group.targets.map((n) => TARGETS[n].label).join(' + ') + (group.store ? '  (shared skill store)' : '')
+    : 'Shared skill store (.agents/skills)';
   console.log(`${hosts}`);
   console.log(`  ${group.skillsDir}`);
 
@@ -151,9 +160,36 @@ function runEcosystemInstallStep(targets, values) {
   console.log('');
 }
 
+/**
+ * Install whichever companion skills (COMPANION_SKILLS) are missing for these
+ * targets and scope. `npx skills add` cannot do this for us, so install and
+ * update both run it unless --skip-companions is passed.
+ */
+function runCompanionStep(targets, values) {
+  if (values['skip-companions']) return;
+  const project = Boolean(values.project);
+  const missing = findMissingCompanions(targets, { project });
+
+  if (!missing.length) {
+    console.log(`Companion skills: all ${COMPANION_SKILLS.length} present.
+`);
+    return;
+  }
+
+  console.log(`Companion skills (${missing.length} missing - required by RULES.md §2.1):`);
+  const commands = buildEcosystemInstallCommands(missing, { targets, project, nonInteractive: true });
+  executeEcosystemCommands(commands, { dryRun: Boolean(values['dry-run']) });
+  console.log('');
+}
+
 async function cmdInstall(values) {
   const targets = values.target ? parseTargets(values.target) : await promptTargets();
-  const opts = { project: Boolean(values.project), link: Boolean(values.link), force: Boolean(values.force) };
+  const opts = {
+    project: Boolean(values.project),
+    link: Boolean(values.link),
+    copy: Boolean(values.copy),
+    force: Boolean(values.force),
+  };
   const plan = planInstall(targets, opts);
   const dryRun = Boolean(values['dry-run']);
 
@@ -165,6 +201,8 @@ async function cmdInstall(values) {
   if (!dryRun) {
     applyInstall(plan, { link: opts.link });
   }
+
+  runCompanionStep(targets, values);
 
   if (values.ecosystem || values.bundle) {
     runEcosystemInstallStep(targets, values);
@@ -217,7 +255,9 @@ function cmdList() {
   }
 
   for (const row of rows) {
-    const mode = row.linked ? 'linked' : 'copied';
+    const mode = row.store
+      ? row.mode === 'link' ? 'shared store, linked to the package' : 'shared store'
+      : { link: 'linked to the package', symlink: 'symlinked to .agents/skills' }[row.mode] ?? 'copied';
     console.log(`${row.label}  (${row.scope}, ${mode}, v${row.version})`);
     console.log(`  ${row.dir}`);
     for (const name of row.installed) console.log(`    ${name}`);
@@ -283,19 +323,23 @@ function cmdUpdate(values) {
     const plan = planInstall(targets, {
       project: Boolean(values.project),
       link: Boolean(values.link),
+      copy: Boolean(values.copy),
       force: Boolean(values.force),
     });
     for (const group of plan) reportGroup(group, { dryRun });
-    if (!dryRun) applyInstall(plan, { link: Boolean(values.link) });
+    if (!dryRun) applyInstall(plan);
   } else if (installedRows.length) {
     for (const scope of ['user', 'project']) {
       const scopeRows = installedRows.filter((r) => r.scope === scope);
       if (!scopeRows.length) continue;
       const targets = [...new Set(scopeRows.map((r) => r.target))];
-      const linked = scopeRows.some((r) => r.linked);
-      const plan = planInstall(targets, { project: scope === 'project', link: linked, force: Boolean(values.force) });
+      // Keep each install's mode: --link stays linked, --copy stays copied, and
+      // anything else (including installs from before the store) moves to symlinks.
+      const link = scopeRows.some((r) => r.linked);
+      const copy = Boolean(values.copy) || scopeRows.some((r) => r.mode === 'copy');
+      const plan = planInstall(targets, { project: scope === 'project', link, copy, force: Boolean(values.force) });
       for (const group of plan) reportGroup(group, { dryRun });
-      if (!dryRun) applyInstall(plan, { link: linked });
+      if (!dryRun) applyInstall(plan);
     }
   } else {
     const plan = planInstall([DEFAULT_TARGET], { project: Boolean(values.project) });
@@ -303,7 +347,21 @@ function cmdUpdate(values) {
     if (!dryRun) applyInstall(plan);
   }
 
-  console.log('2. Updating integrated startup/company ecosystem skills to latest upstream versions:');
+  console.log('2. Installing missing companion skills:');
+  if (values.target) {
+    runCompanionStep(parseTargets(values.target), values);
+  } else if (installedRows.length) {
+    for (const scope of ['user', 'project']) {
+      const scopeRows = installedRows.filter((r) => r.scope === scope);
+      if (!scopeRows.length) continue;
+      const targets = [...new Set(scopeRows.map((r) => r.target))];
+      runCompanionStep(targets, { ...values, project: scope === 'project' });
+    }
+  } else {
+    runCompanionStep([DEFAULT_TARGET], values);
+  }
+
+  console.log('3. Updating integrated startup/company ecosystem skills to latest upstream versions:');
   const commands = buildEcosystemUpdateCommands({
     project: Boolean(values.project),
     bothScopes: !values.project && installedRows.some((r) => r.scope === 'project'),
@@ -354,8 +412,10 @@ async function main() {
         target: { type: 'string' },
         project: { type: 'boolean' },
         ecosystem: { type: 'boolean' },
+        'skip-companions': { type: 'boolean' },
         bundle: { type: 'string' },
         link: { type: 'boolean' },
+        copy: { type: 'boolean' },
         force: { type: 'boolean' },
         days: { type: 'string' },
         file: { type: 'string' },

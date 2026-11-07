@@ -6,7 +6,13 @@
  * its own. That means the host-adaptation rules, the doc contract, the history
  * discipline and the critic checklist exist as copies inside all three skills.
  *
- * shared/references/ is the single source of truth for those files, and
+ * The persona agents get the same treatment: agents/*.md is copied into every
+ * skill's agents/ directory. `npx skills add` installs skill folders only and
+ * never the plugin-level agents/, so without these copies a skills-CLI user has
+ * no persona definitions at all. With them, a host that can dispatch a generic
+ * subagent briefs it from the copy (references/hosts.md, Degradation 1).
+ *
+ * shared/references/ and agents/ are the single sources of truth, and
  * `--check` fails the build if a copy has drifted. This is what stops the
  * duplication problem the kit had before, where a template lived in two places
  * and the two slowly disagreed.
@@ -16,12 +22,17 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const SHARED = path.join(ROOT, 'shared', 'references');
 const SKILLS = path.join(ROOT, 'skills');
 
-function sharedFiles() {
-  if (!fs.existsSync(SHARED)) return [];
-  return fs.readdirSync(SHARED).filter((f) => f.endsWith('.md')).sort();
+/** Source directory -> the subdirectory of every skill it is copied into. */
+const SOURCES = [
+  { src: path.join(ROOT, 'shared', 'references'), sub: 'references' },
+  { src: path.join(ROOT, 'agents'), sub: 'agents' },
+];
+
+function mdFiles(dir) {
+  if (!fs.existsSync(dir)) return [];
+  return fs.readdirSync(dir).filter((f) => f.endsWith('.md')).sort();
 }
 
 function skillDirs() {
@@ -34,15 +45,17 @@ function skillDirs() {
 }
 
 export function sync({ check = false } = {}) {
-  const files = sharedFiles();
   const skills = skillDirs();
+  const files = [];
   const drifted = [];
   let copied = 0;
 
+  for (const source of SOURCES) for (const file of mdFiles(source.src)) files.push({ ...source, file });
+
   for (const skill of skills) {
-    const destDir = path.join(SKILLS, skill, 'references');
-    for (const file of files) {
-      const src = path.join(SHARED, file);
+    for (const { src: srcDir, sub, file } of files) {
+      const destDir = path.join(SKILLS, skill, sub);
+      const src = path.join(srcDir, file);
       const dest = path.join(destDir, file);
       const srcBody = fs.readFileSync(src, 'utf8');
       const same = fs.existsSync(dest) && fs.readFileSync(dest, 'utf8') === srcBody;
@@ -75,10 +88,10 @@ if (invokedDirectly) {
       console.error('\nrun: npm run sync');
       process.exit(1);
     }
-    console.error(`shared references in sync (${result.files.length} files x ${result.skills.length} skills)`);
+    console.error(`shared references and agents in sync (${result.files.length} files x ${result.skills.length} skills)`);
   } else {
     console.log(
-      `synced ${result.files.length} shared reference(s) into ${result.skills.length} skill(s)` +
+      `synced ${result.files.length} shared reference/agent file(s) into ${result.skills.length} skill(s)` +
         ` - ${result.copied} file(s) written`,
     );
   }

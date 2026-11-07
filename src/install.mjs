@@ -1,10 +1,12 @@
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 
 import { resolvePlan, TARGETS } from './targets.mjs';
 import { readManifest, writeManifest, removeManifest, MANIFEST_NAME } from './manifest.mjs';
+import { renderAgentFile } from './agent-format.mjs';
 
 export const PKG_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -62,59 +64,100 @@ function isLink(p) {
   }
 }
 
+/** Does the link at `dest` point at `src`? Works before `src` exists, too. */
+function linksTo(dest, src) {
+  if (!isLink(dest)) return false;
+  try {
+    if (fs.existsSync(src)) return fs.realpathSync(dest) === fs.realpathSync(src);
+    return path.resolve(path.dirname(dest), fs.readlinkSync(dest)) === path.resolve(src);
+  } catch {
+    return false;
+  }
+}
+
 /**
  * Decide what happens to one destination, without touching disk.
  *
  * "ours" means the manifest at this root already claims the entry, so replacing
  * it is safe. Anything else present is the user's and needs --force.
  */
-function classify({ src, dest, name, kind, claimed, link, force }) {
+function classify({ src, dest, name, kind, claimed, link, force, content }) {
   const exists = fs.existsSync(dest) || isLink(dest);
+  const item = { name, kind, src, dest, content };
 
-  if (!exists) return { name, kind, src, dest, action: link ? 'link' : 'create' };
+  if (!exists) return { ...item, action: link ? 'link' : 'create' };
 
   if (link) {
-    if (isLink(dest) && fs.realpathSync(dest) === fs.realpathSync(src)) {
-      return { name, kind, src, dest, action: 'current' };
-    }
-    if (!claimed && !isLink(dest) && !force) {
-      return { name, kind, src, dest, action: 'blocked' };
-    }
-    return { name, kind, src, dest, action: 'relink' };
+    if (linksTo(dest, src)) return { ...item, action: 'current' };
+    if (!claimed && !isLink(dest) && !force) return { ...item, action: 'blocked' };
+    return { ...item, action: 'relink' };
   }
 
   if (isLink(dest)) {
-    // A link from a previous --link install. Replacing it with a copy is ours to do.
-    return { name, kind, src, dest, action: claimed || force ? 'replace' : 'blocked' };
+    // A link from a previous symlinked install. Replacing it with a copy is ours to do.
+    return { ...item, action: claimed || force ? 'replace' : 'blocked' };
   }
 
-  const same = kind === 'skill' ? hashDir(src) === hashDir(dest) : hashFile(src) === hashFile(dest);
-  if (same) return { name, kind, src, dest, action: 'current' };
-  if (!claimed && !force) return { name, kind, src, dest, action: 'blocked' };
-  return { name, kind, src, dest, action: 'update' };
+  const same =
+    kind === 'skill'
+      ? hashDir(src) === hashDir(dest)
+      : crypto.createHash('sha256').update(content).digest('hex') === hashFile(dest);
+  if (same) return { ...item, action: 'current' };
+  if (!claimed && !force) return { ...item, action: 'blocked' };
+  return { ...item, action: 'update' };
+}
+
+/**
+ * The shared skill store: `~/.agents/skills` (user) or `<repo>/.agents/skills`
+ * (project). It is the canonical location the `skills` CLI uses too, and Codex
+ * and Antigravity read it natively.
+ */
+export function storeDir({ project = false, home = os.homedir(), cwd = process.cwd() } = {}) {
+  return path.join(project ? cwd : home, '.agents', 'skills');
 }
 
 /**
  * Build the full install plan for a set of targets. Pure: no writes.
+ *
+ * Default (symlink) mode keeps one real copy of each skill in the store and
+ * makes every other host's skills directory a set of links into it, so four
+ * hosts cost the disk space of one. `copy: true` writes a full copy per host
+ * instead, for filesystems where links are unavailable. `link: true` (developing
+ * the kit) makes the store itself link back to this package.
+ *
+ * The store group always comes first, so the links resolve as soon as they exist.
  */
 export function planInstall(targetNames, opts = {}) {
-  const { project = false, home, cwd, link = false, force = false } = opts;
+  const { project = false, home = os.homedir(), cwd = process.cwd(), link = false, force = false, copy = false } = opts;
   const skills = shippedSkills();
   const agents = shippedAgents();
+  const store = storeDir({ project, home, cwd });
   const groups = resolvePlan(targetNames, { project, home, cwd });
 
-  return groups.map((group) => {
+  let storeGroup = groups.find((g) => g.skillsDir === store);
+  const hostGroups = groups.filter((g) => g !== storeGroup);
+  if (!copy && hostGroups.length && !storeGroup) {
+    // Nothing installed here reads the store directly, but the links need it.
+    storeGroup = { targets: [], skillsDir: store, agentsDir: null, agentFormat: null };
+  }
+
+  const ordered = [storeGroup, ...hostGroups].filter(Boolean);
+  const mode = link ? 'link' : copy ? 'copy' : 'symlink';
+
+  return ordered.map((group) => {
+    const isStore = group === storeGroup;
+    const viaStore = !copy && !isStore;
     const manifest = readManifest(group.skillsDir);
     const claimedSkills = new Set((manifest?.entries ?? []).filter((e) => e.kind === 'skill').map((e) => e.name));
 
     const items = skills.map((name) =>
       classify({
-        src: path.join(PKG_ROOT, 'skills', name),
+        src: viaStore ? path.join(store, name) : path.join(PKG_ROOT, 'skills', name),
         dest: path.join(group.skillsDir, name),
         name,
         kind: 'skill',
         claimed: claimedSkills.has(name),
-        link,
+        link: viaStore || link,
         force,
       }),
     );
@@ -124,15 +167,19 @@ export function planInstall(targetNames, opts = {}) {
       const claimedAgents = new Set(
         (agentManifest?.entries ?? []).filter((e) => e.kind === 'agent').map((e) => e.name),
       );
-      for (const file of agents) {
+      for (const src of agents.map((f) => path.join(PKG_ROOT, 'agents', f))) {
+        // Claude Code takes the markdown as-is; Codex gets it rendered as TOML.
+        const { file, content } = renderAgentFile(src, group.agentFormat);
         items.push(
           classify({
-            src: path.join(PKG_ROOT, 'agents', file),
+            src,
             dest: path.join(group.agentsDir, file),
             name: file,
             kind: 'agent',
+            content,
             claimed: claimedAgents.has(file),
-            // Agent files are always copied. Whether a host discovers an agent
+            // Agent files are always copied. They are a few KB each, Codex's are
+            // generated rather than shipped, and whether a host discovers an agent
             // through a symlink is not something this installer should bet on.
             link: false,
             force,
@@ -141,7 +188,7 @@ export function planInstall(targetNames, opts = {}) {
       }
     }
 
-    return { ...group, items };
+    return { ...group, store: isStore, storeDir: store, mode, items };
   });
 }
 
@@ -153,34 +200,53 @@ function copyDir(src, dest) {
 function makeLink(src, dest) {
   if (fs.existsSync(dest) || isLink(dest)) fs.rmSync(dest, { recursive: true, force: true });
   fs.mkdirSync(path.dirname(dest), { recursive: true });
+  // A junction on Windows: no admin rights or developer mode needed.
   fs.symlinkSync(src, dest, 'junction');
 }
 
 /**
  * Execute a plan produced by planInstall.
+ *
+ * The store's manifest records which targets depend on it, so uninstalling one
+ * host never deletes skills another host still links to.
  */
-export function applyInstall(plan, { link = false } = {}) {
+export function applyInstall(plan) {
   const version = packageVersion();
 
   for (const group of plan) {
     const written = { skills: [], agents: [] };
+    const linkMode = group.mode === 'link' || (group.mode === 'symlink' && !group.store);
 
     for (const item of group.items) {
       if (item.action === 'blocked') continue;
 
       if (item.action !== 'current') {
         fs.mkdirSync(path.dirname(item.dest), { recursive: true });
-        if (item.kind === 'skill' && link) makeLink(item.src, item.dest);
+        if (item.kind === 'skill' && linkMode) makeLink(item.src, item.dest);
         else if (item.kind === 'skill') copyDir(item.src, item.dest);
-        else fs.copyFileSync(item.src, item.dest);
+        else fs.writeFileSync(item.dest, item.content);
       }
 
-      const record = { name: item.name, kind: item.kind, linked: item.kind === 'skill' && link };
-      if (item.kind === 'skill') written.skills.push(record);
-      else written.agents.push(record);
+      if (item.kind === 'skill') {
+        written.skills.push({
+          name: item.name,
+          kind: 'skill',
+          // `linked` means linked to this package (--link). `via` marks a link into the store.
+          linked: group.mode === 'link',
+          ...(group.mode === 'symlink' && !group.store ? { via: 'store' } : {}),
+        });
+      } else {
+        written.agents.push({ name: item.name, kind: 'agent', linked: false });
+      }
     }
 
-    if (written.skills.length) writeManifest(group.skillsDir, { version, entries: written.skills });
+    if (written.skills.length) {
+      const previous = readManifest(group.skillsDir);
+      const targets = group.store
+        ? [...new Set([...(previous?.targets ?? []), ...plan.flatMap((g) => g.targets)])].sort()
+        : group.targets;
+      writeManifest(group.skillsDir, { version, mode: group.mode, targets, entries: written.skills });
+    }
     if (written.agents.length && group.agentsDir) {
       writeManifest(group.agentsDir, { version, entries: written.agents });
     }
@@ -190,13 +256,22 @@ export function applyInstall(plan, { link = false } = {}) {
 }
 
 /**
- * Plan an uninstall. Only manifest-listed entries are ever removed.
+ * Plan an uninstall. Only manifest-listed entries are ever removed, and the
+ * store's skills only once no remaining target depends on them.
  */
 export function planUninstall(targetNames, opts = {}) {
-  const { project = false, home, cwd } = opts;
+  const { project = false, home = os.homedir(), cwd = process.cwd() } = opts;
+  const store = storeDir({ project, home, cwd });
   const groups = resolvePlan(targetNames, { project, home, cwd });
 
+  const storeManifest = readManifest(store);
+  const remaining = (storeManifest?.targets ?? []).filter((t) => !targetNames.includes(t));
+  if (storeManifest && !groups.some((g) => g.skillsDir === store)) {
+    groups.unshift({ targets: [], skillsDir: store, agentsDir: null });
+  }
+
   return groups.map((group) => {
+    const isStore = group.skillsDir === store;
     const items = [];
 
     for (const [root, kind] of [
@@ -204,6 +279,8 @@ export function planUninstall(targetNames, opts = {}) {
       [group.agentsDir, 'agent'],
     ]) {
       if (!root) continue;
+      // The store's skills stay while another installed host still uses them.
+      if (isStore && kind === 'skill' && remaining.length) continue;
       const manifest = readManifest(root);
       if (!manifest) continue;
       for (const entry of manifest.entries) {
@@ -219,7 +296,7 @@ export function planUninstall(targetNames, opts = {}) {
       }
     }
 
-    return { ...group, items };
+    return { ...group, store: isStore, remaining: isStore ? remaining : undefined, items };
   });
 }
 
@@ -231,27 +308,38 @@ export function applyUninstall(plan) {
       if (item.action === 'remove') fs.rmSync(item.dest, { recursive: true, force: true });
       roots.add(item.root);
     }
+    // A kept store just forgets the targets that left.
+    if (group.store && group.remaining?.length) {
+      const manifest = readManifest(group.skillsDir);
+      if (manifest) writeManifest(group.skillsDir, { ...manifest, targets: group.remaining });
+    }
   }
 
   for (const root of roots) removeManifest(root);
   return plan;
 }
 
-/** What is installed where, for `list`. */
-export function inspect({ home, cwd } = {}) {
+/** What is installed where, for `list` and `update`. */
+export function inspect({ home = os.homedir(), cwd = process.cwd() } = {}) {
   const rows = [];
   for (const name of Object.keys(TARGETS)) {
     for (const project of [false, true]) {
       const [group] = resolvePlan([name], { project, home, cwd });
       const manifest = readManifest(group.skillsDir);
+      // The store's manifest lists the targets it serves; a target sharing that
+      // directory (Codex, Antigravity) is installed only if it is on the list.
+      const installed = manifest && (!manifest.targets || manifest.targets.includes(name));
       rows.push({
         target: name,
         label: TARGETS[name].label,
         scope: project ? 'project' : 'user',
         dir: group.skillsDir,
-        installed: manifest ? manifest.entries.map((e) => e.name) : [],
+        installed: installed ? manifest.entries.map((e) => e.name) : [],
+        store: group.skillsDir === storeDir({ project, home, cwd }),
         version: manifest?.version ?? null,
-        linked: Boolean(manifest?.entries?.some((e) => e.linked)),
+        // Manifests from before the shared store carry no mode; `update` moves those to symlinks.
+        mode: manifest?.mode ?? 'legacy',
+        linked: Boolean(installed && manifest.entries.some((e) => e.linked)),
       });
     }
   }

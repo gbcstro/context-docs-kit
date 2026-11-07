@@ -18,10 +18,11 @@ export const TARGETS = {
     label: 'Claude Code',
     userSkills: (home) => path.join(home, '.claude', 'skills'),
     projectSkills: (repo) => path.join(repo, '.claude', 'skills'),
-    // Only Claude Code gets the persona subagents; everywhere else the skill
-    // runs those stages inline (see references/hosts.md).
+    // Claude Code and Codex get the persona subagents; elsewhere the skill
+    // briefs a generic subagent or runs those stages inline (references/hosts.md).
     userAgents: (home) => path.join(home, '.claude', 'agents'),
     projectAgents: (repo) => path.join(repo, '.claude', 'agents'),
+    agentFormat: 'md',
     agentFile: 'AGENTS.md',
     supportsImport: true,
   },
@@ -29,8 +30,11 @@ export const TARGETS = {
     label: 'Codex',
     userSkills: (home) => path.join(home, '.agents', 'skills'),
     projectSkills: (repo) => path.join(repo, '.agents', 'skills'),
-    userAgents: null,
-    projectAgents: null,
+    // Codex custom agents: one TOML file each, rendered from agents/*.md
+    // (src/agent-format.mjs). https://learn.chatgpt.com/docs/agent-configuration/subagents
+    userAgents: (home) => path.join(home, '.codex', 'agents'),
+    projectAgents: (repo) => path.join(repo, '.codex', 'agents'),
+    agentFormat: 'toml',
     agentFile: 'AGENTS.md',
     supportsImport: false,
   },
@@ -86,7 +90,8 @@ export function parseTargets(value) {
  * Resolve targets into the concrete directories to write.
  *
  * Codex and Antigravity share <repo>/.agents/skills at project scope, so the
- * plan groups by destination: one write, credited to both hosts.
+ * plan groups by skills destination: one write, credited to both hosts. Only
+ * Codex has an agents dir, so the merged group takes it.
  */
 export function resolvePlan(
   targetNames,
@@ -99,13 +104,14 @@ export function resolvePlan(
     const skillsDir = project ? t.projectSkills(cwd) : t.userSkills(home);
     const agentsDirFn = project ? t.projectAgents : t.userAgents;
     const agentsDir = agentsDirFn ? agentsDirFn(project ? cwd : home) : null;
+    const agentFormat = agentsDir ? t.agentFormat : null;
 
-    // Paths can contain spaces, so key on the pair rather than a joined string.
-    const key = JSON.stringify([skillsDir, agentsDir]);
-    if (byDest.has(key)) {
-      byDest.get(key).targets.push(name);
+    const group = byDest.get(skillsDir);
+    if (!group) {
+      byDest.set(skillsDir, { targets: [name], skillsDir, agentsDir, agentFormat });
     } else {
-      byDest.set(key, { targets: [name], skillsDir, agentsDir });
+      group.targets.push(name);
+      if (!group.agentsDir && agentsDir) Object.assign(group, { agentsDir, agentFormat });
     }
   }
 

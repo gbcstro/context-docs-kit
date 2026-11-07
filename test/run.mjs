@@ -12,7 +12,7 @@ import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 
 import { parseTargets, resolvePlan, TARGET_NAMES, TARGETS } from '../src/targets.mjs';
-import { planInstall, applyInstall, planUninstall, applyUninstall, shippedSkills, shippedAgents } from '../src/install.mjs';
+import { planInstall, applyInstall, planUninstall, applyUninstall, shippedSkills, shippedAgents, inspect } from '../src/install.mjs';
 import { sync } from '../src/sync-shared.mjs';
 import { compactChangelog, compactChangelogFile } from '../src/compact-changelog.mjs';
 import {
@@ -22,6 +22,8 @@ import {
   resolveEcosystemSelection,
   buildEcosystemInstallCommands,
   buildEcosystemUpdateCommands,
+  COMPANION_SKILLS,
+  findMissingCompanions,
 } from '../src/ecosystem.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -75,12 +77,18 @@ test('codex and antigravity do NOT share a user directory', () => {
   assert.equal(plan.length, 2);
 });
 
-test('only claude installs persona agents', () => {
+test('claude and codex install persona agents, in their own formats', () => {
   for (const name of TARGET_NAMES) {
     const [group] = resolvePlan([name], { home: '/home/u' });
-    const expected = name === 'claude';
-    assert.equal(Boolean(group.agentsDir), expected, `${name} agentsDir`);
+    const expected = { claude: 'md', codex: 'toml' }[name] ?? null;
+    assert.equal(group.agentFormat, expected, `${name} agentFormat`);
+    assert.equal(Boolean(group.agentsDir), Boolean(expected), `${name} agentsDir`);
   }
+});
+
+test('the codex/antigravity shared project group keeps the codex agents dir', () => {
+  const [group] = resolvePlan(['antigravity', 'codex'], { project: true, cwd: '/repo' });
+  assert.equal(group.agentsDir, path.join('/repo', '.codex', 'agents'));
 });
 
 test('all targets use AGENTS.md as the agent file', () => {
@@ -110,14 +118,20 @@ test('install writes every skill to every host root', () => {
   fs.rmSync(home, { recursive: true, force: true });
 });
 
-test('persona agents land only under the claude root', () => {
+test('persona agents land under claude as markdown and codex as TOML', () => {
   const home = tmpHome();
   applyInstall(planInstall(TARGET_NAMES, { home }));
 
   for (const file of shippedAgents()) {
     assert.ok(fs.existsSync(path.join(home, '.claude', 'agents', file)), `missing ${file}`);
+    const toml = fs.readFileSync(path.join(home, '.codex', 'agents', file.replace(/\.md$/, '.toml')), 'utf8');
+    assert.match(toml, /^name = "[a-z-]+"$/m);
+    assert.match(toml, /^description = ".+"$/m);
+    assert.ok(toml.includes('developer_instructions = """\n'), 'developer_instructions block');
   }
-  assert.ok(!fs.existsSync(path.join(home, '.agents', 'agents')), 'codex should get no agents dir');
+  const critic = fs.readFileSync(path.join(home, '.codex', 'agents', 'context-doc-critic.toml'), 'utf8');
+  assert.match(critic, /You are read-only/, 'critic must stay read-only on codex');
+  assert.ok(!fs.existsSync(path.join(home, '.agents', 'agents')), 'no agents dir inside the skills root');
 
   fs.rmSync(home, { recursive: true, force: true });
 });
@@ -141,7 +155,7 @@ test('a foreign skill directory blocks instead of being overwritten', () => {
   fs.writeFileSync(path.join(dest, 'SKILL.md'), 'hand written, do not clobber\n');
 
   const plan = planInstall(['claude'], { home });
-  const item = plan[0].items.find((i) => i.name === skill);
+  const item = plan.find((g) => g.targets.includes('claude')).items.find((i) => i.name === skill);
   assert.equal(item.action, 'blocked');
 
   applyInstall(plan);
@@ -158,10 +172,52 @@ test('--force overwrites a foreign directory', () => {
   fs.writeFileSync(path.join(dest, 'SKILL.md'), 'hand written\n');
 
   const plan = planInstall(['claude'], { home, force: true });
-  assert.equal(plan[0].items.find((i) => i.name === skill).action, 'update');
+  assert.equal(plan.find((g) => g.targets.includes('claude')).items.find((i) => i.name === skill).action, 'relink');
   applyInstall(plan);
+  assert.ok(fs.lstatSync(dest).isSymbolicLink(), 'forced install should leave a link into the store');
   assert.notEqual(fs.readFileSync(path.join(dest, 'SKILL.md'), 'utf8'), 'hand written\n');
 
+  fs.rmSync(home, { recursive: true, force: true });
+});
+
+test('skills live once in .agents/skills and every other host links to it', () => {
+  const home = tmpHome();
+  applyInstall(planInstall(['claude', 'gemini'], { home }));
+
+  for (const skill of shippedSkills()) {
+    const real = path.join(home, '.agents', 'skills', skill);
+    assert.ok(!fs.lstatSync(real).isSymbolicLink(), 'the store holds real files');
+    for (const host of [['.claude', 'skills'], ['.gemini', 'skills']]) {
+      const link = path.join(home, ...host, skill);
+      assert.ok(fs.lstatSync(link).isSymbolicLink(), `${link} should be a link`);
+      assert.equal(fs.realpathSync(link), fs.realpathSync(real));
+    }
+  }
+  const store = JSON.parse(fs.readFileSync(path.join(home, '.agents', 'skills', '.context-docs-kit.json'), 'utf8'));
+  assert.deepEqual(store.targets, ['claude', 'gemini']);
+  const codexRow = inspect({ home }).find((r) => r.target === 'codex' && r.scope === 'user');
+  assert.equal(codexRow.installed.length, 0, 'codex must not look installed just because it shares the store dir');
+
+  fs.rmSync(home, { recursive: true, force: true });
+});
+
+test('--copy writes a full copy per host and no store', () => {
+  const home = tmpHome();
+  applyInstall(planInstall(['claude'], { home, copy: true }));
+  const skill = shippedSkills()[0];
+  assert.ok(!fs.lstatSync(path.join(home, '.claude', 'skills', skill)).isSymbolicLink());
+  assert.ok(!fs.existsSync(path.join(home, '.agents', 'skills', skill)), 'copy mode should not create a store');
+  fs.rmSync(home, { recursive: true, force: true });
+});
+
+test('a copied install migrates to links on the next default install', () => {
+  const home = tmpHome();
+  applyInstall(planInstall(['claude'], { home, copy: true }));
+  const second = planInstall(['claude'], { home });
+  const claude = second.find((g) => g.targets.includes('claude'));
+  assert.ok(claude.items.filter((i) => i.kind === 'skill').every((i) => i.action === 'relink'));
+  applyInstall(second);
+  assert.ok(fs.lstatSync(path.join(home, '.claude', 'skills', shippedSkills()[0])).isSymbolicLink());
   fs.rmSync(home, { recursive: true, force: true });
 });
 
@@ -178,6 +234,22 @@ test('--link symlinks the skill back to the package', () => {
 });
 
 console.log('\nuninstall');
+
+test('uninstalling one host keeps the store while another host links to it', () => {
+  const home = tmpHome();
+  applyInstall(planInstall(['claude', 'codex'], { home }));
+  applyUninstall(planUninstall(['claude'], { home }));
+
+  const skill = shippedSkills()[0];
+  assert.ok(!fs.existsSync(path.join(home, '.claude', 'skills', skill)), 'claude link survived');
+  assert.ok(fs.existsSync(path.join(home, '.agents', 'skills', skill, 'SKILL.md')), 'store removed while codex uses it');
+  const store = JSON.parse(fs.readFileSync(path.join(home, '.agents', 'skills', '.context-docs-kit.json'), 'utf8'));
+  assert.deepEqual(store.targets, ['codex']);
+
+  applyUninstall(planUninstall(['codex'], { home }));
+  assert.ok(!fs.existsSync(path.join(home, '.agents', 'skills', skill)), 'store survived its last user');
+  fs.rmSync(home, { recursive: true, force: true });
+});
 
 test('uninstall removes exactly what was installed', () => {
   const home = tmpHome();
@@ -493,6 +565,69 @@ test('CLI ecosystem list, ecosystem install --dry-run, and update --dry-run work
   assert.match(updateDry, /npx skills update/);
   assert.match(updateDry, /impeccable@latest install/);
   assert.match(updateDry, /@caveman-ai\/cli@latest/);
+});
+
+console.log('\ncompanion skills');
+
+test('every companion is a registered ecosystem item and the companions preset resolves to all of them', () => {
+  const ids = ECOSYSTEM_ITEMS.map((i) => i.id);
+  for (const id of COMPANION_SKILLS) assert.ok(ids.includes(id), `${id} is not in ECOSYSTEM_ITEMS`);
+  assert.deepEqual(resolveEcosystemSelection('companions').map((i) => i.id).sort(), [...COMPANION_SKILLS].sort());
+});
+
+test('findMissingCompanions detects skills in host dirs and the shared .agents/skills dir', () => {
+  const home = fs.mkdtempSync(path.join(os.tmpdir(), 'cdk-comp-'));
+  assert.equal(findMissingCompanions(['claude'], { home }).length, COMPANION_SKILLS.length);
+
+  for (const [dir, name] of [['.claude/skills', 'grill-me'], ['.agents/skills', 'caveman']]) {
+    fs.mkdirSync(path.join(home, dir, name), { recursive: true });
+    fs.writeFileSync(path.join(home, dir, name, 'SKILL.md'), '---\nname: x\n---\n');
+  }
+  const missing = findMissingCompanions(['claude'], { home }).map((i) => i.id);
+  assert.ok(!missing.includes('grill-me'), 'claude skills dir not searched');
+  assert.ok(!missing.includes('caveman'), '.agents/skills not searched');
+  assert.equal(missing.length, COMPANION_SKILLS.length - 2);
+});
+
+test('every skill runs the companion preflight and ships the persona agents', () => {
+  for (const skill of shippedSkills()) {
+    const dir = path.join(ROOT, 'skills', skill);
+    assert.ok(fs.existsSync(path.join(dir, 'references', 'dependencies.md')), `${skill} is missing dependencies.md`);
+    assert.match(fs.readFileSync(path.join(dir, 'SKILL.md'), 'utf8'), /references\/dependencies\.md/);
+    for (const agent of shippedAgents()) {
+      assert.ok(fs.existsSync(path.join(dir, 'agents', agent)), `${skill} is missing agents/${agent}`);
+    }
+  }
+});
+
+test('RULES.md template always writes §2.1 skill usage, §2.2 caveman, and auto-invokes grill-me', () => {
+  for (const file of [
+    path.join(ROOT, 'skills', 'bootstrapping-context-docs', 'references', 'rules.md'),
+    path.join(ROOT, 'agents', 'engineering-standards.md'),
+  ]) {
+    const body = fs.readFileSync(file, 'utf8');
+    assert.match(body, /### 2\.1 Skill Usage \(Mandatory\)/, file);
+    assert.match(body, /### 2\.2 Output Style: Caveman \(Always On\)/, file);
+    assert.match(body, /### 2\.3 Operating Rules/, file);
+    assert.match(body, /\*\*Auto-invoke `grill-me`\.\*\*/, file);
+  }
+});
+
+test('plugin dependencies are allowlisted, and install installs companions unless skipped', () => {
+  const mp = JSON.parse(fs.readFileSync(path.join(ROOT, '.claude-plugin', 'marketplace.json'), 'utf8'));
+  const allow = mp.allowCrossMarketplaceDependenciesOn;
+  for (const dep of mp.plugins[0].dependencies) assert.ok(allow.includes(dep.marketplace), `${dep.marketplace} not allowlisted`);
+
+  const home = fs.mkdtempSync(path.join(os.tmpdir(), 'cdk-cli-'));
+  const run = (...extra) =>
+    execFileSync(process.execPath, [path.join(ROOT, 'bin', 'cli.mjs'), 'install', '--target', 'claude', '--dry-run', ...extra], {
+      env: { ...process.env, HOME: home, USERPROFILE: home },
+    }).toString();
+
+  const out = run();
+  assert.match(out, /Companion skills \(12 missing/);
+  assert.match(out, /\[dry-run\] npx skills add https:\/\/github\.com\/mattpocock\/skills --skill grill-me -g -a claude-code -y/);
+  assert.doesNotMatch(run('--skip-companions'), /Companion skills/);
 });
 
 console.log(`\n${passed} passed, ${failed} failed\n`);

@@ -38,6 +38,7 @@ one at a time.
 1. **`references/hosts.md`** — which host, whether you have subagents, and whether the agent file supports `@file` imports. The last one matters here: if RULES §2 changes, you refresh it in the agent file, and the two forms are different.
 2. **`references/history-discipline.md`** — the In-Version Change Protocol. It is the procedure this whole skill executes.
 3. **`references/doc-contract.md`** — the header, and how to migrate a legacy one.
+4. **`references/dependencies.md`** — the companion-skill preflight. `npx skills add` cannot install the skills `RULES.md` §2.1 routes to, so check for them now and, if any are missing, offer the install once.
 
 ## Flow
 

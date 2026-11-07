@@ -26,10 +26,11 @@ A generated template and a grilled doc look similar and behave nothing alike. Th
 
 ## Before the First Question
 
-Two files, in this order:
+Three files, in this order:
 
 1. **`references/hosts.md`** — which host you are on, whether you have persona subagents, and whether the agent file supports `@file` imports. Two of the three answers change what you write into the user's repo, so resolve them now, not at the wiring step.
-2. **`references/wiring.md`** — where you enter: greenfield, brownfield, or resume.
+2. **`references/dependencies.md`** — the companion-skill preflight. `npx skills add` cannot install the skills `RULES.md` §2.1 routes to, so check for them now and, if any are missing, offer the install once.
+3. **`references/wiring.md`** — where you enter: greenfield, brownfield, or resume.
 
 ## The Doc Contract
 

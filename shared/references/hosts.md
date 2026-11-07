@@ -10,8 +10,8 @@ first question**, because two of them change what you write into the user's repo
 
 | Host | Agent file | `@file` import | Named persona subagents |
 |---|---|---|---|
-| Claude Code | `AGENTS.md` | yes | yes |
-| Codex | `AGENTS.md` | **no** | no |
+| Claude Code | `AGENTS.md` | yes | when installed by the plugin or `npx context-docs-kit install`; otherwise brief a general-purpose subagent |
+| Codex | `AGENTS.md` | **no** | when installed by `npx context-docs-kit install --target codex` (TOML in `.codex/agents/`); otherwise brief a generic subagent (`default`/`worker`) |
 | Gemini CLI | `AGENTS.md` | yes | no |
 | Antigravity | `AGENTS.md` | **no** | no |
 
@@ -20,7 +20,10 @@ first question**, because two of them change what you write into the user's repo
 Do not ask the user. Detect it, and only ask if detection is genuinely ambiguous.
 
 1. **Where was this skill loaded from?** `~/.claude/skills` → Claude Code. `~/.agents/skills` or `<repo>/.agents/skills` → Codex or Antigravity. `~/.gemini/skills` or `.gemini/skills` → Gemini CLI. `~/.gemini/config/skills` → Antigravity.
-2. **Can you dispatch a named subagent?** If you have no tool that dispatches one, you do not have them, regardless of host.
+2. **Can you dispatch a subagent, and which kind?** Three answers, in order of preference:
+   - **Named** — `product-strategist`, `context-doc-critic` and the rest are in your list of dispatchable agents. Use them.
+   - **Generic only** — you can dispatch a general-purpose subagent, but the named ones are absent. This is the normal state after `npx skills add` or a plugin install on Codex, neither of which installs custom agents. Use the **briefed** column below.
+   - **None** — no tool dispatches a subagent. Run the stages inline.
 3. **Are there legacy tool-specific files?** A pre-existing `CLAUDE.md` or `GEMINI.md` provides a hint if the install location is ambiguous, but the standard agent file to use and create is always `AGENTS.md`.
 
 If you cannot tell, ask once — one question, with the four options — and record the answer for the rest of the session.
@@ -28,16 +31,28 @@ If you cannot tell, ask once — one question, with the four options — and rec
 ## Degradation 1 — no persona subagents
 
 The per-doc pass has five stages, three of which are written as subagent
-dispatches. Without subagents, **run them inline in the main conversation** and
-change nothing else about the sequence.
+dispatches. Every persona definition ships inside this skill as
+`agents/<name>.md`, so a missing named agent never means a missing persona.
 
-| Stage | With subagents | Without |
-|---|---|---|
-| 1 Scan | dispatch the persona agent | read the repo yourself, wearing the persona from `references/<doc>.md` |
-| 2 Grill | main conversation | unchanged — this was never a subagent |
-| 3 Draft | dispatch the persona agent | write the doc yourself from approved answers only |
-| 4 Review | dispatch `context-doc-critic` | **a separate turn**, adversarial, against `references/critic.md` |
-| 5 Gate | the user | unchanged |
+| Stage | Named subagents | Generic subagent (briefed) | No subagents |
+|---|---|---|---|
+| 1 Scan | dispatch the persona agent | dispatch a general-purpose subagent briefed from `agents/<persona>.md` | read the repo yourself, wearing the persona from `references/<doc>.md` |
+| 2 Grill | main conversation | main conversation | unchanged — this was never a subagent |
+| 3 Draft | dispatch the persona agent | briefed general-purpose subagent | write the doc yourself from approved answers only |
+| 4 Review | dispatch `context-doc-critic` | general-purpose subagent briefed from `agents/context-doc-critic.md` | **a separate turn**, adversarial, against `references/critic.md` |
+| 5 Gate | the user | the user | unchanged |
+
+**Briefing a general-purpose subagent.** Read `agents/<name>.md` from this
+skill's folder. Its prompt is: the file's body (everything after the
+frontmatter) as the subagent's standing instructions, then the task exactly as
+you would have given the named agent — mode, paths, approved answers, date.
+Carry the frontmatter's `tools:` line over as an instruction ("you may only
+read, glob and grep" for the critic; add "and write `<path>`" for a drafting
+persona), since a general-purpose agent has every tool by default and the
+critic's independence depends on it never editing.
+
+Without any subagents, **run the stages inline in the main conversation** and
+change nothing else about the sequence.
 
 **Stage 4 is the one that degrades badly if you are careless.** Its whole value
 is that a different reader checks the draft. Inline, that becomes a deliberate

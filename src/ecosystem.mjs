@@ -1,5 +1,8 @@
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
 import { spawnSync } from 'node:child_process';
-import { TARGET_NAMES } from './targets.mjs';
+import { TARGET_NAMES, TARGETS } from './targets.mjs';
 
 /**
  * Map context-docs-kit target names to `npx skills` `--agent` identifiers.
@@ -90,10 +93,13 @@ export const ECOSYSTEM_ITEMS = [
     id: 'using-superpowers',
     category: 'dev-workflow',
     kind: 'skills-cli',
-    packageSpec: 'obra/superpowers@using-superpowers',
+    // The whole library, not just the entry skill: RULES.md §2.1 routes to
+    // brainstorming, systematic-debugging, test-driven-development and
+    // verification-before-completion, which ship alongside using-superpowers.
+    packageSpec: 'obra/superpowers',
     repo: 'obra/superpowers',
-    skill: 'using-superpowers',
-    command: 'npx skills add obra/superpowers@using-superpowers',
+    skill: null,
+    command: 'npx skills add obra/superpowers',
     roles: ['engineering'],
     docs: ['ARCHITECTURE.md', 'RULES.md', 'PROGRESS_vN.md'],
     summary: 'Enforces disciplined engineering workflows: step-by-step planning, TDD, and systematic root-cause debugging.',
@@ -290,6 +296,36 @@ export const ECOSYSTEM_ITEMS = [
   },
 ];
 
+/**
+ * Companion skills that RULES.md §2.1 (Skill Usage) and §2.2 (Output Style)
+ * make mandatory in every project bootstrapped by context-docs-kit.
+ *
+ * `npx skills add gbcstro/context-docs-kit` cannot pull these in — the skills
+ * CLI has no dependency resolution and runs no install hooks — so they reach the
+ * user through three other paths, all driven by this one list:
+ *   1. `npx context-docs-kit install` / `update` install whichever are missing.
+ *   2. The skills' own preflight (shared/references/dependencies.md) offers the
+ *      install when a skill runs and finds one absent.
+ *   3. package.json `skills` (read by `npx skills experimental_sync`) and the
+ *      Claude Code plugin `dependencies` in .claude-plugin/marketplace.json.
+ * Each id doubles as the installed skill's directory name, which is how
+ * findMissingCompanions() detects it.
+ */
+export const COMPANION_SKILLS = [
+  'using-superpowers',
+  'ponytail',
+  'grill-me',
+  'impeccable',
+  'design-taste-frontend',
+  'frontend-design',
+  'brand-guidelines',
+  'webapp-testing',
+  'doc-coauthoring',
+  'internal-comms',
+  'skill-creator',
+  'caveman',
+];
+
 const UNIFIED_PRODUCT_GROWTH_ITEMS = [
   'grill-me',
   'doc-coauthoring',
@@ -309,6 +345,11 @@ const UNIFIED_PRODUCT_GROWTH_ITEMS = [
  * Product & Growth use the exact same unified skill stack because brand and GTM live on the product.
  */
 export const TEAM_PRESETS = {
+  companions: {
+    label: 'Core Companions (required by RULES.md §2.1 and §2.2)',
+    description: 'The skills every bootstrapped RULES.md routes to: superpowers, ponytail, grill-me, the 4-layer UI pipeline, webapp-testing, doc-coauthoring, internal-comms, skill-creator, and caveman.',
+    items: COMPANION_SKILLS,
+  },
   'full-team': {
     label: 'Full Startup / Company Team (All 6 Pillars)',
     description: 'Complete 18-tool stack across Documentation, Dev Workflow, UI/Brand, Marketing/SEO, Token Saving, and Video Generation.',
@@ -478,6 +519,37 @@ export function resolveEcosystemSelection(selection = 'full-team') {
   }
 
   return ECOSYSTEM_ITEMS.filter((i) => pickedIds.has(i.id));
+}
+
+/**
+ * Every directory a companion skill could have been installed into for these
+ * targets: each host's own skills dir plus the shared `.agents/skills`
+ * canonical location the skills CLI writes to.
+ */
+function companionSearchDirs(targetNames, { project, home, repo }) {
+  const dirs = new Set([project ? path.join(repo, '.agents', 'skills') : path.join(home, '.agents', 'skills')]);
+  for (const name of targetNames) {
+    const t = TARGETS[name];
+    if (!t) continue;
+    dirs.add(project ? t.projectSkills(repo) : t.userSkills(home));
+  }
+  return [...dirs];
+}
+
+/**
+ * Companion skills (COMPANION_SKILLS) not found in any skills directory for
+ * the given targets and scope. Returns ECOSYSTEM_ITEMS entries.
+ */
+export function findMissingCompanions(
+  targetNames = TARGET_NAMES,
+  { project = false, home = os.homedir(), repo = process.cwd() } = {},
+) {
+  const dirs = companionSearchDirs(targetNames, { project, home, repo });
+  return ECOSYSTEM_ITEMS.filter(
+    (item) =>
+      COMPANION_SKILLS.includes(item.id) &&
+      !dirs.some((d) => fs.existsSync(path.join(d, item.id, 'SKILL.md'))),
+  );
 }
 
 /**

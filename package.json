@@ -38,26 +38,22 @@
     "skills",
     "agents",
     ".claude-plugin",
+    ".codex-plugin",
     "README.md",
     "LICENSE"
   ],
   "skills": [
-    "anthropics/skills@doc-coauthoring",
-    "anthropics/skills@internal-comms",
-    "obra/superpowers@using-superpowers",
-    "anthropics/skills@webapp-testing",
-    "anthropics/skills@skill-creator",
+    "obra/superpowers",
     "DietrichGebert/ponytail",
     "https://github.com/mattpocock/skills#grill-me",
     "Leonxlnx/taste-skill@design-taste-frontend",
     "anthropics/skills@frontend-design",
     "anthropics/skills@brand-guidelines",
-    "coreyhaines31/marketingskills",
-    "https://github.com/affaan-m/ECC#brand-discovery",
-    "https://github.com/remotion-dev/skills#remotion-best-practices",
-    "https://github.com/NousResearch/hermes-agent#brag",
-    "heygen-com/hyperframes",
-    "https://github.com/mattpocock/skills#writing-beats"
+    "anthropics/skills@webapp-testing",
+    "anthropics/skills@doc-coauthoring",
+    "anthropics/skills@internal-comms",
+    "anthropics/skills@skill-creator",
+    "JuliusBrussee/caveman@caveman"
   ],
   "engines": {
     "node": ">=18"

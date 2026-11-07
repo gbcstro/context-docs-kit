@@ -32,7 +32,39 @@ The AI-assistant rules section is the loop-closer. Bootstrap ends when this skil
 
 Without it the failure is predictable and quiet: an assistant implements a feature, makes an architectural choice inline, never updates `ARCHITECTURE.md`, reinvents a helper that already exists elsewhere in the codebase, hallucinates a deprecated framework API, and leaves untested edge cases. Three sessions later the docs describe a system that no longer exists and the codebase is riddled with duplicate logic.
 
-Eleven rules earn their place. Adapt the wording; keep the substance:
+§2 has three subsections, in this order. **§2.1 and §2.2 are always written, verbatim** — they are the kit's standing routing and output contract, not project decisions, so they are not grilled and the critic does not treat them as invented specifics. Only §2.3 is adapted to the project.
+
+```markdown
+### 2.1 Skill Usage (Mandatory)
+
+Invoke the matching skill from `.agents/skills/` **before** acting:
+
+| Scenario | Skills |
+|---|---|
+| Task start, planning, debugging, TDD | `using-superpowers` (brainstorming, systematic-debugging, test-driven-development, verification-before-completion) |
+| Writing, fixing, refactoring, reviewing code | `ponytail` (`ponytail-review`, `ponytail-audit` for reviews) |
+| New feature, vague requirement, plan, or design | `grill-me` (auto-invoked — see below) |
+| UI, design, frontend | `impeccable` first, then `design-taste-frontend`, `frontend-design`, `brand-guidelines` |
+| Verifying live web UI | `webapp-testing` |
+| Specs, RFCs, ADRs | `doc-coauthoring` |
+| Release notes, status updates | `internal-comms` |
+| Context docs drift or version close | `aligning-context-docs`, `versioning-context-docs` |
+| New repeatable workflow | `skill-creator` |
+
+**Auto-invoke `grill-me`.** Before starting any new feature, plan, or design or architecture decision, and whenever a requirement is ambiguous, run `grill-me` without being asked: one question at a time until every branch is resolved, then act. Skip it only for trivial, fully specified changes (typo, rename, a bug with a known fix).
+
+### 2.2 Output Style: Caveman (Always On)
+
+AI chat output uses `caveman` mode: terse, no filler, technical terms exact, code blocks and quoted errors unchanged. Exceptions: security warnings, irreversible-action confirmations, clarification requests. Committed docs, code comments, and commit messages stay in normal prose.
+
+### 2.3 Operating Rules
+
+<the eleven rules below, adapted>
+```
+
+§2.1 names companion skills that `npx skills add` does not install. `references/dependencies.md` already offered to install any that are missing; keep every row regardless of the answer. The table is the project's rule, not a statement about one machine.
+
+§2.3 — eleven rules earn their place. Adapt the wording; keep the substance:
 
 1. **Read before writing.** Read the relevant `context/*.md` before implementing in that area, rather than assuming. Name which doc covers what.
 2. **No undocumented architecture decisions.** Never introduce a library, service, or architectural approach that isn't in `ARCHITECTURE.md`/`SCHEMA.md` without flagging it and getting confirmation — *held to the same standard every existing choice was held to.* This sentence is what makes the rule stick: it's not bureaucracy, it's parity with how the doc was built.
@@ -169,7 +201,7 @@ the project believes, it shows what the project does and where the boundaries si
 Most answers are already implied by the approved docs. **Read them and propose, rather than asking cold** — a question whose answer is sitting in `ARCHITECTURE.md` wastes the user's attention.
 
 ### 1. AI-assistant rules
-Present the eleven above, adapted to this project, for confirmation. Ask what else has bitten them before that's worth encoding (e.g. key utility directories where reuse is required, logging tasks and sessions to the changelog, compacting older entries, or specific framework conventions).
+§2.1 and §2.2 are fixed — show them, do not ask about them. Present the eleven §2.3 rules, adapted to this project, for confirmation. Ask what else has bitten them before that's worth encoding (e.g. key utility directories where reuse is required, logging tasks and sessions to the changelog, compacting older entries, or specific framework conventions).
 
 ### 2. Code organization
 Derived from `ARCHITECTURE.md` §3. State what belongs in each app/package and — more usefully — the rule for deciding where new code goes. "Needed by more than one app? It's a shared package." Explicitly name common directories for reusable assets (`components/`, `utils/`, `hooks/`, `lib/`).
@@ -225,6 +257,13 @@ applies to anyone writing code here.>
 
 ## 2. AI Assistant Rules
 
+### 2.1 Skill Usage (Mandatory)
+<verbatim, from the block above>
+
+### 2.2 Output Style: Caveman (Always On)
+<verbatim, from the block above>
+
+### 2.3 Operating Rules
 <The eleven rules, adapted. Written as instructions, second person, imperative:
 1. Read before writing
 2. No undocumented architecture decisions
