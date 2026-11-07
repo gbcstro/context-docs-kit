@@ -104,10 +104,22 @@ Every `RULES.md` the kit writes routes work to 12 companion skills (§2.1): `sup
 
 | Installed with | Update |
 |---|---|
-| Claude Code plugin | `/plugin update context-docs-kit@context-docs-kit` |
+| Claude Code plugin | `/plugin marketplace update context-docs-kit`, then `/plugin update context-docs-kit@context-docs-kit` |
 | Codex plugin | `codex plugin marketplace upgrade`, then reinstall from `/plugins` |
-| the kit's CLI | `npx context-docs-kit update`: updates the kit's skills and persona agents, offers any missing companions, runs `npx skills update -y`, and refreshes the `@latest` CLIs (`impeccable`, `@caveman-ai/cli`) |
+| the kit's CLI | `npx context-docs-kit@latest update` (`@latest`, or npx may reuse a cached older copy): updates the kit's skills and persona agents, offers any missing companions, runs `npx skills update -y`, and refreshes the `@latest` CLIs (`impeccable`, `@caveman-ai/cli`) |
 | `skills` CLI | `npx skills update` (the kit, and any companions installed the same way) |
+
+### After updating
+
+1. **Restart your assistant.** Skills are loaded at startup.
+2. **New projects:** nothing else. `set up the context docs for this project` writes the current template.
+3. **Projects that already have `context/` docs:** ask
+
+   ```
+   > align the context docs with the latest context-docs-kit
+   ```
+
+   `aligning-context-docs` checks the kit template before anything else. If the project's `RULES.md` §2 predates the current one, the first item in the drift report is a **kit upgrade**: approve it and §2.1 Skill Usage and §2.2 Output Style are inserted, your existing rules move under §2.3 unchanged, `Revision` is bumped, the reason goes in the changelog, and the rules block in `AGENTS.md` is refreshed. Nothing changes without your yes.
 
 <details>
 <summary>CLI reference</summary>

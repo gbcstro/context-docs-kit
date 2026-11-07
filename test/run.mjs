@@ -638,5 +638,46 @@ test('plugin dependencies are allowlisted, and install installs companions unles
   assert.doesNotMatch(real, /-> Running/);
 });
 
+console.log('\nkit upgrade');
+
+/** The §2.1 + §2.2 block: from the 2.1 heading up to (not including) the next heading after 2.2's paragraph. */
+function section2Block(body) {
+  body = body.replace(/\r\n/g, '\n');
+  // The heading at the start of a line, not a mention of it in prose.
+  const start = body.search(/^### 2\.1 Skill Usage \(Mandatory\)$/m);
+  assert.ok(start >= 0, 'no §2.1 heading');
+  const caveman = body.indexOf('### 2.2 Output Style: Caveman (Always On)', start);
+  assert.ok(caveman > start, 'no §2.2 heading after §2.1');
+  const end = body.indexOf('\n#', caveman + 1);
+  const fence = body.indexOf('\n```', caveman);
+  const cut = [end, fence].filter((i) => i > 0);
+  return body.slice(start, cut.length ? Math.min(...cut) : undefined).replace(/\r\n/g, '\n').trim();
+}
+
+test('the §2.1/§2.2 block is identical in rules.md, engineering-standards and kit-upgrade', () => {
+  const read = (...p) => fs.readFileSync(path.join(ROOT, ...p), 'utf8');
+  const canonical = section2Block(read('shared', 'references', 'kit-upgrade.md'));
+  assert.equal(section2Block(read('skills', 'bootstrapping-context-docs', 'references', 'rules.md')), canonical, 'rules.md drifted');
+  assert.equal(section2Block(read('agents', 'engineering-standards.md')), canonical, 'engineering-standards drifted');
+});
+
+test('aligning checks the kit template first, and the drift scan points at it', () => {
+  const align = fs.readFileSync(path.join(ROOT, 'skills', 'aligning-context-docs', 'SKILL.md'), 'utf8');
+  assert.match(align, /Check the kit template first.*references\/kit-upgrade\.md/s);
+  const scan = fs.readFileSync(path.join(ROOT, 'shared', 'references', 'drift-scan.md'), 'utf8');
+  assert.ok(scan.indexOf('## First: the kit template') < scan.indexOf('## PRODUCT.md'), 'kit check must come before the doc scans');
+  for (const skill of shippedSkills()) {
+    assert.ok(fs.existsSync(path.join(ROOT, 'skills', skill, 'references', 'kit-upgrade.md')), `${skill} is missing kit-upgrade.md`);
+  }
+});
+
+test('every manifest carries the same version', () => {
+  const version = JSON.parse(fs.readFileSync(path.join(ROOT, 'package.json'), 'utf8')).version;
+  const read = (...p) => JSON.parse(fs.readFileSync(path.join(ROOT, ...p), 'utf8'));
+  assert.equal(read('.claude-plugin', 'plugin.json').version, version);
+  assert.equal(read('.codex-plugin', 'plugin.json').version, version);
+  assert.equal(read('.claude-plugin', 'marketplace.json').plugins[0].version, version);
+});
+
 console.log(`\n${passed} passed, ${failed} failed\n`);
 process.exit(failed ? 1 : 0);

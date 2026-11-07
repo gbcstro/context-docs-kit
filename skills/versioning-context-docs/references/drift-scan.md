@@ -18,6 +18,15 @@ looked at `ARCHITECTURE.md`, and finding it twice wastes the user's attention.
 
 ---
 
+## First: the kit template
+
+Before any doc, check whether the project was bootstrapped by an older
+`context-docs-kit`: `references/kit-upgrade.md`. It compares `RULES.md` §2 and the
+agent file against the current template, not against the code, and reports as
+its own group at the top of the report.
+
+---
+
 ## PRODUCT.md
 
 | Read | Compare against |
@@ -139,7 +148,7 @@ check that they still agree with each other.
 | `.gitignore`, tracked files | §8 secrets. **Report a tracked secret immediately and prominently, before anything else in the report.** |
 | the migration commands actually used | §9 |
 | the code at the seams §4's examples describe | do the worked examples still compile and still describe the real structure? |
-| `RULES.md` §2 and `AGENTS.md` | **Ongoing-project upgrade check:** does §2 include the 11 rules (with 4-layer UI craft, Beat-Sheet Video/Media Gate, Playwright `webapp-testing`, and 30-day changelog compaction), and does `AGENTS.md` carry the `## Team Skill Ecosystem` routing table from `references/agent-file.md`? |
+| `RULES.md` §2 and `AGENTS.md` | **Kit template check** (`references/kit-upgrade.md`): §2.1 Skill Usage and §2.2 Output Style present verbatim; the eleven rules under §2.3 (with 4-layer UI craft, Beat-Sheet Video/Media Gate, Playwright `webapp-testing`, and 30-day changelog compaction); `AGENTS.md` carrying the current §2 between its markers and the `## Team Skill Ecosystem` routing table from `references/agent-file.md` |
 
 **Two checks unique to this doc:**
 

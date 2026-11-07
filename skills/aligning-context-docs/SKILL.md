@@ -112,6 +112,11 @@ not assume which side loses.
 `references/drift-scan.md` has the per-doc scan: what to read, and what a
 mismatch looks like for each of PRODUCT, ARCHITECTURE, SCHEMA, DESIGN and RULES.
 
+**Check the kit template first** (`references/kit-upgrade.md`). A project
+bootstrapped by an older `context-docs-kit` has a `RULES.md` §2 missing §2.1 Skill
+Usage and §2.2 Output Style. That is the kit moving, not the code, so it is
+reported as its own group above the code findings and applied only on a yes.
+
 ## Step 3 — The drift report
 
 Group by severity, most severe first. Every finding names its evidence — a file
@@ -276,9 +281,9 @@ explicitly. Doing it quietly, item by item, is how a version stops ever ending.
 | `references/hosts.md` | first |
 | `references/doc-contract.md` | before editing any doc header |
 | `references/history-discipline.md` | the protocol itself — the core of this skill |
+| `references/kit-upgrade.md` | step 2, first — is `RULES.md` §2 on the current kit template? |
 | `references/drift-scan.md` | step 2, the per-doc three-way diff |
 | `references/agent-file.md` | step 7, if the agent file needs refreshing |
 | `references/closing-questions.md` | any time a fix cannot be settled outright |
 | `references/ecosystem.md` | routing drift resolution, Playwright QA (`webapp-testing`), and team comms (`internal-comms`) |
-| `references/critic.md` | after a substantial rewrite, to check the result like a fresh draft |
 | `references/critic.md` | after a substantial rewrite, to check the result like a fresh draft |
