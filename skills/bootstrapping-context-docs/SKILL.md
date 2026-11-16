@@ -68,6 +68,7 @@ digraph bootstrap {
     "Draft v1/CHECKLIST.md\nchecklist + acceptance criteria" [shape=box];
     "User approved v1 scope?" [shape=diamond];
     "Create empty v1/ folders" [shape=box];
+    "Propose project personas" [shape=box];
     "Done" [shape=doublecircle];
 
     "Resolve host\n(references/hosts.md)" -> "context/ docs exist?";
@@ -87,7 +88,8 @@ digraph bootstrap {
     "Draft v1/CHECKLIST.md\nchecklist + acceptance criteria" -> "User approved v1 scope?";
     "User approved v1 scope?" -> "Draft v1/CHECKLIST.md\nchecklist + acceptance criteria" [label="no, revise"];
     "User approved v1 scope?" -> "Create empty v1/ folders" [label="yes"];
-    "Create empty v1/ folders" -> "Done";
+    "Create empty v1/ folders" -> "Propose project personas";
+    "Propose project personas" -> "Done";
 }
 ```
 
@@ -124,6 +126,8 @@ Five stages. **Only stages 2 and 5 involve the user.**
 On a host without subagents, stages 1, 3 and 4 run inline instead of being dispatched. The sequence does not change. `references/hosts.md` says exactly how, and why stage 4 must be its own turn.
 
 Stage 1 reads manifests, layout, migrations, CI, and pre-existing docs, and returns facts to pre-fill your questions. Skip it on a truly empty repo.
+
+**`ARCHITECTURE.md` and `RULES.md` add an advise step at the end of stage 1**, on empty repos too. Dispatch the persona in ADVISE mode with the approved upstream docs and the scan report. `solutions-architect` returns the infrastructure and approach this project should follow; `engineering-standards` returns the code organization, principles and workflow. Each recommendation comes with its cost and the trigger to move up a rung. Those recommendations are what you grill with: every question in stage 2 opens with the advised option, its cost, and the runner-up. The user decides; an advised option never reaches the draft unless the user approved it. For `ARCHITECTURE.md`, settle the binding constraint before dispatching: ADVISE without it returns only constraint candidates.
 
 Stage 3 writes the doc from **approved answers only**, with unknowns parked.
 
@@ -201,11 +205,12 @@ cheap.
 
 ## Closing the Pass
 
-Not done when the last doc is approved. Three steps remain, in order:
+Not done when the last doc is approved. Four steps remain, in order:
 
 1. **Wire the agent file** — `references/wiring.md` §3, using the import or the inline block per `references/hosts.md`. An unwired `context/` is inert.
 2. **Draft `context/PROGRESS/v1/CHECKLIST.md`** — read every approved doc and derive the v1 scope checklist with acceptance criteria. Gate it with the user like any other doc. Always `v1`; there is no path that starts anywhere else. Full spec in `references/history-discipline.md`.
 3. **Create the rest of `context/PROGRESS/v1/`** — `changelog/`, `specs/`, `plans/` and `sdd/`, each holding only a `.gitkeep`, and add `.superpowers/` to `.gitignore`. A first draft is not a revision of anything, so there is nothing to log yet. Specs, plans and SDD ledgers from superpowers land in these folders from now on (`RULES.md` §2.1).
+4. **Propose project personas** — `references/project-agents.md`. From the approved docs, propose up to five project-specific agents (domain expert, stack reviewer, schema guardian, …), let the user pick, write them to `context/agents/`, render them for each host, and add the Project Agents table to the agent file. The user may decline; then skip it.
 
 Then tell the user what happens next: changes inside v1 go through `aligning-context-docs`, and v1 closes only when they say so, through `versioning-context-docs`.
 
@@ -254,3 +259,4 @@ Load only what the current pass needs.
 | `references/critic.md` | stage 4 of every pass |
 | `references/optional-docs.md` | doc-set proposal, if the core five don't fit |
 | `references/history-discipline.md` | closing the pass, and any revision to a doc already approved |
+| `references/project-agents.md` | closing the pass, step 4 — project-specific personas |

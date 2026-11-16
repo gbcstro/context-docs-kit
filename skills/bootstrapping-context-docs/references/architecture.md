@@ -89,7 +89,7 @@ A complete, industry-standard `ARCHITECTURE.md` covers 18 architectural pillars:
 
 ## Question Bank
 
-Ask one question at a time, each with a recommendation tied to the project's constraints and its concrete cost. Order matters: earlier answers constrain later ones.
+Ask one question at a time, each with a recommendation tied to the project's constraints and its concrete cost. Take the recommendation from the `solutions-architect` ADVISE report (or, inline, from the Decision Guide in `agents/solutions-architect.md`): default rung first, moved up only by a signal you can cite. Order matters: earlier answers constrain later ones.
 
 ### 1. Hardest / binding constraint
 Per the Hardest-Constraint Rule above. Do not propose a stack until answered.

@@ -98,6 +98,8 @@ Add project-specific rules — but confirm each with the user; don't invent obli
 
 **A principle is agreed on its example, never on its name.**
 
+The candidates come from the `engineering-standards` ADVISE report (or, inline, the Decision Guide in `agents/engineering-standards.md`): each arrives with its seam, its scenario boundary, and an example sketch to render. Offer those first; the user may add others.
+
 Everyone says yes to "single responsibility". Almost nobody means the same thing
 by it, and a `RULES.md` full of principle names is a doc that changes no
 behaviour — a contributor reads "we follow SOLID", learns nothing about where the

@@ -270,6 +270,8 @@ Each doc has a lens and its own list of things it won't let slide:
 
 On Claude Code and Codex these run as named subagents (Markdown agents on Claude Code, TOML custom agents on Codex). Where the named agents are not installed, a general-purpose subagent is briefed from the persona file the skill ships with; where there are no subagents at all, the same personas run inline in the main conversation — the sequence doesn't change, and the review still happens in its own turn, because a writer checking a sentence as it writes it finds nothing.
 
+**Project personas.** Once your docs are approved, the bootstrap proposes up to five agents specific to *your* project — a `<domain>-expert` built from your business rules, a `<stack>-reviewer` from your architecture and rules, a `schema-guardian`, a `design-reviewer`, a `security-reviewer`, and a `context-keeper` that checks every change is tracked in `context/`. You pick which ones you want. Each is written once to `context/agents/<name>.md`, and points at doc sections instead of copying them. It's rendered to `.claude/agents/` and `.codex/agents/`, and `aligning-context-docs` rewrites it when a section it cites changes.
+
 **One structural note.** Subagents can't ask you anything, so the interview always happens in the main conversation. Five stages per doc, and only two involve you — the grilling and the approval gate.
 
 ## Why `RULES.md` matters most

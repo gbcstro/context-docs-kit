@@ -98,6 +98,8 @@ The markers are not decoration: `aligning-context-docs` refreshes what is betwee
 
 Either way, only `RULES.md` reaches the agent file this way. Do **not** import or inline the other docs — they are large, situational, and the map table already makes them discoverable. Loading all five would burn context in every conversation to no benefit.
 
+**E. Project Agents** — added only once project personas exist (`references/project-agents.md` §5): a table of each agent in `context/agents/` and when to dispatch it. On hosts without named subagents, this table is how an assistant finds the persona file to brief from.
+
 If the user has declined the rules wiring, include the map table and skip C.
 
 ## After merging
@@ -117,6 +119,7 @@ When you are updating rather than wiring for the first time, **merge, never over
 - **`RULES.md` §2 changed** — with import support there is nothing to do; the import picks it up. Without it, replace the text **between** the `context-docs-kit:rules` markers. Never append a second copy. If the markers are missing on an import-less host, the rules were never wired: add the block and say so.
 - **A key fact changed** — stack, layout, hosting, binding constraint, current version. Update those bullets and leave the rest.
 - **The doc set changed** — a doc added or dropped. Update the map table.
+- **A project persona was added, changed or removed** — update the Project Agents table (`references/project-agents.md` §6).
 - **Ongoing project missing the `## Team Skill Ecosystem` section or updated `RULES.md` §2** — when running `aligning-context-docs` on a project wired by an earlier version of `context-docs-kit`, merge in **C. Team Skill Ecosystem & Media Routing**, and once the `references/kit-upgrade.md` finding is approved, refresh `RULES.md` §2 (§2.1 Skill Usage, §2.2 Output Style, §2.3 Operating Rules) between the `context-docs-kit:rules` markers, so the project immediately gains the skill routing, the `grill-me` auto-invoke, and the caveman output style.
 
 Everything outside those blocks is the user's, including sections that look like they overlap. Preserve them verbatim.

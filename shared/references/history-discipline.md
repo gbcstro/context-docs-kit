@@ -11,6 +11,7 @@ context/
   SCHEMA.md
   DESIGN.md
   RULES.md
+  agents/                 project personas (references/project-agents.md); rendered to host agent folders
   PROGRESS/
     v1/
       CHECKLIST.md        v1 scope + checklist + acceptance criteria

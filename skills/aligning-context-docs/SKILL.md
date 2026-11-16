@@ -220,6 +220,7 @@ Only when something in it moved:
 - **`RULES.md` §2 changed** — on a host with `@file` import support, the import picks it up and there is nothing to do. Without one, replace the text **between** the `<!-- context-docs-kit:rules:start -->` and `<!-- context-docs-kit:rules:end -->` markers. Never append a second copy. If the markers are missing on an import-less host, the rules were never wired — add the block and say so.
 - **A Quick-Reference key fact changed** — stack, layout, hosting, the binding constraint, the current version. Update those bullets and nothing else.
 - **The doc set changed** — a doc added or dropped. Update the Context Docs Map table.
+- **A changed doc section is cited by a project persona** — grep `context/agents/` for it, rewrite the affected checks, re-render the host copies, and update the Project Agents table (`references/project-agents.md` §6). A project with no `context/agents/` yet can get them here on request.
 
 `references/agent-file.md` has the exact blocks and the refresh rules. Merge, never overwrite; preserve every other section verbatim.
 
@@ -284,6 +285,7 @@ explicitly. Doing it quietly, item by item, is how a version stops ever ending.
 | `references/kit-upgrade.md` | step 2, first — is `RULES.md` §2 on the current kit template? |
 | `references/drift-scan.md` | step 2, the per-doc three-way diff |
 | `references/agent-file.md` | step 7, if the agent file needs refreshing |
+| `references/project-agents.md` | step 7, if a changed section is cited by a project persona |
 | `references/closing-questions.md` | any time a fix cannot be settled outright |
 | `references/ecosystem.md` | routing drift resolution, Playwright QA (`webapp-testing`), and team comms (`internal-comms`) |
 | `references/critic.md` | after a substantial rewrite, to check the result like a fresh draft |
