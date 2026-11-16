@@ -21,11 +21,11 @@ context/*.md present?
 
 **To resume**, read every existing doc's header and parse:
 
-- `**Project version:**` — which version the set describes. Cross-check against the highest `context/PROGRESS/PROGRESS_v*.md`; if they disagree, say so before continuing.
+- `**Project version:**` — which version the set describes. Cross-check against the highest `context/PROGRESS/v*/CHECKLIST.md`; if they disagree, say so before continuing.
 - `**Revision:**` — how many times that doc has been reworked
 - `**Depends on:**` — its position in the chain
 - `## Next Steps` — what the previous session said comes next
-- `context/PROGRESS/PROGRESS_v*.md` §4 — provisional decisions already in force; carry them forward as decisions, and do not re-ask unless the user reopens one
+- `context/PROGRESS/v*/CHECKLIST.md` §4 — provisional decisions already in force; carry them forward as decisions, and do not re-ask unless the user reopens one
 
 A doc carrying the legacy `**Status:** Draft vN` header gets migrated per `references/doc-contract.md` — one line saying what you changed, no edit to the body.
 
@@ -75,7 +75,7 @@ For each mapped doc:
 1. Extract its actual decisions into a short list.
 2. Cross-check them against what the code does. **Where a doc and the code disagree, the code is evidence and the doc is intent** — surface the gap explicitly; it is usually the most valuable thing you'll find.
 3. Present the decisions for confirmation in batches by topic, one topic at a time. Flag anything stale, contradicted, or unsupported by the code.
-4. Anything the old doc left vague gets **closed**, not copied across vague. Decide it, or take the cheapest-to-reverse reading and register it in `PROGRESS_v1.md` §4, or descope it. An inherited `TBD` copied into a new doc is the oldest way this set rots — `references/closing-questions.md`.
+4. Anything the old doc left vague gets **closed**, not copied across vague. Decide it, or take the cheapest-to-reverse reading and register it in `v1/CHECKLIST.md` §4, or descope it. An inherited `TBD` copied into a new doc is the oldest way this set rots — `references/closing-questions.md`.
 
 > `.docs/prd.md` lists "CSV import" as a v1 feature, but there's no parser anywhere in `apps/`
 > and no CSV dependency in any manifest. Still v1, or has it slipped out of scope?
@@ -103,11 +103,11 @@ table lists only docs that exist), and the binding constraint from
 
 ---
 
-## 4. Close the pass: PROGRESS_v1.md and CHANGELOG_v1.md
+## 4. Close the pass: v1/CHECKLIST.md and v1/changelog/
 
 The last two files, in this order. Full spec in `references/history-discipline.md`.
 
-**`context/PROGRESS/PROGRESS_v1.md`** — read every approved doc and derive the v1 scope: the shippable slices, each with acceptance criteria and a pointer to the doc section it came from, all unchecked. Then the explicit out-of-scope list, the §4 register of provisional decisions, and the exit criteria.
+**`context/PROGRESS/v1/CHECKLIST.md`** — read every approved doc and derive the v1 scope: the shippable slices, each with acceptance criteria and a pointer to the doc section it came from, all unchecked. Then the explicit out-of-scope list, the §4 register of provisional decisions, and the exit criteria.
 
 This is a gate like any other doc. Present it, take corrections, and get approval. It is the file that decides when v1 is done, so a checklist the user has not agreed to is worse than none.
 
@@ -116,7 +116,7 @@ Two failure modes to avoid:
 - **Inventing items.** Every checklist item traces to an approved doc section, and the pointer is written down. An item with no source is scope nobody agreed to.
 - **Dropping altitude.** Items are shippable slices, not tasks. "Habit CRUD" with three acceptance criteria, not "add a column to the habits table".
 
-**`context/PROGRESS/CHANGELOG_v1.md`** — created with its title, an `## Active Log (Last 30 Days)` section, and a `## Compacted History (> 30 days)` section. A first draft is not a revision of anything, so initial bootstrap logs nothing yet. Future completed tasks, conversations, and in-version changes are logged here, with entries older than 30 days compacted into monthly summaries.
+**`context/PROGRESS/v1/` folders** — `changelog/`, `specs/`, `plans/` and `sdd/`, each holding only a `.gitkeep`. Add `.superpowers/` to `.gitignore`. A first draft is not a revision of anything, so initial bootstrap logs nothing yet. From now on every completed task, conversation and in-version change is logged to `changelog/YYYY-MM-DD.md`, day files older than 30 days roll up into `YYYY-MM.md`, and superpowers specs, plans and finished SDD ledgers go to `specs/`, `plans/` and `sdd/` (`references/history-discipline.md`).
 
 Always `v1`. Even if the project has shipped before, what shipped was never tracked here.
 
@@ -126,6 +126,6 @@ Tell the user, in two lines, what the other two skills are for:
 
 > Changes inside v1 — a decision reversed, a doc that no longer matches the
 > code — go through `aligning-context-docs`, which rewrites the doc and puts the
-> reason in `CHANGELOG_v1.md`. Whenever tasks or conversations finish, log them there too.
-> When every box in `PROGRESS_v1.md` is checked and you say v1 is done, `versioning-context-docs`
+> reason in `v1/changelog/`. Whenever tasks or conversations finish, log them there too.
+> When every box in `v1/CHECKLIST.md` is checked and you say v1 is done, `versioning-context-docs`
 > closes it and opens v2.

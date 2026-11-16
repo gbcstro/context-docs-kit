@@ -36,7 +36,7 @@ doc(s) before working in that area:
 | [`context/SCHEMA.md`](./context/SCHEMA.md) | Data model |
 | [`context/DESIGN.md`](./context/DESIGN.md) | Theme colors, typography, layout/spacing, UI components to be built, motion & accessibility |
 | [`context/RULES.md`](./context/RULES.md) | Coding conventions, git workflow, AI assistant rules |
-| [`context/PROGRESS/`](./context/PROGRESS/) | `PROGRESS_v<N>.md` is current scope & checklist; `CHANGELOG_v<N>.md` logs task completions, sessions, and decision shifts (compacted after 30 days) |
+| [`context/PROGRESS/`](./context/PROGRESS/) | `v<N>/CHECKLIST.md` is current scope & checklist; `v<N>/changelog/YYYY-MM-DD.md` logs task completions, sessions, and decision shifts (compacted after 30 days); `v<N>/specs/`, `v<N>/plans/`, `v<N>/sdd/` hold superpowers specs, plans and SDD ledgers — never `docs/superpowers/` |
 ```
 
 Include only the docs that actually exist. The "Covers" column must describe *this* project's docs, not be copied boilerplate.
@@ -46,7 +46,7 @@ Include only the docs that actually exist. The "Covers" column must describe *th
 ```markdown
 ## Quick-Reference Key Facts
 
-- **Current version:** v1 — scope and checklist in `context/PROGRESS/PROGRESS_v1.md`
+- **Current version:** v1 — scope and checklist in `context/PROGRESS/v1/CHECKLIST.md`
 - **Repo layout:** <apps and packages, one line each>
 - **Frontend:** <framework, key libraries>
 - **Backend:** <framework, API style, ORM, database, cache, queues>
@@ -66,9 +66,9 @@ Keep all team skills updated to their latest upstream versions with `npx context
 | Workstream | Active Skills & Tools | How to Chain |
 |---|---|---|
 | **Product, Brand & Growth (Unified)** | `grill-me`, `brand-discovery`, `brand-guidelines`, `marketingskills`, `doc-coauthoring`, `internal-comms` | Interrogate positioning & audience (`grill-me` + `brand-discovery`), define CRO/SEO/GTM in `PRODUCT.md` (`marketingskills`), co-author specs (`doc-coauthoring`), and publish 3P updates (`internal-comms`) |
-| **Engineering & QA Workflow** | `using-superpowers`, `ponytail`, `webapp-testing`, `skill-creator`, `grill-me` | Plan & execute TDD slices (`using-superpowers` + `ponytail`), verify web UI in Playwright before ticking `PROGRESS_v<N>.md` (`webapp-testing`), package recurring workflows (`skill-creator`) |
+| **Engineering & QA Workflow** | `using-superpowers`, `ponytail`, `webapp-testing`, `skill-creator`, `grill-me` | Plan & execute TDD slices (`using-superpowers` + `ponytail`), verify web UI in Playwright before ticking `v<N>/CHECKLIST.md` (`webapp-testing`), package recurring workflows (`skill-creator`) |
 | **UI, Brand & Frontend Craft** | `brand-guidelines` → `design-taste-frontend` → `frontend-design` → `impeccable` | Enforce `DESIGN.md` tokens & brand spine (`brand-guidelines`), run anti-slop pre-flight (`design-taste-frontend`), build components after chat wireframe gate (`frontend-design`), run final craft audit (`impeccable`) |
-| **SocMed & Website Video / Media** | `brag` → `writing-beats` → `remotion-best-practices` / `hyperframes` → `marketingskills` | Read `PRODUCT.md` + `DESIGN.md` + `CHANGELOG_v<N>.md` (`brag`), gate a Beat Sheet in chat (`writing-beats`), render code video (`remotion-best-practices`) or AI presenter video (`hyperframes`), draft launch copy (`marketingskills`) |
+| **SocMed & Website Video / Media** | `brag` → `writing-beats` → `remotion-best-practices` / `hyperframes` → `marketingskills` | Read `PRODUCT.md` + `DESIGN.md` + `v<N>/changelog/` (`brag`), gate a Beat Sheet in chat (`writing-beats`), render code video (`remotion-best-practices`) or AI presenter video (`hyperframes`), draft launch copy (`marketingskills`) |
 | **Token Efficiency** | `@caveman-ai/cli@latest`, `compact-changelog` | High-signal low-token communication and 30-day changelog compaction (`npx context-docs-kit compact-changelog`) |
 ```
 

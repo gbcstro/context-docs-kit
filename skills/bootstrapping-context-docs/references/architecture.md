@@ -56,7 +56,7 @@ Give the resolution its own section, titled for the constraint and its answer �
 
 If there is genuinely no binding constraint, say so explicitly in §2. That is informative too — but ask twice before believing it.
 
-A constraint you cannot pin down is never left open. Take the most restrictive plausible reading, record it as the decision in force, and register it in `PROGRESS_v1.md` §4 — designing against a constraint that turns out to be looser is recoverable; discovering a real one in month three is not.
+A constraint you cannot pin down is never left open. Take the most restrictive plausible reading, record it as the decision in force, and register it in `v1/CHECKLIST.md` §4 — designing against a constraint that turns out to be looser is recoverable; discovering a real one in month three is not.
 
 ---
 
@@ -244,7 +244,7 @@ Only if the product stores, processes, or serves files/blobs/attachments (if non
   - Be realistic about team size: write down the standard the project will actually hold and enforce in CI.
 
 ### 17. Out of scope for v1, and nothing left open
-What is deliberately not in the architecture for v1 (e.g., multi-region active-active failover, Kubernetes, Elasticsearch cluster, microservices split, secondary mobile platform)? Then sweep back over the pass: every question must be decided, provisionally decided and registered in `PROGRESS_v1.md` §4, or descoped — `references/closing-questions.md`. Architecture is where an unclosed question does the most damage, because `SCHEMA.md`, `DESIGN.md`, and `RULES.md` are all written against it.
+What is deliberately not in the architecture for v1 (e.g., multi-region active-active failover, Kubernetes, Elasticsearch cluster, microservices split, secondary mobile platform)? Then sweep back over the pass: every question must be decided, provisionally decided and registered in `v1/CHECKLIST.md` §4, or descoped — `references/closing-questions.md`. Architecture is where an unclosed question does the most damage, because `SCHEMA.md`, `DESIGN.md`, and `RULES.md` are all written against it.
 
 ---
 
@@ -648,7 +648,7 @@ Renumber to fit the sections that actually apply. Do not keep empty sections. Th
   - Real-time state indicators (§6.5), optimistic UI expectations (§5.3), file upload progress/error states (§10.2), and client performance budgets (§15.1).
 - `RULES.md` needs:
   - The repository layout and package placement rules (§3.2–3.3), internal module dependency direction seams for its worked examples (§3.4), API contract/error conventions (§6.2–6.4), database migration workflow (§7.3), IaC & ops runbook rules (§14), secrets handling (§12.4), and testing/CI enforcement gates (§14.3, §16.2).
-- `PROGRESS_v1.md` needs:
+- `v1/CHECKLIST.md` needs:
   - Every capability and infrastructure foundation this architecture must stand up for v1 to be shippable — including the build/deploy pipeline, container/IaC setup, auth, storage, and verifiable performance/acceptance criteria.
 
 The rule that keeps this doc honest lives in `RULES.md`: no new library, cloud service, queue, cache, or architectural approach gets introduced later without the same confirmation and cost accounting it got here. Make sure that rule ships.

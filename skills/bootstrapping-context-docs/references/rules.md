@@ -53,6 +53,19 @@ Invoke the matching skill from `.agents/skills/` **before** acting:
 
 **Auto-invoke `grill-me`.** Before starting any new feature, plan, or design or architecture decision, and whenever a requirement is ambiguous, run `grill-me` without being asked: one question at a time until every branch is resolved, then act. Skip it only for trivial, fully specified changes (typo, rename, a bug with a known fix).
 
+**Every work artifact lives in `context/`.** All planning, execution and change records for the current version go under `context/PROGRESS/v<current>/`. This overrides every skill's default location, including superpowers:
+
+| Artifact | Path | Overrides |
+|---|---|---|
+| Design / spec (`brainstorming`, `doc-coauthoring`) | `context/PROGRESS/v<current>/specs/YYYY-MM-DD-<topic>-design.md` | `docs/superpowers/specs/` |
+| Implementation plan (`writing-plans`) | `context/PROGRESS/v<current>/plans/YYYY-MM-DD-<feature>.md` | `docs/superpowers/plans/` |
+| SDD / executing-plans ledger | `context/PROGRESS/v<current>/sdd/<plan-basename>.md` | committed copy of `.superpowers/sdd/<plan>/progress.md` |
+| Change log | `context/PROGRESS/v<current>/changelog/YYYY-MM-DD.md` | any other changelog |
+
+Never create `docs/superpowers/`. `.superpowers/` (SDD workspaces, brainstorm mockups) is scratch only: keep it in `.gitignore`, and when a plan finishes, copy its `progress.md` ledger to the `sdd/` path above. A subagent dispatched by any skill gets these paths in its brief.
+
+**Track every change in `context/`.** No code, doc, or decision change ends without its record: the doc it changes is updated in present tense, and the reason and result are appended to today's changelog file. Untracked work is unfinished work.
+
 ### 2.2 Output Style: Caveman (Always On)
 
 AI chat output uses `caveman` mode: terse, no filler, technical terms exact, code blocks and quoted errors unchanged. Exceptions: security warnings, irreversible-action confirmations, clarification requests. Committed docs, code comments, and commit messages stay in normal prose.
@@ -62,21 +75,21 @@ AI chat output uses `caveman` mode: terse, no filler, technical terms exact, cod
 <the eleven rules below, adapted>
 ```
 
-§2.1 names companion skills that `npx skills add` does not install. `references/dependencies.md` already offered to install any that are missing; keep every row regardless of the answer. The table is the project's rule, not a statement about one machine.
+§2.1 names companion skills that `npx skills add` does not install. `references/dependencies.md` already installed any that were missing into `.agents/skills/`, or found them loaded from a plugin or global install; keep every row regardless. The table is the project's rule, not a statement about one machine.
 
 §2.3 — eleven rules earn their place. Adapt the wording; keep the substance:
 
 1. **Read before writing.** Read the relevant `context/*.md` before implementing in that area, rather than assuming. Name which doc covers what.
 2. **No undocumented architecture decisions.** Never introduce a library, service, or architectural approach that isn't in `ARCHITECTURE.md`/`SCHEMA.md` without flagging it and getting confirmation — *held to the same standard every existing choice was held to.* This sentence is what makes the rule stick: it's not bureaucracy, it's parity with how the doc was built.
-3. **Keep the docs living, not frozen.** When an implementation decision changes or resolves something documented, update that doc **in the same change**, bump its `Revision`, and cascade to any doc that depends on it. Present tense only: the doc reads as if the new decision had always been the decision. **The reason goes in `context/PROGRESS/CHANGELOG_v<current>.md`, never in the doc.** The docs are the source of truth and must never drift from what is actually decided.
-4. **No speculative scope.** Don't add features beyond `PRODUCT.md`, or beyond the current version's checklist in `context/PROGRESS/PROGRESS_v<current>.md`, without checking first. The checklist is what this version is committed to; anything outside it is a conversation, not a task.
+3. **Keep the docs living, not frozen.** When an implementation decision changes or resolves something documented, update that doc **in the same change**, bump its `Revision`, and cascade to any doc that depends on it. Present tense only: the doc reads as if the new decision had always been the decision. **The reason goes in `context/PROGRESS/v<current>/changelog/`, never in the doc.** The docs are the source of truth and must never drift from what is actually decided.
+4. **No speculative scope.** Don't add features beyond `PRODUCT.md`, or beyond the current version's checklist in `context/PROGRESS/v<current>/CHECKLIST.md`, without checking first. The checklist is what this version is committed to; anything outside it is a conversation, not a task.
 5. **Ask, don't guess.** When a requirement is ambiguous, ask rather than silently picking an interpretation.
-6. **Wireframe before building UI, and Beat-Sheet before generating Video/Media** (only if `DESIGN.md` exists). Present an ASCII wireframe in chat reflecting `DESIGN.md`'s tokens and components for user approval before writing UI code (or whenever the user asks for a wireframe in chat), then execute the 4-layer UI craft pipeline (`brand-guidelines` -> `design-taste-frontend` -> `frontend-design` -> `impeccable`). When asked to generate a video or media asset for social media or the website, read `PRODUCT.md` + `DESIGN.md` + `CHANGELOG_v<current>.md` (`brag`), present a **Beat Sheet** in chat via `writing-beats` for user approval, and render via `remotion-best-practices` or `hyperframes` paired with `marketingskills` copy. Never save wireframes or beat sheets into `context/*.md` files.
+6. **Wireframe before building UI, and Beat-Sheet before generating Video/Media** (only if `DESIGN.md` exists). Present an ASCII wireframe in chat reflecting `DESIGN.md`'s tokens and components for user approval before writing UI code (or whenever the user asks for a wireframe in chat), then execute the 4-layer UI craft pipeline (`brand-guidelines` -> `design-taste-frontend` -> `frontend-design` -> `impeccable`). When asked to generate a video or media asset for social media or the website, read `PRODUCT.md` + `DESIGN.md` + `v<current>/changelog/` (`brag`), present a **Beat Sheet** in chat via `writing-beats` for user approval, and render via `remotion-best-practices` or `hyperframes` paired with `marketingskills` copy. Never save wireframes or beat sheets into `context/*.md` files.
 7. **Reuse before creating.** Always search the codebase (`src/`, `components/`, `utils/`, `lib/`, `hooks/`, shared packages) for existing functions, helpers, hooks, or components that can be reused, composed, or adapted before writing new ones. Never create duplicate or parallel utility logic.
 8. **Code like a senior engineer (pragmatic principles per scenario).** Write clean, readable, maintainable, production-ready code. Apply core software principles (KISS, YAGNI, DRY, SOLID, separation of concerns) *carefully per scenario*—never as cargo-cult dogma. Prefer simplicity and readability over cleverness or premature abstraction. Defend system boundaries with explicit validation; handle errors deliberately rather than swallowing them; keep pure business logic decoupled from side-effect-heavy I/O. Use `using-superpowers` and `ponytail` for disciplined planning/TDD execution, `grill-me` when requirements need interrogation, and `skill-creator` to package recurring team workflows into repo skills.
 9. **Follow official documentation per language and framework.** Strictly adhere to the official, version-matched documentation, modern idioms, and API signatures for the project's exact languages, runtimes, and frameworks as declared in `ARCHITECTURE.md` and package manifests. Never rely on deprecated patterns, obsolete syntax, or hallucinated methods. Obey the project's linter, formatter, and type-checker configs as absolute constraints.
 10. **Test and verify thoroughly.** Accompany every new or modified unit of logic with meaningful tests covering happy paths, edge cases, and failure modes. Test behavior rather than internal implementation details. For web UI surfaces, verify live browser behavior with `webapp-testing` (Playwright). Run the verification commands and confirm all tests pass before considering any task complete; leave no broken tests or test debt.
-11. **Always log when a task or conversation is done.** Before ending any conversation or declaring a task, feature, bug fix, or refactor complete, append a concise record to `context/PROGRESS/CHANGELOG_v<current>.md`. Record the date, what was accomplished, why/context, and files/docs affected (or checklist criteria evidenced). Check for and compact any changelog entries older than 30 days into monthly rollups (`npx context-docs-kit compact-changelog`), keep communication token-efficient (`@caveman-ai/cli`), and use `internal-comms` or `brag` when synthesizing changelog milestones into team updates or sprint summaries. Never finish a task or close a substantive session without logging the work.
+11. **Always log when a task or conversation is done.** Before ending any conversation or declaring a task, feature, bug fix, or refactor complete, append a concise record to today's file, `context/PROGRESS/v<current>/changelog/YYYY-MM-DD.md` (create it if missing). Record the date, what was accomplished, why/context, and files/docs affected (or checklist criteria evidenced). Compact day files older than 30 days into monthly `YYYY-MM.md` rollups (`npx context-docs-kit compact-changelog`), keep communication token-efficient (`@caveman-ai/cli`), and use `internal-comms` or `brag` when synthesizing changelog milestones into team updates or sprint summaries. Never finish a task or close a substantive session without logging the work.
 Add project-specific rules — but confirm each with the user; don't invent obligations they never agreed to.
 
 ---
@@ -180,7 +193,7 @@ recording a principle the user has agreed to a different version of.
 ### 6. Cap at three rounds
 
 If three rounds have not converged, stop. The principle does not go in the doc —
-that absence is the decision. Register it in `PROGRESS_v<N>.md` §4 with what was
+that absence is the decision. Register it in `v<N>/CHECKLIST.md` §4 with what was
 tried and where the disagreement sits, and move to the next principle.
 A principle nobody can pin down is not one the project will follow, and grinding
 on it costs more than it returns.
@@ -189,7 +202,7 @@ on it costs more than it returns.
 
 The accepted example goes into `RULES.md` §4 **with** the principle and its scenario boundary.
 A principle with no accepted worked example does not enter the doc. It goes to the
-`PROGRESS_v<N>.md` §4 register, or it goes nowhere.
+`v<N>/CHECKLIST.md` §4 register, or it goes nowhere.
 
 That is what makes §4 the section a contributor can act on: it does not say what
 the project believes, it shows what the project does and where the boundaries sit.
@@ -275,7 +288,7 @@ applies to anyone writing code here.>
 8. Code like a senior engineer (pragmatic principles per scenario, clean boundaries, error handling)
 9. Follow official documentation per language and framework (modern idioms, no deprecated APIs)
 10. Test and verify thoroughly (test behavior, edge cases, verify before completion)
-11. Always log when a task or conversation is done (log completed tasks/sessions to CHANGELOG_v<current>.md, compacting entries older than 30 days)>
+11. Always log when a task or conversation is done (log completed tasks/sessions to v<current>/changelog/YYYY-MM-DD.md, compacting day files older than 30 days)>
 
 ## 3. Code Organization
 ## 4. Design Principles
@@ -310,4 +323,4 @@ This is the last doc in the chain. Its `## Next Steps` points at the wiring step
 
 Then run `references/wiring.md` §3. This is the doc whose §2 reaches the agent file — as an `@`-import on hosts that support one, or copied verbatim between markers on hosts that do not (`references/hosts.md`). Either way §2 is the part that actually executes. Everything else in the set is discoverable; §2 is unconditional.
 
-`PROGRESS_v1.md` comes after the wiring, and it needs one thing from here: the testing posture, because "done" in an acceptance criterion means whatever §7 says it means.
+`v1/CHECKLIST.md` comes after the wiring, and it needs one thing from here: the testing posture, because "done" in an acceptance criterion means whatever §7 says it means.

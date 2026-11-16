@@ -28,7 +28,7 @@ one at a time.
 - The code and the docs disagree, or the user says the docs are stale
 - A decision is being reversed or refined and the version is not moving
 - A feature or dependency landed that no doc mentions
-- Checklist items in `PROGRESS_v<N>.md` are done but unticked, or ticked but not actually met
+- Checklist items in `v<N>/CHECKLIST.md` are done but unticked, or ticked but not actually met
 - Before closing a version — `versioning-context-docs` calls this first, because closing on drifted docs bakes the drift in permanently
 
 **Do NOT use for:** creating a doc set that does not exist (`bootstrapping-context-docs`); closing a version and opening the next (`versioning-context-docs`); a typo or formatting pass, which is not a revision and needs none of this.
@@ -38,13 +38,13 @@ one at a time.
 1. **`references/hosts.md`** — which host, whether you have subagents, and whether the agent file supports `@file` imports. The last one matters here: if RULES §2 changes, you refresh it in the agent file, and the two forms are different.
 2. **`references/history-discipline.md`** — the In-Version Change Protocol. It is the procedure this whole skill executes.
 3. **`references/doc-contract.md`** — the header, and how to migrate a legacy one.
-4. **`references/dependencies.md`** — the companion-skill preflight. `npx skills add` cannot install the skills `RULES.md` §2.1 routes to, so check for them now and, if any are missing, offer the install once.
+4. **`references/dependencies.md`** — the companion-skill preflight. `npx skills add` cannot install the skills `RULES.md` §2.1 routes to, so check for them now and install any that are missing into the project's `.agents/skills/` (symlinked to each host). Check again before the closing summary.
 
 ## Flow
 
 ```dot
 digraph align {
-    "Read version state\n(highest PROGRESS_vN.md)" [shape=box];
+    "Read version state\n(highest vN/CHECKLIST.md)" [shape=box];
     "Three-way diff\ndocs / code / checklist" [shape=box];
     "Present drift report\nby severity" [shape=box];
     "User picks what to fix" [shape=diamond];
@@ -57,7 +57,7 @@ digraph align {
     "Hand off to\nversioning-context-docs" [shape=box];
     "Done" [shape=doublecircle];
 
-    "Read version state\n(highest PROGRESS_vN.md)" -> "Three-way diff\ndocs / code / checklist";
+    "Read version state\n(highest vN/CHECKLIST.md)" -> "Three-way diff\ndocs / code / checklist";
     "Three-way diff\ndocs / code / checklist" -> "Present drift report\nby severity";
     "Present drift report\nby severity" -> "User picks what to fix";
     "User picks what to fix" -> "Apply In-Version Change Protocol\nper accepted item";
@@ -76,14 +76,14 @@ digraph align {
 Never guess which version is current.
 
 ```
-context/PROGRESS/PROGRESS_v*.md  -> the highest N whose Status is "open" is the current version
+context/PROGRESS/v*/CHECKLIST.md  -> the highest N whose Status is "open" is the current version
                                     if the highest is "closed", say so: the user is between
                                     versions, and opening the next is versioning-context-docs
 none present                     -> the set predates PROGRESS/. Say so, offer to derive
-                                    PROGRESS_v1.md from the docs as they stand, and gate it.
+                                    v1/CHECKLIST.md from the docs as they stand, and gate it.
 ```
 
-Read `PROGRESS_v<N>.md` (scope, checklist, §4 provisional decisions) and `CHANGELOG_v<N>.md`
+Read `v<N>/CHECKLIST.md` (scope, checklist, §4 provisional decisions) and `v<N>/changelog/`
 (active entries and compacted history — do not re-report a change that is
 already logged). Then read every `context/*.md` header and note each doc's
 `Revision`.
@@ -102,7 +102,7 @@ This is the work. For each doc in the set, hold three things against each other:
 |---|---|---|
 | the doc | what was decided | intent |
 | the code | what exists | evidence |
-| `PROGRESS_v<N>.md` | what this version committed to | scope |
+| `v<N>/CHECKLIST.md` | what this version committed to | scope |
 
 **Where a doc and the code disagree, the code is evidence and the doc is intent.**
 That does not automatically mean the doc is wrong — sometimes the code drifted
@@ -135,7 +135,7 @@ never written down.
 > `ARCHITECTURE.md` names no cache layer at all.
 
 **MINOR** — stale wording, a checklist item satisfied but unticked, numbering.
-> `PROGRESS_v1.md` item "Habit CRUD" is unticked, but all three of its
+> `v1/CHECKLIST.md` item "Habit CRUD" is unticked, but all three of its
 > acceptance criteria are covered by `src/db/habits.ts` and
 > `test/habits.test.ts`.
 
@@ -163,9 +163,9 @@ For each accepted fix, in full, per `references/history-discipline.md`:
 
 1. **Rewrite the doc into the new decision.** Delete the old text — do not annotate, contrast, or explain it. The doc reads as if it had always said this.
 2. **Bump `Revision` and `Last updated`.** `Project version` does not move.
-3. **Append to `CHANGELOG_v<N>.md`** — changed, why, affects. Check for and compact any changelog entries older than 30 days into monthly rollups under `## Compacted History (> 30 days)` (or run `npx context-docs-kit compact-changelog`).
+3. **Append to today's `v<N>/changelog/YYYY-MM-DD.md`** — changed, why, affects. Compact day files older than 30 days into monthly `YYYY-MM.md` rollups (or run `npx context-docs-kit compact-changelog`).
 4. **Cascade** along `Depends on` before you finish.
-5. **Re-check `PROGRESS_v<N>.md`** if scope, criteria or a §4 provisional decision moved. A decision that is now settled leaves §4 in this same pass.
+5. **Re-check `v<N>/CHECKLIST.md`** if scope, criteria or a §4 provisional decision moved. A decision that is now settled leaves §4 in this same pass.
 6. **Run the banned-phrase check.**
 
 ### The cascade is the part that gets skipped
@@ -201,7 +201,7 @@ back until the walk is done.
 
 Every tick is **proposed, never silent**, and every tick names what satisfies it:
 
-> `PROGRESS_v1.md` item "Daily check-in":
+> `v1/CHECKLIST.md` item "Daily check-in":
 >   AC "tapping a habit records an entry dated today" — `src/db/entries.ts:34`, `test/entries.test.ts:12`
 >   AC "tapping again removes it, no duplicate can exist" — unique index in `src/db/schema.ts:41`, `test/entries.test.ts:28`
 >   Both met. Tick it?
@@ -211,7 +211,7 @@ looks. For web UI acceptance criteria, run live browser verification via `webapp
 usually the most useful finding in the whole pass, because it is the gap between
 "we built it" and "we can show it works".
 
-Update `Last updated` in `PROGRESS_v<N>.md` when you tick anything.
+Update `Last updated` in `v<N>/CHECKLIST.md` when you tick anything.
 
 ## Step 7 — Refresh the agent file
 
@@ -229,7 +229,7 @@ Close with a plain account:
 
 > Fixed: `ARCHITECTURE.md` rev 4 (Postgres), `SCHEMA.md` rev 3 (cascade: the
 > local/server lockstep note no longer applies), `RULES.md` rev 2 (§9 migration
-> command). One `CHANGELOG_v1.md` entry covering all three. Ticked "Habit CRUD".
+> command). One `v1/changelog/` entry covering all three. Ticked "Habit CRUD".
 > Refreshed the Quick-Reference backend bullet in `AGENTS.md`.
 >
 > Left open: the Redis cache. You wanted to decide whether it stays before it
@@ -262,7 +262,7 @@ explicitly. Doing it quietly, item by item, is how a version stops ever ending.
 | Rationalization | Reality |
 |---|---|
 | "The code is right, I'll just update the doc" | Report the gap and let the user pick the direction. Sometimes the code is the thing that drifted. |
-| "I'll note in the doc that this replaced the earlier approach" | Never. Present tense in the doc, reason in `CHANGELOG_v<N>.md`. That is the entire point of this skill. |
+| "I'll note in the doc that this replaced the earlier approach" | Never. Present tense in the doc, reason in `v<N>/changelog/`. That is the entire point of this skill. |
 | "Just this one 'previously' makes it clearer" | It is a defect at the same severity as an invented fact. Run the banned-phrase check. |
 | "I fixed the doc the finding was about" | Then you are half done. Cascade downhill along `Depends on` before reporting back. |
 | "It's obviously done, I'll tick it" | Every tick needs evidence, and every tick is proposed to the user first. |

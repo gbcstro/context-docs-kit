@@ -1,4 +1,4 @@
-# History Discipline: PROGRESS_vN.md, CHANGELOG_vN.md, and In-Version Changes
+# History Discipline: vN/CHECKLIST.md, vN/changelog/, and In-Version Changes
 
 <!-- context-docs-kit:shared — canonical copy lives in shared/references/. Edit there, then `npm run sync`. -->
 
@@ -12,23 +12,39 @@ context/
   DESIGN.md
   RULES.md
   PROGRESS/
-    PROGRESS_v1.md        v1 scope + checklist + acceptance criteria
-    CHANGELOG_v1.md       task completions, session logs, and why anything changed during v1
-    PROGRESS_v2.md        written only when the user closes v1
-    CHANGELOG_v2.md
+    v1/
+      CHECKLIST.md        v1 scope + checklist + acceptance criteria
+      changelog/          one file per day: task completions, session logs, why anything changed
+        2026-03-14.md
+        2026-02.md        monthly rollup of day files older than 30 days
+      specs/              design specs (superpowers brainstorming, doc-coauthoring)
+        2026-03-14-<topic>-design.md
+      plans/              implementation plans (superpowers writing-plans)
+        2026-03-15-<feature>.md
+      sdd/                finished SDD / executing-plans ledgers
+        2026-03-15-<feature>.md
+    v2/                   written only when the user closes v1
 ```
+
+`v<N>/` is the version's whole working record. Skills that would write elsewhere
+by default — superpowers' `docs/superpowers/specs/` and `docs/superpowers/plans/`
+— write here instead; `RULES.md` §2.1 makes that the user preference those
+skills honor. Superpowers' SDD workspace (`.superpowers/sdd/<plan>/`) has a
+hard-coded path, so it stays a git-ignored scratch directory; when a plan
+finishes, its `progress.md` ledger is copied to `v<N>/sdd/<plan-basename>.md`.
+No `docs/superpowers/` folder is ever created, and `.superpowers/` is never committed.
 
 Three rules govern the whole folder:
 
 1. **The docs say what is true. The changelog says why it changed and what was completed.** Never both.
 2. **The first version is always `v1`**, and only the user decides when it ends.
-3. **Always log when a task or conversation is done, and compact after 30 days.** Every completed task, feature, fix, or session milestone is recorded before declaring done. Entries older than 30 days are compacted into monthly summary rollups so the active log stays clean and context-efficient.
+3. **Always log when a task or conversation is done, and compact after 30 days.** Every completed task, feature, fix, or session milestone is recorded before declaring done. Day files older than 30 days are compacted into one monthly rollup file so the active log stays clean and context-efficient.
 
 ---
 
-## `PROGRESS_vN.md` — the version's scope and checklist
+## `vN/CHECKLIST.md` — the version's scope and checklist
 
-One file per project version. `PROGRESS_v1.md` is written at the end of the first
+One file per project version. `v1/CHECKLIST.md` is written at the end of the first
 bootstrap pass, after the agent file is wired. It is **not** a snapshot of what
 happened; it is the scope the version is committed to, with the acceptance
 criteria that decide when it is met.
@@ -92,7 +108,7 @@ settled or explicitly carried, and the user says v1 is done. Nothing here closes
 on its own.
 ```
 
-### Rules for `PROGRESS_vN.md`
+### Rules for `vN/CHECKLIST.md`
 
 - **Derived from the docs, never invented.** Every checklist item traces to a section of an approved doc, and that pointer is written down. An item with no source is a feature nobody agreed to.
 - **Acceptance criteria are observable.** "Auth works" is not a criterion. "A user can register, verify by email, sign in, and the session survives an app restart" is four. Write what you would check, not what you would hope.
@@ -100,20 +116,34 @@ on its own.
 - **A box is ticked with evidence** — the file, test, or route that satisfies the criterion — and only ever by proposing the tick to the user first.
 - **§4 is the only place unsettled things live.** The docs themselves carry no open questions — every one is closed before its doc is approved, per `references/closing-questions.md`.
 - **Only the user closes a version.** However complete it looks, the skill states the status and waits.
-- **Never start at anything but v1.** On a first bootstrap, the file is `PROGRESS_v1.md`, even if the project has shipped before. What shipped before was not tracked here.
+- **Never start at anything but v1.** On a first bootstrap, the file is `v1/CHECKLIST.md`, even if the project has shipped before. What shipped before was not tracked here.
 
 ---
 
-## `CHANGELOG_vN.md` — task completions, session logs, and in-version changes
+## `vN/changelog/` — task completions, session logs, and in-version changes
 
-Created alongside `PROGRESS_vN.md`. Appended to for the life of that version.
-When the version closes, it is frozen and never written to again — vN+1 gets its own.
+A folder, created alongside `vN/CHECKLIST.md`. **One markdown file per day**,
+named `YYYY-MM-DD.md` for the real current date: the first entry of the day
+creates the file, later entries that day are appended to it. When the version
+closes, the folder is frozen and never written to again — vN+1 gets its own.
 
-`CHANGELOG_vN.md` has two primary purposes:
+```markdown
+# <Project> — v1 — 2026-04-15
+
+## Task: Stripe webhook signature verification
+**Completed:** ...
+**Why / Context:** ...
+**Affects:** ...
+```
+
+The date lives in the file name and the `#` title, so entry headings carry only
+the title.
+
+`vN/changelog/` has two primary purposes:
 1. **Documenting completed tasks & conversation sessions** — what was accomplished, why/context, and files or checklist items affected.
 2. **Documenting in-version doc revisions & decision shifts** — why any decision changed in `context/*.md` without cluttering the present-tense doc.
 
-**The Golden Rule: Always log when a conversation or task is done.** An AI agent or human contributor must never finish a task, implement a feature, resolve a bug, or end a work conversation without logging what was completed to `context/PROGRESS/CHANGELOG_v<current>.md`.
+**The Golden Rule: Always log when a conversation or task is done.** An AI agent or human contributor must never finish a task, implement a feature, resolve a bug, or end a work conversation without logging what was completed to today's file in `context/PROGRESS/v<current>/changelog/`.
 
 ### Entry Types
 
@@ -122,10 +152,10 @@ When the version closes, it is frozen and never written to again — vN+1 gets i
 Used whenever an architectural, product, schema, design, or rule decision changes inside the current version:
 
 ```markdown
-## 2026-04-02 — ARCHITECTURE.md rev 3, SCHEMA.md rev 2
+## ARCHITECTURE.md rev 3, SCHEMA.md rev 2
 **Changed:** the local store moved from SQLite to Postgres behind a small sync service.
 **Why:** multi-device turned out to be a v1 requirement after the user testing round, and SQLite has no server-side merge story — conflict resolution would have been ours to write.
-**Affects:** ARCHITECTURE.md §5 and §7, SCHEMA.md §3 (added `sync_conflicts`), PROGRESS_v1.md checklist item "Daily check-in" (offline behaviour AC added).
+**Affects:** ARCHITECTURE.md §5 and §7, SCHEMA.md §3 (added `sync_conflicts`), v1/CHECKLIST.md checklist item "Daily check-in" (offline behaviour AC added).
 ```
 
 #### Type 2: Task & Conversation Completion Entry
@@ -133,10 +163,10 @@ Used whenever an architectural, product, schema, design, or rule decision change
 Used whenever a coding task, feature, bug fix, refactor, or substantive conversation session concludes:
 
 ```markdown
-## 2026-04-15 — Task: Stripe webhook signature verification
+## Task: Stripe webhook signature verification
 **Completed:** Implemented Stripe webhook endpoint with signature checking, raw body parsing, and event routing.
 **Why / Context:** Payment events were failing signature verification in staging environments.
-**Affects:** `src/api/webhooks/stripe.ts`, `test/webhooks.test.ts`, PROGRESS_v1.md checklist item "Billing".
+**Affects:** `src/api/webhooks/stripe.ts`, `test/webhooks.test.ts`, v1/CHECKLIST.md checklist item "Billing".
 ```
 
 Every entry carries all parts. **Affects** is the one that gets skipped and
@@ -147,44 +177,31 @@ radius of a decision or task without re-deriving it.
 
 ## The 30-Day Compaction Protocol
 
-As AI agents log every task, session, and doc revision, `CHANGELOG_vN.md` grows.
-If left uncompacted, loading weeks of granular daily entries burns unnecessary context tokens
-and degrades model attention.
+As AI agents log every task, session, and doc revision, `vN/changelog/` fills
+with day files. Loading weeks of granular entries burns context tokens and
+degrades model attention, so the folder has two zones:
 
-To keep the changelog performant and clear, entries follow a **dual-zone structure**:
-1. **Active Log (Last 30 Days):** Full granular detail (date, title, Completed/Changed, Why, Affects).
-2. **Compacted History (> 30 days):** Entries older than 30 days rolled up into concise monthly bullet summaries.
+1. **Active (last 30 days):** the day files, `YYYY-MM-DD.md`, in full detail.
+2. **Compacted (> 30 days):** one rollup per month, `YYYY-MM.md`, holding a
+   single bullet per entry. Its day files are deleted.
 
 ```markdown
-# <Project> — v1 Change Log
+# <Project> — v1 — 2026-03 (Compacted)
 
-## Active Log (Last 30 Days)
-
-## 2026-04-15 — Task: Stripe webhook signature verification
-**Completed:** Implemented Stripe webhook endpoint with signature checking, raw body parsing, and event routing.
-**Why / Context:** Payment events were failing signature verification in staging.
-**Affects:** `src/api/webhooks/stripe.ts`, `test/webhooks.test.ts`.
-
----
-
-## Compacted History (> 30 days)
-
-### 2026-03 (Compacted)
-- **2026-03-14 – 2026-03-25 (Habit CRUD & Check-in):** Built habit CRUD, daily check-in toggle, streak computation core. Why: core v1 checklist scope. Affects: `src/core/`, `src/db/schema.ts`, PROGRESS_v1.md.
+- **2026-03-14 – 2026-03-25 (Habit CRUD & Check-in):** Built habit CRUD, daily check-in toggle, streak computation core. Why: core v1 checklist scope. Affects: `src/core/`, `src/db/schema.ts`, v1/CHECKLIST.md.
 - **2026-03-28 (ARCHITECTURE.md rev 2):** Switched local DB driver to better-sqlite3 for synchronous IPC. Why: Expo build performance. Affects: ARCHITECTURE.md §3.
 ```
 
-### How to Compact Entries Older Than 30 Days
+### How to compact day files older than 30 days
 
 When an AI agent logs a new entry, runs `aligning-context-docs`, or closes a version with `versioning-context-docs`:
-1. **Identify entries dated > 30 days ago** relative to today's date.
+1. **Find day files dated > 30 days ago** relative to today's date.
 2. **Group them by month** (`YYYY-MM`).
-3. **Condense each entry** into a single bullet summarizing the date, task/doc title, core change, rationale, and blast radius (affected files or checklist items).
-4. **Move the condensed bullets** under `### YYYY-MM (Compacted)` in `## Compacted History (> 30 days)`. If that month section already exists, merge the new bullets into it.
-5. **Remove the granular entries** from the Active Log section.
-6. **Retain entries <= 30 days old** in full granular detail.
+3. **Condense each entry** into one bullet: date, title, core change, rationale, blast radius.
+4. **Append the bullets** to `YYYY-MM.md`, creating it if missing.
+5. **Delete the compacted day files.** Day files <= 30 days old stay untouched.
 
-Alternatively, run the automated CLI compaction tool:
+Or run the CLI, which does exactly this:
 ```bash
 npx context-docs-kit compact-changelog --days 30
 ```
@@ -199,9 +216,9 @@ explaining a change inside the doc feels helpful in the moment.
 
 1. **Rewrite the doc into the new decision.** Delete the old text. Do not annotate it, contrast it, or explain it. When you are done the doc reads as if it had always said this.
 2. **Bump `**Revision:**` and `**Last updated:**`.** `**Project version:**` does not move.
-3. **Append the entry to `CHANGELOG_v<current>.md`** — changed, why, affects. The reason lives here and nowhere else. Check for and compact any entries older than 30 days.
+3. **Append the entry to today's `v<current>/changelog/YYYY-MM-DD.md`** — changed, why, affects. The reason lives here and nowhere else. Compact any day files older than 30 days.
 4. **Cascade before you finish.** Walk the `Depends on:` chain downhill from the doc you changed. Every dependent doc that now disagrees gets fixed in the same pass, each with its own revision bump; one changelog entry can cover them all. A change is not complete while a downstream doc contradicts it.
-5. **Re-check `PROGRESS_v<current>.md`.** If the change altered a scope item, its acceptance criteria, or a §4 provisional decision, update it and say so in the entry's **Affects**. A provisional decision that has just been settled leaves §4 in this same pass.
+5. **Re-check `v<current>/CHECKLIST.md`.** If the change altered a scope item, its acceptance criteria, or a §4 provisional decision, update it and say so in the entry's **Affects**. A provisional decision that has just been settled leaves §4 in this same pass.
 6. **Run the banned-phrase check** over every `context/*.md` before declaring the change done.
 
 ### The banned-phrase check
@@ -234,7 +251,7 @@ sentence is about a *decision*, it is banned; if it is about *behaviour*, it is 
 
   ARCHITECTURE.md will read "The store is Postgres, running in
   the compose stack" — no mention of SQLite, as if it were never
-  there. The reason you switched goes in CHANGELOG_v1.md so it
+  there. The reason you switched goes in v1/changelog/ so it
   stays findable.
 
   Before I write it: Postgres means you need the compose stack
@@ -247,10 +264,10 @@ sentence is about a *decision*, it is banned; if it is about *behaviour*, it is 
 
 | Skill | Writes |
 |---|---|
-| `bootstrapping-context-docs` | `PROGRESS_v1.md` at the end of the pass; initializes `CHANGELOG_v1.md` with active and compacted sections |
+| `bootstrapping-context-docs` | `v1/CHECKLIST.md` at the end of the pass; creates the empty `v1/changelog/`, `specs/`, `plans/` and `sdd/` folders (each with a `.gitkeep`) |
 | `aligning-context-docs` | changelog entries, task logs, doc revisions, and 30-day compaction; proposes checklist ticks |
-| `versioning-context-docs` | runs 30-day compaction on `CHANGELOG_vN.md` before freeze; opens `PROGRESS_v(N+1).md` and `CHANGELOG_v(N+1).md` |
-| AI Assistant / Contributor | always logs when a task or conversation is done, compacting entries older than 30 days |
+| `versioning-context-docs` | runs 30-day compaction on `vN/changelog/` before freeze; opens `v(N+1)/CHECKLIST.md` and the empty `v(N+1)/changelog/`, `specs/`, `plans/`, `sdd/` |
+| AI Assistant / Contributor | always logs to today's changelog file when a task or conversation is done, compacting day files older than 30 days; writes specs, plans and SDD ledgers into `v<current>/` |
 
 A first draft is not a revision of anything, so **initial bootstrap logs no changes**
-— `CHANGELOG_v1.md` starts with empty active/compacted sections and receives its first entry when the first task or change lands.
+— `v1/changelog/` starts empty and gets its first day file when the first task or change lands.

@@ -94,7 +94,7 @@ Now the volume work. For **each** feature in v1, lock down all five aspects:
 - **Monetization Model:** Free, subscription, one-time purchase, freemium, or unmonetized?
 - **Value Metric:** What exactly is being paid for? (A feature gate, a capacity limit, seat count, or convenience).
 - **Tier Entitlements & Quotas:** Detail the free tier limits vs. paid tier capabilities.
-- *If undecided:* Close it provisionally via `references/closing-questions.md` (e.g., v1 is free, no billing code) and register in `PROGRESS_v1.md` §4.
+- *If undecided:* Close it provisionally via `references/closing-questions.md` (e.g., v1 is free, no billing code) and register in `v1/CHECKLIST.md` §4.
 
 ### 10. Platform, interaction ergonomics & environment posture
 - **Target Platforms:** Which platforms for v1 (Web desktop, Web responsive mobile, iOS, Android, macOS, CLI)? Which are explicitly excluded?
@@ -107,7 +107,7 @@ Now the volume work. For **each** feature in v1, lock down all five aspects:
 
 ### 12. Out of scope for v1 & nothing left open
 - **Deliberate Exclusions:** What are you deliberately not building in v1? (Integrations, secondary platforms, team sharing, advanced AI automations, complex analytics).
-- **Closing Pass:** Sweep back over the pass. Every question raised must be decided, provisionally decided and registered in `PROGRESS_v1.md` §4, or descoped per `references/closing-questions.md`.
+- **Closing Pass:** Sweep back over the pass. Every question raised must be decided, provisionally decided and registered in `v1/CHECKLIST.md` §4, or descoped per `references/closing-questions.md`.
 
 ---
 
@@ -270,7 +270,7 @@ Before the gate, confirm the doc gives downstream docs everything they need:
   - Target users, context of use, and device ergonomics (§2.1, §6.2)
   - The functional surfaces and views (§4.1)
   - The UI components, forms, tables, actions, and empty/error states required by the §4 feature specifications
-- `PROGRESS_v1.md` needs:
+- `v1/CHECKLIST.md` needs:
   - The §4.1 v1 feature map and §4.3+ functional specs to derive shippable slices and observable acceptance criteria
   - §7 success metrics and §8 out-of-scope exclusions
 - Every doc needs §1.3 (principles) and §3.2 (differentiation mechanism) to check scope decisions against.

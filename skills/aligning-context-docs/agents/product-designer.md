@@ -47,7 +47,7 @@ Write `DESIGN.md` from the approved answers in your task.
 
 ### Rules for Drafting `DESIGN.md`:
 
-- **Nothing is left open.** Your task's approved answers are the only source. If a section needs a fact you were not given, report it back rather than writing `TBD`, `to be decided`, or an `## Open Questions` section. **There is no `## Open Questions` section in any doc.** Values marked as *provisional* are decisions the user made — write them as plain, present-tense decisions with no hedging; the main conversation registers them in `PROGRESS_v1.md` §4.
+- **Nothing is left open.** Your task's approved answers are the only source. If a section needs a fact you were not given, report it back rather than writing `TBD`, `to be decided`, or an `## Open Questions` section. **There is no `## Open Questions` section in any doc.** Values marked as *provisional* are decisions the user made — write them as plain, present-tense decisions with no hedging; the main conversation registers them in `v1/CHECKLIST.md` §4.
 - **Do not invent decisions.** No token, font, radius, animation curve, or component variant the user didn't approve.
 - **Color tokens are semantically named with a complete surface hierarchy and pairing rules.** Never bare hex values in component descriptions. Ramps map to semantic tokens (`--bg-base`, `--bg-surface`, `--text-primary`, `--border-default`, `--accent-primary`, status tokens). Include WCAG AA contrast pairing rules.
 - **Typography includes a complete type ramp.** Display down to Code/Mono with size, weight, line-height, and usage.

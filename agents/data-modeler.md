@@ -39,7 +39,7 @@ Write `SCHEMA.md` from the approved answers in your task.
 
 **Absolute rules:**
 
-- **Nothing is left open.** Your task's approved answers are the only source. If a section needs a fact you were not given, that is a defect in the task, not a licence to invent and not a hole to leave: report it back rather than writing `TBD`, `to be decided`, or an `## Open Questions` section. **There is no `## Open Questions` section in any doc.** Values marked in your task as *provisional* are decisions the user made — write them as plain, present-tense decisions with no hedging; the main conversation registers them in `PROGRESS_v<N>.md` §4.
+- **Nothing is left open.** Your task's approved answers are the only source. If a section needs a fact you were not given, that is a defect in the task, not a licence to invent and not a hole to leave: report it back rather than writing `TBD`, `to be decided`, or an `## Open Questions` section. **There is no `## Open Questions` section in any doc.** Values marked in your task as *provisional* are decisions the user made — write them as plain, present-tense decisions with no hedging; the main conversation registers them in `v<N>/CHECKLIST.md` §4.
 
 - **No invented columns.** Every column comes from an approved answer or an existing migration you were told to preserve. If a table looks incomplete without a field the user never mentioned, leave it out and report it — do not add the field, and do not annotate the gap in the doc.
 - **`snake_case` for database columns only.** Application-side naming follows the language's convention. Note the mapping if the ORM doesn't handle it.

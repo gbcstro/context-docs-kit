@@ -12,12 +12,12 @@
 | Skill / Tool | Upstream Command | Role in `context-docs-kit` |
 |---|---|---|
 | **`doc-coauthoring`** | `npx skills add anthropics/skills@doc-coauthoring` | Structured collaborative co-authoring when drafting or refining `PRODUCT.md`, `ARCHITECTURE.md`, RFCs, ADRs, and technical specs with stakeholders. |
-| **`internal-comms`** | `npx skills add anthropics/skills@internal-comms` | Converts `CHANGELOG_v<N>.md` entries, `PROGRESS_v<N>.md` milestone ticks, and drift reports into 3P updates (Progress, Plans, Problems), company newsletters, executive status updates, and incident reports. |
+| **`internal-comms`** | `npx skills add anthropics/skills@internal-comms` | Converts `v<N>/changelog/` entries, `v<N>/CHECKLIST.md` milestone ticks, and drift reports into 3P updates (Progress, Plans, Problems), company newsletters, executive status updates, and incident reports. |
 
 ### B. Dev Workflow, Testing & Interrogation
 | Skill / Tool | Upstream Command | Role in `context-docs-kit` |
 |---|---|---|
-| **`using-superpowers`** | `npx skills add obra/superpowers` | Enforces disciplined engineering execution: micro-step implementation plans, strict TDD (red-green-refactor), and root-cause debugging against `PROGRESS_v<N>.md` checklist slices. |
+| **`using-superpowers`** | `npx skills add obra/superpowers` | Enforces disciplined engineering execution: micro-step implementation plans, strict TDD (red-green-refactor), and root-cause debugging against `v<N>/CHECKLIST.md` checklist slices. |
 | **`webapp-testing`** | `npx skills add anthropics/skills@webapp-testing` | Drives live Playwright browser verification of web UI surfaces. Required by `RULES.md` §2 Rule 10 and `aligning-context-docs` Step 6 to supply concrete browser evidence before ticking web acceptance criteria. |
 | **`skill-creator`** | `npx skills add anthropics/skills@skill-creator` | Encapsulates recurring project workflows, migration runbooks, or domain conventions discovered in `RULES.md` into project-scoped skills under `.agents/skills/`. |
 | **`ponytail`** | `npx skills add DietrichGebert/ponytail` | Orchestrates developer workflow and context continuity across multi-step implementation sessions. |
@@ -47,7 +47,7 @@ Because brand identity, positioning, SEO, and growth live directly on the produc
 ### F. Video Generation, Social/Website Media & Brag Docs
 | Skill / Tool | Upstream Command | Role in `context-docs-kit` |
 |---|---|---|
-| **`brag`** | `npx skills add https://github.com/NousResearch/hermes-agent --skill brag` | Synthesizes completed `PROGRESS_v<N>.md` acceptance criteria and `CHANGELOG_v<N>.md` logs into engineering brag documents, sprint review summaries, and social proof for launches. |
+| **`brag`** | `npx skills add https://github.com/NousResearch/hermes-agent --skill brag` | Synthesizes completed `v<N>/CHECKLIST.md` acceptance criteria and `v<N>/changelog/` logs into engineering brag documents, sprint review summaries, and social proof for launches. |
 | **`writing-beats`** | `npx skills add https://github.com/mattpocock/skills --skill writing-beats` | Powers the **Beat-Sheet Gate**: scripts social media reels, website hero demos, and technical explainers into tight narrative beats before rendering. |
 | **`remotion-best-practices`** | `npx skills add https://github.com/remotion-dev/skills --skill remotion-best-practices` | Builds programmatic React/Remotion launch videos, animated UI walkthroughs, and social media reels (`16:9` and `9:16`) directly from `DESIGN.md` tokens and `PRODUCT.md` specs. |
 | **`hyperframes`** | `npx skills add heygen-com/hyperframes` | Produces AI-driven video presentations, HeyGen avatar explainers, and hyperframe storyboards for social media and website onboarding flows. |
@@ -61,7 +61,7 @@ Whenever a user asks to generate a video, reel, teaser, or animated walkthrough 
 1. **Step 1 — Harvest `context/` Truth Automatically (Never Re-Ask Known Facts):**
    - Read `context/PRODUCT.md` for Brand Voice (`brand-discovery`), Named Incumbent Pain (§3.1), Structural Differentiation (§3.2), Core Value Loop (§3.3), and CRO/GTM hooks (`marketingskills`).
    - Read `context/DESIGN.md` for exact Brand Palette tokens (`--bg-base`, `--accent-primary`), Typography (`Display`, `Body`, `Mono`), Radii, and Motion curves (`brand-guidelines` + `design-taste-frontend`).
-   - Read `context/PROGRESS/PROGRESS_v<N>.md` and `CHANGELOG_v<N>.md` via **`brag`** if the media highlights a shipped feature, sprint milestone, or version release.
+   - Read `context/PROGRESS/v<N>/CHECKLIST.md` and `v<N>/changelog/` via **`brag`** if the media highlights a shipped feature, sprint milestone, or version release.
 2. **Step 2 — Present the Beat-Sheet Gate in Chat (`writing-beats`):**
    - Before writing video code or triggering renders, use **`writing-beats`** to present a concise 30–60s Beat Sheet in chat (*Beat 1: Hook / Incumbent Pain -> Beat 2: Structural Mechanism -> Beat 3: Live UI Proof -> Beat 4: Primary CTA*, with visual + audio per beat) and get user approval. Never save beat sheets inside `context/*.md`.
 3. **Step 3 — Render by Target Channel:**

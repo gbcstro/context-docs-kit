@@ -166,7 +166,7 @@ If the product includes charts or graphs, define:
 Explicitly list design features deferred to later versions (e.g., custom theme builder, secondary themes, complex motion choreography).
 
 ### 9. Nothing left open
-Sweep back over the pass: every decision is decided, provisionally decided and registered in `PROGRESS_v1.md` §4, or descoped. See `references/closing-questions.md`.
+Sweep back over the pass: every decision is decided, provisionally decided and registered in `v1/CHECKLIST.md` §4, or descoped. See `references/closing-questions.md`.
 
 ---
 
@@ -280,4 +280,4 @@ Points to `RULES.md`.
   - Token naming conventions and UI component standards.
   - The rule that a wireframe is presented in chat for approval before building UI (or when requested), and never saved to `context/*.md` files.
 - `ARCHITECTURE.md` needs: UI component library, icon library, and CSS/styling tooling commitments.
-- `PROGRESS_v1.md` needs: the core UI components and design system tokens as verifiable acceptance criteria.
+- `v1/CHECKLIST.md` needs: the core UI components and design system tokens as verifiable acceptance criteria.

@@ -73,7 +73,7 @@ For `ARCHITECTURE.md` specifically: is there a top-level section (§2) for the b
 
 Grep the draft for: `previously`, `used to`, `we switched`, `changed from`, `as of v`, `originally`, `no longer`, `instead of the`, `migrated from`, `formerly`, `moved away from`, `we now`.
 
-Every hit about a **decision** is a defect at the same severity as an invented fact, and belongs in `context/PROGRESS/CHANGELOG_v<current>.md` instead. Hits about **runtime behaviour** ("once the token expires the session is no longer valid") are fine — that is a fact about the product, not about the doc's history.
+Every hit about a **decision** is a defect at the same severity as an invented fact, and belongs in `context/PROGRESS/v<current>/changelog/` instead. Hits about **runtime behaviour** ("once the token expires the session is no longer valid") are fine — that is a fact about the product, not about the doc's history.
 
 ### 7. Architecture artifacts, system completeness, and RULES.md standards
 

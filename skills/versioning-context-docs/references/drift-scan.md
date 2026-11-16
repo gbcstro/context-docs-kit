@@ -6,7 +6,7 @@ For each doc in the set, hold three sources against each other:
 
 - **the doc** — what was decided (intent)
 - **the code** — what exists (evidence)
-- **`PROGRESS_v<N>.md`** — what this version committed to (scope)
+- **`v<N>/CHECKLIST.md`** — what this version committed to (scope)
 
 Read the doc, then read the code the table points at, then read the checklist
 items whose `Source:` pointer names that doc. A finding is any place two of the
@@ -164,7 +164,7 @@ show the user, or park the principle.
 
 ---
 
-## PROGRESS_v<N>.md
+## v<N>/CHECKLIST.md
 
 | Read | Compare against |
 |---|---|

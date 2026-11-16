@@ -50,7 +50,7 @@ npx skills add gbcstro/context-docs-kit -a claude-code        # this project
 npx skills add gbcstro/context-docs-kit -a claude-code -g     # all projects
 ```
 
-This installs the skills only. On first run, the skill offers to install any missing companion skills, and runs its scan, draft and review stages as general-purpose subagents briefed from the persona files it ships with.
+This installs the skills only. On first run, the skill installs any missing companion skills into the project's `.agents/skills/` (symlinked to each host), and runs its scan, draft and review stages as general-purpose subagents briefed from the persona files it ships with.
 
 ### Codex
 
@@ -68,7 +68,7 @@ codex plugin marketplace add gbcstro/context-docs-kit
 codex plugin add context-docs-kit@context-docs-kit
 ```
 
-Or run `/plugins` inside Codex and pick it from the `context-docs-kit` tab. Codex plugins carry skills only: the skill offers to install missing companions on first run, and briefs Codex's built-in `default` agent with each persona instead of using named ones.
+Or run `/plugins` inside Codex and pick it from the `context-docs-kit` tab. Codex plugins carry skills only: the skill installs missing companions into the project's `.agents/skills/` on first run, and briefs Codex's built-in `default` agent with each persona instead of using named ones.
 
 **Option 3: the `skills` CLI.**
 
@@ -97,7 +97,7 @@ Every `RULES.md` the kit writes routes work to 12 companion skills (§2.1): `sup
 |---|---|
 | Claude Code plugin | Plugin dependencies: installed with the kit once their marketplaces are added. |
 | `npx context-docs-kit install` / `update` | Lists the missing ones with their sources and asks once (`[Y/n]`). With no terminal (CI, scripts) they are skipped unless you pass `--yes`. `--skip-companions` turns the offer off. |
-| `npx skills add`, or the Codex plugin | The first time a context-docs skill runs, it checks for them and offers to install any that are missing, once, with your OK. Or run `npx context-docs-kit install --target <host>` to install them all now. |
+| `npx skills add`, or the Codex plugin | Each bootstrap, align or versioning run installs any that are missing into the project's `.agents/skills/` (symlinked to each host, recorded in `skills-lock.json`), and re-checks before it finishes. Or run `npx context-docs-kit install --target <host>` to install them all now. |
 | npm (`npm i -D context-docs-kit`) | `npx skills experimental_sync -y` reads the kit's `skills` list and installs them. Add it as a `prepare` script to keep them in step with `npm update`. |
 
 ### Updating
@@ -196,7 +196,7 @@ One question at a time. A recommendation with every question. The realistic opti
 
 When you don't know something, it doesn't invent a plausible answer — and it doesn't leave a `TBD` either. **Both are holes; the second just looks honest.** An invented `$4.99/mo` reads as decided and three docs downstream inherit it. A "pricing TBD" is worse in a different way: `SCHEMA.md` still has to decide whether a price is a column, so it guesses, and nobody notices.
 
-Instead the question gets *closed*. It finds the option that's **cheapest to reverse**, tells you what reversing it would actually cost, and asks you to accept it as the decision in force. The doc then reads like any other decision — "v1 is free, there is no billing" — and the fact that it's unsettled is registered in one place, `PROGRESS_v1.md` §4, with what would settle it and what changing it costs.
+Instead the question gets *closed*. It finds the option that's **cheapest to reverse**, tells you what reversing it would actually cost, and asks you to accept it as the decision in force. The doc then reads like any other decision — "v1 is free, there is no billing" — and the fact that it's unsettled is registered in one place, `v1/CHECKLIST.md` §4, with what would settle it and what changing it costs.
 
 That's more work than parking a question, not less. The point is that the cost moves from a future reader, who can't pay it, to the conversation you're already having.
 
@@ -216,17 +216,24 @@ The set is versioned as a product, not as files:
 context/
   PRODUCT.md  ARCHITECTURE.md  SCHEMA.md  DESIGN.md  RULES.md
   PROGRESS/
-    PROGRESS_v1.md      v1's scope, checklist, acceptance criteria,
+    v1/
+      CHECKLIST.md      v1's scope, checklist, acceptance criteria,
                         and the register of provisional decisions
-    CHANGELOG_v1.md     completed tasks, session logs, and why anything
-                        changed during v1 (compacted after 30 days)
+      changelog/        one YYYY-MM-DD.md per day: completed tasks, session
+                        logs, why anything changed (older than 30 days
+                        rolled into YYYY-MM.md)
+      specs/            design specs (superpowers brainstorming)
+      plans/            implementation plans (superpowers writing-plans)
+      sdd/              finished subagent-driven-development ledgers
 ```
 
-**`PROGRESS_v1.md` is written from every approved doc** at the end of the bootstrap, and it is a commitment, not a summary: the shippable slices v1 owes, each with acceptance criteria you could actually check, each pointing at the doc section it came from. Boxes get ticked as work lands, with evidence — the file or test that satisfies the criterion. It is always `v1` on a first run, and **only you close it**.
+Superpowers writes into `v<N>/specs/` and `v<N>/plans/` instead of `docs/superpowers/` — `RULES.md` §2.1 sets that location, and superpowers honors it as a user preference. Its SDD scratch workspace (`.superpowers/sdd/`) has a fixed path, so it stays git-ignored, and each finished plan's ledger is copied into `v<N>/sdd/`. Projects on the old flat `PROGRESS_v1.md` / `CHANGELOG_v1.md` layout are migrated by `aligning-context-docs` as part of the kit-upgrade check.
 
-**The docs never explain themselves.** When a decision changes and the version doesn't move, the doc is rewritten so it reads as if it had always said this — no "previously", no "we switched from X" — and the reason goes in `CHANGELOG_v1.md`, with a list of every doc the change touched. That list is what makes a decision's blast radius findable later, and it's why the docs stay readable: a doc arguing with its own history buries the one fact you opened it for.
+**`v1/CHECKLIST.md` is written from every approved doc** at the end of the bootstrap, and it is a commitment, not a summary: the shippable slices v1 owes, each with acceptance criteria you could actually check, each pointing at the doc section it came from. Boxes get ticked as work lands, with evidence — the file or test that satisfies the criterion. It is always `v1` on a first run, and **only you close it**.
 
-**Always log on completion, compact after 30 days.** Whenever an AI assistant or contributor finishes a task, resolves a bug, or ends a conversation session, it logs what was completed to `CHANGELOG_v<current>.md` before declaring completion. To avoid bloating LLM context with old granular entries, entries older than 30 days are automatically compacted into concise monthly summary rollups.
+**The docs never explain themselves.** When a decision changes and the version doesn't move, the doc is rewritten so it reads as if it had always said this — no "previously", no "we switched from X" — and the reason goes in `v1/changelog/`, with a list of every doc the change touched. That list is what makes a decision's blast radius findable later, and it's why the docs stay readable: a doc arguing with its own history buries the one fact you opened it for.
+
+**Always log on completion, compact after 30 days.** Whenever an AI assistant or contributor finishes a task, resolves a bug, or ends a conversation session, it logs what was completed to today's `v<current>/changelog/YYYY-MM-DD.md` before declaring completion. To avoid bloating LLM context with old granular entries, day files older than 30 days are compacted into one monthly rollup file.
 
 Then the cascade, which is the part that usually gets skipped: a change is not finished until every doc downstream of it agrees. `aligning-context-docs` walks the `Depends on` chain and fixes them in the same pass.
 
@@ -238,7 +245,7 @@ Then the cascade, which is the part that usually gets skipped: a change is not f
 | **No open questions, anywhere** | Every question closes before its doc is drafted; what can't be settled becomes a registered provisional decision |
 | **`Project version` + `Revision`** | Two separate axes: `v1` is the product, `Revision: 3` is the file. `v` never means both |
 | **Agent-file wiring** — docs map + rules | Without it the folder is inert. Excellent docs nobody opens change nothing |
-| **`PROGRESS_vN` + `CHANGELOG_vN`** | Docs stay present-tense; scope is committed with criteria; completed tasks & reasons stay findable; compacted after 30 days |
+| **`vN/CHECKLIST.md` + `vN/changelog/`** | Docs stay present-tense; scope is committed with criteria; completed tasks & reasons stay findable; compacted after 30 days |
 
 Agent-file wiring is the step most often skipped, and the one that decides whether any of this has an effect. The kit uses `@context/RULES.md` on hosts that support imports, and copies §2 verbatim between markers on hosts that don't — so the rules apply on Codex and Antigravity too, instead of sitting there as an inert line.
 
@@ -292,7 +299,7 @@ npx context-docs-kit update
 
 | Pillar | Integrated Skills & Tools | How `context-docs-kit` Orchestrates Them |
 |---|---|---|
-| **Documentation & Internal Comms** | `anthropics/skills@doc-coauthoring`, `anthropics/skills@internal-comms` | Co-authors `PRODUCT.md`, `ARCHITECTURE.md`, and RFCs; turns `CHANGELOG_vN.md` & `PROGRESS_vN.md` into 3P updates and release notes |
+| **Documentation & Internal Comms** | `anthropics/skills@doc-coauthoring`, `anthropics/skills@internal-comms` | Co-authors `PRODUCT.md`, `ARCHITECTURE.md`, and RFCs; turns `vN/changelog/` & `vN/CHECKLIST.md` into 3P updates and release notes |
 | **Dev Workflow & QA** | `obra/superpowers`, `anthropics/skills@webapp-testing`, `anthropics/skills@skill-creator`, `DietrichGebert/ponytail`, `mattpocock/skills` (`grill-me`) | Single-question interrogation (`grill-me`), TDD execution (`using-superpowers`, `ponytail`), live Playwright browser verification (`webapp-testing`), and custom repo skills (`skill-creator`) |
 | **UI Principles, Brand & Craft** | `anthropics/skills@brand-guidelines` -> `Leonxlnx/taste-skill@design-taste-frontend` -> `anthropics/skills@frontend-design` -> `npx impeccable install` | Sequenced 4-layer pipeline around `DESIGN.md` and `RULES.md` §2 Rule 6 |
 | **Marketing, SEO & Brand (Unified with Product)** | `coreyhaines31/marketingskills`, `affaan-m/ECC` (`brand-discovery`) | Unified directly into `PRODUCT.md` and the `product`/`growth` pod: brand voice, positioning, CRO, copywriting, technical/programmatic SEO, and GTM launch playbooks |
@@ -302,7 +309,7 @@ npx context-docs-kit update
 ### Creating Videos & Media for Social Media or Websites
 
 When you ask your assistant to create a launch video, social media reel, or website hero demo, `RULES.md` §2 Rule 6 and `AGENTS.md` automatically run a 4-step pipeline:
-1. **Harvest `context/` Truth:** Reads `PRODUCT.md` (brand voice, incumbent pain, differentiation, CRO hook), `DESIGN.md` (exact semantic color tokens, fonts, radii, motion curves), and `CHANGELOG_vN.md` / `PROGRESS_vN.md` (via `brag`).
+1. **Harvest `context/` Truth:** Reads `PRODUCT.md` (brand voice, incumbent pain, differentiation, CRO hook), `DESIGN.md` (exact semantic color tokens, fonts, radii, motion curves), and `vN/changelog/` / `vN/CHECKLIST.md` (via `brag`).
 2. **Beat-Sheet Gate (`writing-beats`):** Presents a 30–60s narrative Beat Sheet (*Hook -> Mechanism -> Live Proof -> CTA*) in chat for your approval before rendering.
 3. **Render by Target Channel:** Uses `remotion-best-practices` + `design-taste-frontend` + `frontend-design` for programmatic React/UI videos (website embeds or `16:9` / `9:16` social reels), or `hyperframes` for HeyGen AI presenter/storyboard videos.
 4. **Companion Copy (`marketingskills`):** Writes the matching X thread, LinkedIn post, or landing page copy aligned with the video beats.

@@ -6,7 +6,8 @@ import readline from 'node:readline';
 
 import { parseTargets, TARGET_NAMES, TARGETS, DEFAULT_TARGET } from '../src/targets.mjs';
 import { planInstall, applyInstall, planUninstall, applyUninstall, inspect, packageVersion } from '../src/install.mjs';
-import { compactChangelogFile, findCurrentChangelog } from '../src/compact-changelog.mjs';
+import fs from 'node:fs';
+import { compactChangelogFile, compactChangelogDir, findCurrentChangelog } from '../src/compact-changelog.mjs';
 import {
   ECOSYSTEM_CATEGORIES,
   ECOSYSTEM_ITEMS,
@@ -51,7 +52,7 @@ Options
   --link            link the .agents/skills store back to this package (for developing the kit)
   --force           replace files this tool did not install
   --days <number>   cutoff age in days for compact-changelog (default: 30)
-  --file <path>     specific changelog path for compact-changelog
+  --file <path>     changelog file or v<N>/changelog/ folder for compact-changelog
   --dry-run         print what would happen, write nothing
   -h, --help        this text
   -v, --version     print the version
@@ -434,7 +435,10 @@ function cmdCompactChangelog(values) {
   }
 
   const dryRun = Boolean(values['dry-run']);
-  const result = compactChangelogFile(filePath, { days, dryRun });
+  const isDir = fs.existsSync(filePath) && fs.statSync(filePath).isDirectory();
+  const result = isDir
+    ? compactChangelogDir(filePath, { days, dryRun })
+    : compactChangelogFile(filePath, { days, dryRun });
 
   console.log(`\nCompacting ${filePath} (entries older than ${days} days):`);
   console.log(`  Compacted: ${result.compactedCount} entry/entries`);
