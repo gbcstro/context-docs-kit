@@ -10,8 +10,8 @@ first question**, because two of them change what you write into the user's repo
 
 | Host | Agent file | `@file` import | Named persona subagents |
 |---|---|---|---|
-| Claude Code | `AGENTS.md` | yes | when installed by the plugin or `npx context-docs-kit install`; otherwise brief a general-purpose subagent |
-| Codex | `AGENTS.md` | **no** | when installed by `npx context-docs-kit install --target codex` (TOML in `.codex/agents/`); otherwise brief a generic subagent (`default`/`worker`) |
+| Claude Code | `AGENTS.md` | yes | when installed by the plugin; otherwise brief a general-purpose subagent |
+| Codex | `AGENTS.md` | **no** | when `.codex/agents/` holds the persona TOML files; otherwise brief a generic subagent (`default`/`worker`) |
 | Gemini CLI | `AGENTS.md` | yes | no |
 | Antigravity | `AGENTS.md` | **no** | no |
 

@@ -42,7 +42,7 @@ Because brand identity, positioning, SEO, and growth live directly on the produc
 ### E. Token Saving & Context Efficiency
 | Skill / Tool | Upstream Command | Role in `context-docs-kit` |
 |---|---|---|
-| **`@caveman-ai/cli`** | `npx @caveman-ai/cli@latest` | Cuts LLM output and context token burn via high-signal, zero-fluff communication, working alongside present-tense docs and `npx context-docs-kit compact-changelog --days 30` to keep long-running team repos fast and economical. |
+| **`@caveman-ai/cli`** | `npx @caveman-ai/cli@latest` | Cuts LLM output and context token burn via high-signal, zero-fluff communication, working alongside present-tense docs and 30-day changelog compaction to keep long-running team repos fast and economical. |
 
 ### F. Video Generation, Social/Website Media & Brag Docs
 | Skill / Tool | Upstream Command | Role in `context-docs-kit` |
@@ -75,23 +75,13 @@ Whenever a user asks to generate a video, reel, teaser, or animated walkthrough 
 
 ## 3. Installing & Keeping Everything Always Updated
 
-External skills are **never frozen as static copies** inside `context-docs-kit`. Instead, `context-docs-kit` installs and updates them live from their upstream GitHub repositories and `@latest` npm packages.
+External skills are **never frozen as static copies** inside `context-docs-kit`. Each one installs live from its upstream repository into the project, with the command in the tables above:
 
 ```bash
-# Install context-docs-kit + all 18 ecosystem integrations across all assistants
-npx context-docs-kit install --target all --ecosystem
+# Install one skill into this repo (.agents/skills, symlinked to each host)
+npx skills add <source> [--skill <name>] -a <claude-code|codex|gemini-cli|antigravity> -y
 
-# Install into the project repository (.agents/skills, .claude/skills) for the whole team
-npx context-docs-kit install --target all --ecosystem --project
-
-# Or install by unified team pod (--bundle)
-npx context-docs-kit install --bundle full-team      # All 6 categories (18 integrations)
-npx context-docs-kit install --bundle product        # Unified Product, Brand & Growth pod (same as --bundle growth)
-npx context-docs-kit install --bundle engineering    # Dev workflow, QA, docs, brag, caveman
-npx context-docs-kit install --bundle design         # 4-layer UI craft, brand, Remotion, QA
-npx context-docs-kit install --bundle video          # Social media & website video production suite
-
-# Keep context-docs-kit + all 16 upstream skill repos + @latest CLIs always updated
-npx context-docs-kit update
+# Keep every skill installed this way at its latest upstream version
+npx skills update
 ```
 

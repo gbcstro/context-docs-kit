@@ -13,8 +13,8 @@ Runs on **Claude Code, Codex, Gemini CLI and Antigravity**, and installs as a pl
 | Assistant | Recommended | Gets you |
 |---|---|---|
 | **Claude Code** | the plugin | skills, persona subagents, and all 12 companion skills as plugin dependencies |
-| **Codex** | `npx context-docs-kit install --target codex` | skills, persona subagents (as Codex custom agents), and all 12 companion skills |
-| Gemini CLI / Antigravity | `npx context-docs-kit install --target gemini` (or `antigravity`) | skills and companion skills |
+| **Codex** | the kit's CLI, from a clone (`node bin/cli.mjs install --target codex`) | skills, persona subagents (as Codex custom agents), and all 12 companion skills |
+| Gemini CLI / Antigravity | `npx skills add gbcstro/context-docs-kit -a gemini-cli` (or `antigravity`) | skills; companions installed into the project on first run |
 
 Restart your assistant after any install.
 
@@ -36,11 +36,11 @@ Restart your assistant after any install.
 
 The same from a shell: `claude plugin marketplace add <repo>` for each, then `claude plugin install context-docs-kit@context-docs-kit`. If you added the kit before its dependencies, add the missing marketplaces and run `/reload-plugins`. Claude Code then installs what it can resolve.
 
-**Option 2: the kit's CLI.** Installs the skills, the persona subagents to `~/.claude/agents`, and offers to install any missing companion skills:
+**Option 2: the kit's CLI.** The package is not on npm, so run it from a clone of this repo (see [Development](#development)). Installs the skills, the persona subagents to `~/.claude/agents`, and offers to install any missing companion skills:
 
 ```bash
-npx context-docs-kit install                # your user account
-npx context-docs-kit install --project      # this repo (.claude/), shared with the team
+node bin/cli.mjs install                # your user account
+node bin/cli.mjs install --project      # this repo (.claude/), shared with the team
 ```
 
 **Option 3: the `skills` CLI.**
@@ -54,11 +54,11 @@ This installs the skills only. On first run, the skill installs any missing comp
 
 ### Codex
 
-**Option 1: the kit's CLI (recommended).** This is the only route that gives Codex the named persona subagents. It renders each persona as a Codex custom agent (TOML), and offers to install any missing companion skills:
+**Option 1: the kit's CLI (recommended), from a clone.** This is the only route that gives Codex the named persona subagents. It renders each persona as a Codex custom agent (TOML), and offers to install any missing companion skills:
 
 ```bash
-npx context-docs-kit install --target codex             # ~/.agents/skills + ~/.codex/agents
-npx context-docs-kit install --target codex --project   # .agents/skills + .codex/agents, shared with the team
+node bin/cli.mjs install --target codex             # ~/.agents/skills + ~/.codex/agents
+node bin/cli.mjs install --target codex --project   # .agents/skills + .codex/agents, shared with the team
 ```
 
 **Option 2: Codex plugin.** Codex reads the kit's marketplace directly:
@@ -82,8 +82,6 @@ Same as the plugin: skills only, with companions offered on first run.
 ### Gemini CLI and Antigravity
 
 ```bash
-npx context-docs-kit install --target gemini
-npx context-docs-kit install --target antigravity
 npx skills add gbcstro/context-docs-kit -a gemini-cli     # or -a antigravity
 ```
 
@@ -96,9 +94,8 @@ Every `RULES.md` the kit writes routes work to 12 companion skills (§2.1): `sup
 | You installed with | Companions |
 |---|---|
 | Claude Code plugin | Plugin dependencies: installed with the kit once their marketplaces are added. |
-| `npx context-docs-kit install` / `update` | Lists the missing ones with their sources and asks once (`[Y/n]`). With no terminal (CI, scripts) they are skipped unless you pass `--yes`. `--skip-companions` turns the offer off. |
-| `npx skills add`, or the Codex plugin | Each bootstrap, align or versioning run installs any that are missing into the project's `.agents/skills/` (symlinked to each host, recorded in `skills-lock.json`), and re-checks before it finishes. Or run `npx context-docs-kit install --target <host>` to install them all now. |
-| npm (`npm i -D context-docs-kit`) | `npx skills experimental_sync -y` reads the kit's `skills` list and installs them. Add it as a `prepare` script to keep them in step with `npm update`. |
+| the kit's CLI (`install` / `update`) | Lists the missing ones with their sources and asks once (`[Y/n]`). With no terminal (CI, scripts) they are skipped unless you pass `--yes`. `--skip-companions` turns the offer off. |
+| `npx skills add`, or the Codex plugin | Each bootstrap, align or versioning run installs any that are missing into the project's `.agents/skills/` (symlinked to each host, recorded in `skills-lock.json`), and re-checks before it finishes. |
 
 ### Updating
 
@@ -106,7 +103,7 @@ Every `RULES.md` the kit writes routes work to 12 companion skills (§2.1): `sup
 |---|---|
 | Claude Code plugin | `/plugin marketplace update context-docs-kit`, then `/plugin update context-docs-kit@context-docs-kit` |
 | Codex plugin | `codex plugin marketplace upgrade`, then reinstall from `/plugins` |
-| the kit's CLI | `npx context-docs-kit@latest update` (`@latest`, or npx may reuse a cached older copy): updates the kit's skills and persona agents, offers any missing companions, runs `npx skills update -y`, and refreshes the `@latest` CLIs (`impeccable`, `@caveman-ai/cli`) |
+| the kit's CLI | `git pull`, then `node bin/cli.mjs update`: updates the kit's skills and persona agents, offers any missing companions, runs `npx skills update -y`, and refreshes the `@latest` CLIs (`impeccable`, `@caveman-ai/cli`) |
 | `skills` CLI | `npx skills update` (the kit, and any companions installed the same way) |
 
 ### After updating
@@ -137,9 +134,9 @@ Every `RULES.md` the kit writes routes work to 12 companion skills (§2.1): `sup
 | `--force` | replace files this tool did not install |
 | `--dry-run` | print what would happen, write nothing |
 
-`npx context-docs-kit list` shows what is installed where. `npx context-docs-kit uninstall` removes it — and only ever removes what it installed, tracked in a manifest at each install root, so a hand-written skill sitting in the same directory is never touched.
+`node bin/cli.mjs list` shows what is installed where. `node bin/cli.mjs uninstall` removes it — and only ever removes what it installed, tracked in a manifest at each install root, so a hand-written skill sitting in the same directory is never touched.
 
-`npx context-docs-kit compact-changelog [--days 30]` compacts changelog entries older than 30 days into monthly rollups, keeping the active log clean.
+`node bin/cli.mjs compact-changelog [--days 30]` compacts changelog entries older than 30 days into monthly rollups, keeping the active log clean.
 
 </details>
 
@@ -286,17 +283,17 @@ Bootstrap ends when the skill exits. §2 is what stops the docs drifting on ever
 
 ```bash
 # Install context-docs-kit + all 18 startup/company ecosystem skills across all assistants
-npx context-docs-kit install --target all --ecosystem
+node bin/cli.mjs install --target all --ecosystem
 
 # Or install by team pod (--bundle)
-npx context-docs-kit install --bundle full-team      # All 6 categories (18 integrations)
-npx context-docs-kit install --bundle product        # Unified Product, Brand & Growth pod (same as --bundle growth)
-npx context-docs-kit install --bundle engineering    # Dev workflow, Playwright QA, docs, brag, caveman
-npx context-docs-kit install --bundle design         # 4-layer UI craft, brand, Remotion, QA
-npx context-docs-kit install --bundle video          # Social media & website video production suite
+node bin/cli.mjs install --bundle full-team      # All 6 categories (18 integrations)
+node bin/cli.mjs install --bundle product        # Unified Product, Brand & Growth pod (same as --bundle growth)
+node bin/cli.mjs install --bundle engineering    # Dev workflow, Playwright QA, docs, brag, caveman
+node bin/cli.mjs install --bundle design         # 4-layer UI craft, brand, Remotion, QA
+node bin/cli.mjs install --bundle video          # Social media & website video production suite
 
 # Always keep context-docs-kit + all upstream skills updated
-npx context-docs-kit update
+node bin/cli.mjs update
 ```
 
 | Pillar | Integrated Skills & Tools | How `context-docs-kit` Orchestrates Them |
@@ -340,7 +337,7 @@ Shared references live once in `shared/references/`, and personas once in `agent
 ```bash
 git clone https://github.com/gbcstro/context-docs-kit.git
 cd context-docs-kit
-npx . install --link          # symlink the skills so edits are live
+node bin/cli.mjs install --link # symlink the skills so edits are live
 npm test                      # installer behaviour + shared-reference drift
 ```
 

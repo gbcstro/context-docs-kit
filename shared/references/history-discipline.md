@@ -202,11 +202,6 @@ When an AI agent logs a new entry, runs `aligning-context-docs`, or closes a ver
 4. **Append the bullets** to `YYYY-MM.md`, creating it if missing.
 5. **Delete the compacted day files.** Day files <= 30 days old stay untouched.
 
-Or run the CLI, which does exactly this:
-```bash
-npx context-docs-kit compact-changelog --days 30
-```
-
 ---
 
 ## The In-Version Change Protocol

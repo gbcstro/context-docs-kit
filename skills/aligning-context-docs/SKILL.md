@@ -163,7 +163,7 @@ For each accepted fix, in full, per `references/history-discipline.md`:
 
 1. **Rewrite the doc into the new decision.** Delete the old text — do not annotate, contrast, or explain it. The doc reads as if it had always said this.
 2. **Bump `Revision` and `Last updated`.** `Project version` does not move.
-3. **Append to today's `v<N>/changelog/YYYY-MM-DD.md`** — changed, why, affects. Compact day files older than 30 days into monthly `YYYY-MM.md` rollups (or run `npx context-docs-kit compact-changelog`).
+3. **Append to today's `v<N>/changelog/YYYY-MM-DD.md`** — changed, why, affects. Compact day files older than 30 days into monthly `YYYY-MM.md` rollups.
 4. **Cascade** along `Depends on` before you finish.
 5. **Re-check `v<N>/CHECKLIST.md`** if scope, criteria or a §4 provisional decision moved. A decision that is now settled leaves §4 in this same pass.
 6. **Run the banned-phrase check.**

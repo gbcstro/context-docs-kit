@@ -28,18 +28,14 @@ at the end of the pass.
 
 ## 2. Detect what is missing
 
-A companion is **present** — and must not be installed again — if any of these holds:
+A companion is **present** only if `<repo>/.agents/skills/<name>/SKILL.md`
+exists (the project store). Anything else is **missing**, including a companion
+your host already loads from a plugin (`superpowers:brainstorming`) or a
+home-directory folder (`~/.claude/skills/`, `~/.agents/skills/`).
 
-- `<repo>/.agents/skills/<name>/SKILL.md` exists (the project store).
-- It appears in the skills list your host gave you, under its bare name or a
-  plugin namespace (`superpowers:brainstorming`, `example-skills:webapp-testing`).
-- `<dir>/<name>/SKILL.md` exists in a home-directory skills folder for this host
-  (`~/.agents/skills/`, `~/.claude/skills/`, `~/.gemini/skills/`; `references/hosts.md`).
-
-Installing a second copy of a skill the host already loads makes it appear
-twice, and the two copies drift apart. So only a companion found **nowhere** is
-missing. One loaded from a plugin or a global install stays as it is; `RULES.md`
-§2.1 still names it, which is how a teammate without it knows to install it.
+The project copy is the point: it is committed with the repo, pinned in
+`skills-lock.json`, and reaches every teammate and CI run, whatever they have
+installed globally. Leave the global or plugin copy alone; do not uninstall it.
 
 Check silently. Do not narrate the search.
 

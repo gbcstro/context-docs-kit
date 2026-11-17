@@ -56,12 +56,12 @@ Include only the docs that actually exist. The "Covers" column must describe *th
 
 The **defining constraint** bullet matters most — it is the fact that most often prevents a wrong suggestion, and the one an agent is least likely to infer. The **current version** bullet is what stops an agent inventing scope: it points at the file that says what this version is committed to.
 
-**C. Team Skill Ecosystem & Media Routing** — maps the project's workstreams to the integrated ecosystem skills (see `references/ecosystem.md`) so every contributor's assistant invokes the right specialized skill chain and keeps the suite updated via `npx context-docs-kit update`:
+**C. Team Skill Ecosystem & Media Routing** — maps the project's workstreams to the integrated ecosystem skills (see `references/ecosystem.md`) so every contributor's assistant invokes the right specialized skill chain and keeps the suite updated via `npx skills update`:
 
 ```markdown
 ## Team Skill Ecosystem
 
-Keep all team skills updated to their latest upstream versions with `npx context-docs-kit update`.
+Keep all team skills updated to their latest upstream versions with `npx skills update`.
 
 | Workstream | Active Skills & Tools | How to Chain |
 |---|---|---|
@@ -69,7 +69,7 @@ Keep all team skills updated to their latest upstream versions with `npx context
 | **Engineering & QA Workflow** | `using-superpowers`, `ponytail`, `webapp-testing`, `skill-creator`, `grill-me` | Plan & execute TDD slices (`using-superpowers` + `ponytail`), verify web UI in Playwright before ticking `v<N>/CHECKLIST.md` (`webapp-testing`), package recurring workflows (`skill-creator`) |
 | **UI, Brand & Frontend Craft** | `brand-guidelines` → `design-taste-frontend` → `frontend-design` → `impeccable` | Enforce `DESIGN.md` tokens & brand spine (`brand-guidelines`), run anti-slop pre-flight (`design-taste-frontend`), build components after chat wireframe gate (`frontend-design`), run final craft audit (`impeccable`) |
 | **SocMed & Website Video / Media** | `brag` → `writing-beats` → `remotion-best-practices` / `hyperframes` → `marketingskills` | Read `PRODUCT.md` + `DESIGN.md` + `v<N>/changelog/` (`brag`), gate a Beat Sheet in chat (`writing-beats`), render code video (`remotion-best-practices`) or AI presenter video (`hyperframes`), draft launch copy (`marketingskills`) |
-| **Token Efficiency** | `@caveman-ai/cli@latest`, `compact-changelog` | High-signal low-token communication and 30-day changelog compaction (`npx context-docs-kit compact-changelog`) |
+| **Token Efficiency** | `@caveman-ai/cli@latest`, changelog compaction | High-signal low-token communication and 30-day changelog compaction into monthly rollups |
 ```
 
 **D. The rules, so conventions apply unconditionally** rather than only when an agent chooses to read them.

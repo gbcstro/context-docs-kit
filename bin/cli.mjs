@@ -29,12 +29,12 @@ context-docs-kit ${packageVersion()}
   Installs into Claude Code, Codex, Gemini CLI or Antigravity.
 
 Usage
-  npx context-docs-kit install           [options]
-  npx context-docs-kit update            [options]
-  npx context-docs-kit ecosystem         [list|install|update] [options]
-  npx context-docs-kit uninstall         [options]
-  npx context-docs-kit list
-  npx context-docs-kit compact-changelog [options]
+  node bin/cli.mjs install           [options]
+  node bin/cli.mjs update            [options]
+  node bin/cli.mjs ecosystem         [list|install|update] [options]
+  node bin/cli.mjs uninstall         [options]
+  node bin/cli.mjs list
+  node bin/cli.mjs compact-changelog [options]
 
 Options
   --target <list>   ${TARGET_NAMES.join(', ')}, or all      (default: ${DEFAULT_TARGET})
@@ -58,16 +58,16 @@ Options
   -v, --version     print the version
 
 Examples
-  npx context-docs-kit install
-  npx context-docs-kit install --target all --ecosystem
-  npx context-docs-kit install --skip-companions
-  npx context-docs-kit install --target all --bundle startup --project
-  npx context-docs-kit install --bundle product,design
-  npx context-docs-kit update
-  npx context-docs-kit ecosystem list
-  npx context-docs-kit ecosystem install --bundle full-team
-  npx context-docs-kit ecosystem update
-  npx context-docs-kit compact-changelog --days 30
+  node bin/cli.mjs install
+  node bin/cli.mjs install --target all --ecosystem
+  node bin/cli.mjs install --skip-companions
+  node bin/cli.mjs install --target all --bundle startup --project
+  node bin/cli.mjs install --bundle product,design
+  node bin/cli.mjs update
+  node bin/cli.mjs ecosystem list
+  node bin/cli.mjs ecosystem install --bundle full-team
+  node bin/cli.mjs ecosystem update
+  node bin/cli.mjs compact-changelog --days 30
 `.trimStart();
 
 const ACTION_LABEL = {
@@ -212,7 +212,7 @@ async function runCompanionStep(targets, values) {
   }
 
   if (!(await confirmCompanions(missing.length, values))) {
-    const retry = `npx context-docs-kit install --target ${targets.join(',')}${project ? ' --project' : ''} --yes`;
+    const retry = `node bin/cli.mjs install --target ${targets.join(',')}${project ? ' --project' : ''} --yes`;
     console.log(
       process.stdin.isTTY && !values.yes
         ? `Skipped. Install them later with: ${retry}
@@ -297,7 +297,7 @@ function cmdList() {
   console.log('');
   if (!rows.length) {
     console.log('context-docs-kit is not installed anywhere yet.');
-    console.log('Run: npx context-docs-kit install\n');
+    console.log('Run: node bin/cli.mjs install\n');
     return;
   }
 
