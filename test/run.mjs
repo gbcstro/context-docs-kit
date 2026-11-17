@@ -701,6 +701,15 @@ test('aligning checks the kit template first, and the drift scan points at it', 
   }
 });
 
+test('kit changelog leads with the package version, and the upgrade skill uses it', () => {
+  const version = JSON.parse(fs.readFileSync(path.join(ROOT, 'package.json'), 'utf8')).version;
+  const log = fs.readFileSync(path.join(ROOT, 'shared', 'references', 'kit-changelog.md'), 'utf8');
+  assert.equal(log.match(/^## (\d+\.\d+\.\d+)$/m)?.[1], version, 'newest kit-changelog entry must equal package.json version');
+  const upgrade = fs.readFileSync(path.join(ROOT, 'skills', 'upgrading-context-docs', 'SKILL.md'), 'utf8');
+  assert.match(upgrade, /references\/kit-changelog\.md/);
+  assert.match(upgrade, /references\/kit-upgrade\.md/);
+});
+
 test('every manifest carries the same version', () => {
   const version = JSON.parse(fs.readFileSync(path.join(ROOT, 'package.json'), 'utf8')).version;
   const read = (...p) => JSON.parse(fs.readFileSync(path.join(ROOT, ...p), 'utf8'));

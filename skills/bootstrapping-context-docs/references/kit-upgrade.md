@@ -62,6 +62,7 @@ On yes:
 6. **Run the companion preflight** (`references/dependencies.md`) if it has not
    run this session. §2.1 now names those skills.
 7. **Migrate the layout** (§5) if the project still uses the old one.
+8. **Stamp the kit version** (§6), last.
 
 On no: change nothing, say once that the project stays on the older template,
 and do not raise it again this session.
@@ -126,3 +127,17 @@ apply it on the same yes, using `git mv` so history follows:
    `.gitkeep`, and add `.superpowers/` to `.gitignore`.
 5. Update every path in `RULES.md`, the agent file, and other docs that named
    the old files. Log one changelog entry for the whole migration.
+
+## 6. Stamp the kit version
+
+After every other upgrade step is applied, write the kit version into the agent
+file, directly under its `# ` title, replacing any older stamp:
+
+```markdown
+<!-- context-docs-kit:version 2.2.0 -->
+```
+
+The version is the newest entry in `references/kit-changelog.md`. Stamp last:
+the stamp claims the project is on that template, so a partial upgrade is never
+stamped. `bootstrapping-context-docs` writes the stamp when it creates the agent
+file.

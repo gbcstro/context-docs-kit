@@ -1,6 +1,6 @@
 # context-docs-kit
 
-Three Agent Skills that build a project's `context/` foundation docs — product, architecture, schema, design, rules — by **interviewing you** rather than filling in a template, then keep them true as the code moves.
+Four Agent Skills that build a project's `context/` foundation docs — product, architecture, schema, design, rules — by **interviewing you** rather than filling in a template, then keep them true as the code moves.
 
 Every project should start with these docs. The problem is that generated docs and decided docs look identical and behave nothing alike: a template is full of gaps nobody can see. A grilled doc has none — every question in it was closed before it was written. This kit exists to produce the second kind, and to stop the first kind quietly replacing it six weeks later.
 
@@ -113,10 +113,10 @@ Every `RULES.md` the kit writes routes work to 12 companion skills (§2.1): `sup
 3. **Projects that already have `context/` docs:** ask
 
    ```
-   > align the context docs with the latest context-docs-kit
+   > what's new in context-docs-kit? upgrade the context docs
    ```
 
-   `aligning-context-docs` checks the kit template before anything else. If the project's `RULES.md` §2 predates the current one, the first item in the drift report is a **kit upgrade**: approve it and §2.1 Skill Usage and §2.2 Output Style are inserted, your existing rules move under §2.3 unchanged, `Revision` is bumped, the reason goes in the changelog, and the rules block in `AGENTS.md` is refreshed. Nothing changes without your yes.
+   `upgrading-context-docs` reads the project's kit version stamp in `AGENTS.md` (`<!-- context-docs-kit:version X.Y.Z -->`), lists what every newer release brings (`references/kit-changelog.md`), and the exact steps it would apply to this project: layout migration, `RULES.md` §2 template, companion installs, the stamp. You approve the list once and can drop items. Your own rules and decisions are moved as they are, never reworded, and one changelog entry records the upgrade. Nothing changes without your yes.
 
 <details>
 <summary>CLI reference</summary>
@@ -177,13 +177,14 @@ Later, when things have moved:
 > v1 is done, let's start v2
 ```
 
-## The three skills
+## The four skills
 
 | Skill | Runs when |
 |---|---|
 | **`bootstrapping-context-docs`** | there are no foundation docs yet, or the set is partial |
 | **`aligning-context-docs`** | the docs and the code have drifted, or a decision changes inside the current version |
 | **`versioning-context-docs`** | a version is finished and the next one opens |
+| **`upgrading-context-docs`** | the kit was updated and an existing project should move onto the new template |
 
 Each has one job and one trigger, so your assistant picks the right one without being told.
 
@@ -323,6 +324,7 @@ skills/
   bootstrapping-context-docs/  process, gates, grilling, architecture gate, worked-example loop
   aligning-context-docs/       three-way drift scan, in-version change protocol, cascade
   versioning-context-docs/     close a version, account for every item, open the next
+  upgrading-context-docs/      what's new in the kit, migrate a project onto it
 agents/                        five doc personas + the critic (source; rendered to TOML for Codex)
 .claude-plugin/                Claude Code plugin + marketplace manifests (Codex reads the marketplace too)
 .codex-plugin/                 Codex plugin manifest

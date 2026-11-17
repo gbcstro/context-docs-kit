@@ -31,7 +31,7 @@ one at a time.
 - Checklist items in `v<N>/CHECKLIST.md` are done but unticked, or ticked but not actually met
 - Before closing a version — `versioning-context-docs` calls this first, because closing on drifted docs bakes the drift in permanently
 
-**Do NOT use for:** creating a doc set that does not exist (`bootstrapping-context-docs`); closing a version and opening the next (`versioning-context-docs`); a typo or formatting pass, which is not a revision and needs none of this.
+**Do NOT use for:** creating a doc set that does not exist (`bootstrapping-context-docs`); moving a project onto a newer kit template (`upgrading-context-docs`); closing a version and opening the next (`versioning-context-docs`); a typo or formatting pass, which is not a revision and needs none of this.
 
 ## Before You Start
 
@@ -116,6 +116,8 @@ mismatch looks like for each of PRODUCT, ARCHITECTURE, SCHEMA, DESIGN and RULES.
 bootstrapped by an older `context-docs-kit` has a `RULES.md` §2 missing §2.1 Skill
 Usage and §2.2 Output Style. That is the kit moving, not the code, so it is
 reported as its own group above the code findings and applied only on a yes.
+For the full what's-new walk across every kit release, hand off to
+`upgrading-context-docs`.
 
 ## Step 3 — The drift report
 

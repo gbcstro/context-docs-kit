@@ -74,6 +74,8 @@ Keep all team skills updated to their latest upstream versions with `npx skills 
 
 **D. The rules, so conventions apply unconditionally** rather than only when an agent chooses to read them.
 
+**Kit version stamp.** Directly under the file's `# ` title, write `<!-- context-docs-kit:version X.Y.Z -->`, where X.Y.Z is the newest entry in `references/kit-changelog.md`. `upgrading-context-docs` reads it to know which kit changes the project still needs. Only `upgrading-context-docs` (`references/kit-upgrade.md` §6) moves it.
+
 Because `AGENTS.md` is shared across all coding tools, inlining `RULES.md` §2 between markers is the universal format that works across every tool (Claude Code, Codex, Gemini CLI, Antigravity, Cursor, etc.). Tools without `@file` import support (Codex, Antigravity) cannot resolve an `@context/RULES.md` line, whereas all tools read inlined markdown text between markers.
 
 *Universal format (recommended for cross-tool compatibility, required without import support):*
