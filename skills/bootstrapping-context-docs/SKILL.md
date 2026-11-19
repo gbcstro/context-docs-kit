@@ -29,7 +29,7 @@ A generated template and a grilled doc look similar and behave nothing alike. Th
 Three files, in this order:
 
 1. **`references/hosts.md`** — which host you are on, whether you have persona subagents, and whether the agent file supports `@file` imports. Two of the three answers change what you write into the user's repo, so resolve them now, not at the wiring step.
-2. **`references/dependencies.md`** — the companion-skill preflight. `npx skills add` cannot install the skills `RULES.md` §2.1 routes to, so check for them now and, if any are missing, offer the install once.
+2. **`references/dependencies.md`** — the companion-skill preflight. `npx skills add` cannot install the skills `RULES.md` §2.1 routes to, so check for them now and install any that are missing into the project's `.agents/skills/` (symlinked to each host). Check again before the closing summary.
 3. **`references/wiring.md`** — where you enter: greenfield, brownfield, or resume.
 
 ## The Doc Contract
@@ -48,7 +48,7 @@ Every doc in the set carries the same header and closing sections. The full cont
 Three things it is worth carrying in your head for the whole pass:
 
 - **`v` means the project version, never a doc's revision.** A doc's revision is a bare integer. `v1` is the product; `Revision: 3` is the file.
-- **Present tense only.** A doc says what is decided now, never how it got there. Reasons live in `context/PROGRESS/CHANGELOG_v1.md`. See `references/history-discipline.md`.
+- **Present tense only.** A doc says what is decided now, never how it got there. Reasons live in `context/PROGRESS/v1/changelog/`. See `references/history-discipline.md`.
 - **No doc ships with a hole in it.** There is no `## Open Questions` section anywhere in the set. Every question closes before its doc is drafted. See `references/closing-questions.md`.
 
 ## Flow
@@ -65,9 +65,10 @@ digraph bootstrap {
     "User approved doc?" [shape=diamond];
     "More docs in set?" [shape=diamond];
     "Wire into agent file" [shape=box];
-    "Draft PROGRESS_v1.md\nchecklist + acceptance criteria" [shape=box];
+    "Draft v1/CHECKLIST.md\nchecklist + acceptance criteria" [shape=box];
     "User approved v1 scope?" [shape=diamond];
-    "Create empty CHANGELOG_v1.md" [shape=box];
+    "Create empty v1/ folders" [shape=box];
+    "Propose project personas" [shape=box];
     "Done" [shape=doublecircle];
 
     "Resolve host\n(references/hosts.md)" -> "context/ docs exist?";
@@ -83,11 +84,12 @@ digraph bootstrap {
     "User approved doc?" -> "More docs in set?" [label="yes"];
     "More docs in set?" -> "Run per-doc pass for next doc\nin dependency order" [label="yes"];
     "More docs in set?" -> "Wire into agent file" [label="no"];
-    "Wire into agent file" -> "Draft PROGRESS_v1.md\nchecklist + acceptance criteria";
-    "Draft PROGRESS_v1.md\nchecklist + acceptance criteria" -> "User approved v1 scope?";
-    "User approved v1 scope?" -> "Draft PROGRESS_v1.md\nchecklist + acceptance criteria" [label="no, revise"];
-    "User approved v1 scope?" -> "Create empty CHANGELOG_v1.md" [label="yes"];
-    "Create empty CHANGELOG_v1.md" -> "Done";
+    "Wire into agent file" -> "Draft v1/CHECKLIST.md\nchecklist + acceptance criteria";
+    "Draft v1/CHECKLIST.md\nchecklist + acceptance criteria" -> "User approved v1 scope?";
+    "User approved v1 scope?" -> "Draft v1/CHECKLIST.md\nchecklist + acceptance criteria" [label="no, revise"];
+    "User approved v1 scope?" -> "Create empty v1/ folders" [label="yes"];
+    "Create empty v1/ folders" -> "Propose project personas";
+    "Propose project personas" -> "Done";
 }
 ```
 
@@ -105,7 +107,7 @@ Confirm the set with the user before writing anything. Default is adaptive, not 
 
 Additional docs when the project warrants them — see `references/optional-docs.md`. A CLI tool with no persistence gets three docs, not five with two stubs. Say which you are dropping and why, then let the user correct you.
 
-The pass ends with two more files that are not docs and are not optional: `context/PROGRESS/PROGRESS_v1.md` and `context/PROGRESS/CHANGELOG_v1.md`.
+The pass ends with two more files that are not docs and are not optional: `context/PROGRESS/v1/CHECKLIST.md` and `context/PROGRESS/v1/changelog/`.
 
 ## The Per-Doc Pass
 
@@ -124,6 +126,8 @@ Five stages. **Only stages 2 and 5 involve the user.**
 On a host without subagents, stages 1, 3 and 4 run inline instead of being dispatched. The sequence does not change. `references/hosts.md` says exactly how, and why stage 4 must be its own turn.
 
 Stage 1 reads manifests, layout, migrations, CI, and pre-existing docs, and returns facts to pre-fill your questions. Skip it on a truly empty repo.
+
+**`ARCHITECTURE.md` and `RULES.md` add an advise step at the end of stage 1**, on empty repos too. Dispatch the persona in ADVISE mode with the approved upstream docs and the scan report. `solutions-architect` returns the infrastructure and approach this project should follow; `engineering-standards` returns the code organization, principles and workflow. Each recommendation comes with its cost and the trigger to move up a rung. Those recommendations are what you grill with: every question in stage 2 opens with the advised option, its cost, and the runner-up. The user decides; an advised option never reaches the draft unless the user approved it. For `ARCHITECTURE.md`, settle the binding constraint before dispatching: ADVISE without it returns only constraint candidates.
 
 Stage 3 writes the doc from **approved answers only**, with unknowns parked.
 
@@ -177,7 +181,7 @@ no `## Open Questions` section in any doc. Full procedure in
 | Closure | When | What the doc says |
 |---|---|---|
 | **Decided** | the user picks, knowing the cost | the decision, present tense |
-| **Provisionally decided** | they genuinely cannot settle it yet | the decision, present tense — and it is registered in `PROGRESS_v1.md` §4 |
+| **Provisionally decided** | they genuinely cannot settle it yet | the decision, present tense — and it is registered in `v1/CHECKLIST.md` §4 |
 | **Descoped** | nothing sensible can be decided at all | nothing; the thing it concerns moves to `## Out of Scope for v1` |
 
 The middle one is the work. "I don't know yet" is not an answer you accept and
@@ -187,7 +191,7 @@ write down — it is the start of a shorter conversation:
 2. State the reversal cost concretely.
 3. Get it accepted as the decision **in force**, not as a placeholder.
 4. Write it into the doc with **no hedging language** — no `TBD`, no "for now", no "probably".
-5. Register it in `PROGRESS_v1.md` §4 with what would settle it and what changing it costs.
+5. Register it in `v1/CHECKLIST.md` §4 with what would settle it and what changing it costs.
 
 **None of this softens the rule against inventing.** A provisional decision and an
 invented specific look identical on the page; what separates them is that the
@@ -201,11 +205,12 @@ cheap.
 
 ## Closing the Pass
 
-Not done when the last doc is approved. Three steps remain, in order:
+Not done when the last doc is approved. Four steps remain, in order:
 
 1. **Wire the agent file** — `references/wiring.md` §3, using the import or the inline block per `references/hosts.md`. An unwired `context/` is inert.
-2. **Draft `context/PROGRESS/PROGRESS_v1.md`** — read every approved doc and derive the v1 scope checklist with acceptance criteria. Gate it with the user like any other doc. Always `v1`; there is no path that starts anywhere else. Full spec in `references/history-discipline.md`.
-3. **Create `context/PROGRESS/CHANGELOG_v1.md`** — empty but for its title. A first draft is not a revision of anything, so there is nothing to log yet.
+2. **Draft `context/PROGRESS/v1/CHECKLIST.md`** — read every approved doc and derive the v1 scope checklist with acceptance criteria. Gate it with the user like any other doc. Always `v1`; there is no path that starts anywhere else. Full spec in `references/history-discipline.md`.
+3. **Create the rest of `context/PROGRESS/v1/`** — `changelog/`, `specs/`, `plans/` and `sdd/`, each holding only a `.gitkeep`, and add `.superpowers/` to `.gitignore`. A first draft is not a revision of anything, so there is nothing to log yet. Specs, plans and SDD ledgers from superpowers land in these folders from now on (`RULES.md` §2.1).
+4. **Propose project personas** — `references/project-agents.md`. From the approved docs, propose up to five project-specific agents (domain expert, stack reviewer, schema guardian, …), let the user pick, write them to `context/agents/`, render them for each host, and add the Project Agents table to the agent file. The user may decline; then skip it.
 
 Then tell the user what happens next: changes inside v1 go through `aligning-context-docs`, and v1 closes only when they say so, through `versioning-context-docs`.
 
@@ -226,13 +231,13 @@ Then tell the user what happens next: changes inside v1 go through `aligning-con
 | "No subagents here, so I'll skip the review stage" | Run it inline, in its own turn. The review is the stage, not the agent. |
 | "There's an existing prd.md, I'll just rename it" | Reconcile and interrogate it. Inherited docs carry unexamined assumptions. |
 | "Five docs is the standard, write all five" | Adaptive set. A stub doc teaches nothing. |
-| "The docs are written, we're done" | Not done until the agent file is wired and `PROGRESS_v1.md` is approved. |
+| "The docs are written, we're done" | Not done until the agent file is wired and `v1/CHECKLIST.md` is approved. |
 | "I'll describe the architecture in the doc, that's clearer than a diagram" | Present the tree and the diagram first. The user corrects a picture; they nod at a paragraph. |
 | "They agreed to the principle, the example is busywork" | The example is what they agreed to. A principle with no accepted example does not enter `RULES.md`. |
 | "This project already shipped, so start at v2" | The first `PROGRESS` file is always `v1`. What shipped before was never tracked here. |
 | "The checklist is obvious, acceptance criteria are overkill" | Without them nobody can say whether v1 is done, so v1 never ends. |
 | "v1 looks complete, I'll mark it done" | Only the user closes a version. |
-| "I'll note in the doc that this replaced the earlier approach" | History is never inline. It goes in `CHANGELOG_v1.md`; the doc stays present tense. |
+| "I'll note in the doc that this replaced the earlier approach" | History is never inline. It goes in `v1/changelog/`; the doc stays present tense. |
 | "This `@context/RULES.md` line works everywhere" | Only on hosts with import support. Check `references/hosts.md` or the rules silently never apply. |
 
 ## Reference Index
@@ -254,3 +259,4 @@ Load only what the current pass needs.
 | `references/critic.md` | stage 4 of every pass |
 | `references/optional-docs.md` | doc-set proposal, if the core five don't fit |
 | `references/history-discipline.md` | closing the pass, and any revision to a doc already approved |
+| `references/project-agents.md` | closing the pass, step 4 — project-specific personas |

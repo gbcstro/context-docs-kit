@@ -6,7 +6,8 @@ Every `RULES.md` this kit writes makes a set of companion skills mandatory (§2.
 Skill Usage, §2.2 Output Style). `npx skills add gbcstro/context-docs-kit`
 **cannot** install them: the skills CLI copies `SKILL.md` folders and nothing
 else — no dependency resolution, no install hooks. So the check happens here,
-when a skill actually runs. Do it once, before the first question.
+when a skill actually runs. Do it before the first question, and check again
+at the end of the pass.
 
 ## 1. The companions
 
@@ -27,58 +28,55 @@ when a skill actually runs. Do it once, before the first question.
 
 ## 2. Detect what is missing
 
-A companion is **present** if any of these holds:
+A companion is **present** only if `<repo>/.agents/skills/<name>/SKILL.md`
+exists (the project store). Anything else is **missing**, including a companion
+your host already loads from a plugin (`superpowers:brainstorming`) or a
+home-directory folder (`~/.claude/skills/`, `~/.agents/skills/`).
 
-- It appears in the skills list your host gave you, under its bare name or a
-  plugin namespace (`superpowers:brainstorming`, `example-skills:webapp-testing`).
-- `<dir>/<name>/SKILL.md` exists in any skills directory for this host and
-  scope — `.agents/skills/`, `.claude/skills/`, `.gemini/skills/`, or their
-  home-directory equivalents (`references/hosts.md` lists them).
+The project copy is the point: it is committed with the repo, pinned in
+`skills-lock.json`, and reaches every teammate and CI run, whatever they have
+installed globally. Leave the global or plugin copy alone; do not uninstall it.
 
 Check silently. Do not narrate the search.
 
-## 3. Offer the install — once, with consent
+## 3. Install the missing ones — automatically, into the project
 
 If nothing is missing, say nothing and continue.
 
-If something is missing, send **one** message: the missing names, what each is
-for in this pass, and the exact commands. Then ask once.
+Otherwise install every missing companion now, into the project, without asking. Run each command
+**from the repo root**, separately:
 
-- **Scope matches this kit's install.** Loaded from a project directory
-  (`<repo>/.agents/skills`, `<repo>/.claude/skills`) → project scope, no `-g`.
-  Loaded from the home directory → add `-g`.
-- **Target this host only.** Append `-a <agent> -y` to each `npx skills add`:
-  `claude-code`, `codex`, `gemini-cli`, or `antigravity`. For `impeccable`,
-  `--providers=` takes `claude`, `codex`, `gemini`, or `antigravity`.
-- **Name the one-shot alternative** when the user would rather do it themselves
-  outside this session: `npx context-docs-kit install` installs every missing
-  companion for the chosen hosts.
+```
+npx skills add <source> [--skill <name>] -a <agent> -y
+```
 
-> Four companion skills this project's rules route to are not installed:
-> `grill-me` (runs the interview), `doc-coauthoring` (drafting), `webapp-testing`
-> (UI evidence) and `caveman` (chat output style). I can install them now:
->
-> ```
-> npx skills add mattpocock/skills --skill grill-me -a claude-code -y
-> npx skills add anthropics/skills --skill doc-coauthoring -a claude-code -y
-> ...
-> ```
->
-> Install them? (Or run `npx context-docs-kit install` yourself later.)
+- **Project scope, always.** Never pass `-g`. The skills CLI writes the one real
+  copy to `<repo>/.agents/skills/<name>/` and records it in `skills-lock.json`.
+- **Symlink, never copy.** Never pass `--copy`. Hosts that read another
+  directory (`.claude/skills/`, `.gemini/skills/`) get a symlink to the
+  `.agents/skills/` copy, so one update reaches every host.
+- **`-a <agent>`:** `claude-code`, `codex`, `gemini-cli`, or `antigravity`.
+- **`impeccable`** has its own installer:
+  `npx impeccable install --providers=<claude|codex|gemini|antigravity> --scope=project`.
 
-**Never install without a yes.** These commands fetch third-party code onto the
-user's machine; that is their decision, every time.
+Then send **one** short message: what was installed, where, and any command that
+failed with its error. A failed companion degrades the pass; it does not block it.
 
-## 4. After the answer
+## 4. After the install
 
-- **Yes:** run each command separately. Report any that failed, with the error,
-  and carry on — a failed companion degrades the pass, it does not block it.
-  A skill installed mid-session is usually not loaded until the host restarts,
-  so for the rest of this session **read the installed `SKILL.md` directly**
-  when you need it.
-- **No:** continue without them. Do not ask again this session. Each place a
-  skill names a companion already says what to do without it.
+- **Verify** each installed companion: `<repo>/.agents/skills/<name>/SKILL.md`
+  exists, and for Claude Code or Gemini CLI, `.claude/skills/<name>` or
+  `.gemini/skills/<name>` exists. On Windows without symlink permission the CLI
+  may copy instead; that still works, say so in the message.
+- A skill installed mid-session is usually not loaded until the host restarts,
+  so for the rest of this session **read
+  `<repo>/.agents/skills/<name>/SKILL.md` directly** when you need it.
+- **Commit `.agents/skills/` and `skills-lock.json`** with the docs, unless the
+  repo ignores them. A teammate restores them with
+  `npx skills experimental_install`.
+- **Check again at the end of the pass**, before the closing summary. Install
+  anything still missing the same way. A bootstrap or align run never ends with
+  a §2.1 companion absent from `.agents/skills/` without saying why.
 
-Either way, the companions stay listed in `RULES.md` §2.1. That table is what
-tells the next assistant which skill to reach for; whether it is installed on
-one machine today does not change the project's rules.
+The companions stay listed in `RULES.md` §2.1 either way. That table tells the
+next assistant which skill to reach for.

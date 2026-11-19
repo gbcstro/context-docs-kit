@@ -14,7 +14,7 @@ import { execFileSync } from 'node:child_process';
 import { parseTargets, resolvePlan, TARGET_NAMES, TARGETS } from '../src/targets.mjs';
 import { planInstall, applyInstall, planUninstall, applyUninstall, shippedSkills, shippedAgents, inspect } from '../src/install.mjs';
 import { sync } from '../src/sync-shared.mjs';
-import { compactChangelog, compactChangelogFile } from '../src/compact-changelog.mjs';
+import { compactChangelog, compactChangelogFile, compactChangelogDir, findCurrentChangelog } from '../src/compact-changelog.mjs';
 import {
   ECOSYSTEM_CATEGORIES,
   ECOSYSTEM_ITEMS,
@@ -473,6 +473,36 @@ test('CLI compact-changelog command works and respects --dry-run', () => {
   fs.rmSync(home, { recursive: true, force: true });
 });
 
+test('compactChangelogDir rolls day files older than 30 days into a month file', () => {
+  const home = tmpHome();
+  const dir = path.join(home, 'context', 'PROGRESS', 'v1', 'changelog');
+  fs.mkdirSync(dir, { recursive: true });
+  fs.mkdirSync(path.join(home, 'context', 'PROGRESS', 'v2'), { recursive: true }); // no changelog yet
+  const day = (title) => `# P — v1\n\n## ${title}\n**Completed:** Did it.\n**Why:** Needed.\n**Affects:** src/.\n`;
+  fs.writeFileSync(path.join(dir, '2026-01-05.md'), day('Old A'));
+  fs.writeFileSync(path.join(dir, '2026-01-20.md'), day('Old B'));
+  fs.writeFileSync(path.join(dir, '2026-03-10.md'), day('Recent'));
+  const now = new Date('2026-03-15T00:00:00Z');
+
+  assert.equal(findCurrentChangelog(home), dir, 'highest version with a changelog folder');
+
+  const dry = compactChangelogDir(dir, { now, dryRun: true });
+  assert.equal(dry.compactedCount, 2);
+  assert.ok(fs.existsSync(path.join(dir, '2026-01-05.md')), 'dry run writes nothing');
+
+  const res = compactChangelogDir(dir, { now });
+  assert.deepEqual([res.compactedCount, res.activeCount], [2, 1]);
+  assert.ok(!fs.existsSync(path.join(dir, '2026-01-05.md')));
+  assert.ok(fs.existsSync(path.join(dir, '2026-03-10.md')));
+  const rollup = fs.readFileSync(path.join(dir, '2026-01.md'), 'utf8');
+  assert.match(rollup, /^# v1 — 2026-01 \(Compacted\)/);
+  assert.match(rollup, /\*\*2026-01-05 \(Old A\):\*\*/);
+  assert.match(rollup, /\*\*2026-01-20 \(Old B\):\*\*/);
+
+  assert.equal(compactChangelogDir(dir, { now }).compactedCount, 0, 'second run is a no-op');
+  fs.rmSync(home, { recursive: true, force: true });
+});
+
 console.log('\necosystem & startup team integration');
 
 test('ecosystem registers all 6 categories and 18 upstream integrations', () => {
@@ -669,6 +699,15 @@ test('aligning checks the kit template first, and the drift scan points at it', 
   for (const skill of shippedSkills()) {
     assert.ok(fs.existsSync(path.join(ROOT, 'skills', skill, 'references', 'kit-upgrade.md')), `${skill} is missing kit-upgrade.md`);
   }
+});
+
+test('kit changelog leads with the package version, and the upgrade skill uses it', () => {
+  const version = JSON.parse(fs.readFileSync(path.join(ROOT, 'package.json'), 'utf8')).version;
+  const log = fs.readFileSync(path.join(ROOT, 'shared', 'references', 'kit-changelog.md'), 'utf8');
+  assert.equal(log.match(/^## (\d+\.\d+\.\d+)$/m)?.[1], version, 'newest kit-changelog entry must equal package.json version');
+  const upgrade = fs.readFileSync(path.join(ROOT, 'skills', 'upgrading-context-docs', 'SKILL.md'), 'utf8');
+  assert.match(upgrade, /references\/kit-changelog\.md/);
+  assert.match(upgrade, /references\/kit-upgrade\.md/);
 });
 
 test('every manifest carries the same version', () => {

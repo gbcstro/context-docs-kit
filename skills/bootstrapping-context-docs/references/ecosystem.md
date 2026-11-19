@@ -12,12 +12,12 @@
 | Skill / Tool | Upstream Command | Role in `context-docs-kit` |
 |---|---|---|
 | **`doc-coauthoring`** | `npx skills add anthropics/skills@doc-coauthoring` | Structured collaborative co-authoring when drafting or refining `PRODUCT.md`, `ARCHITECTURE.md`, RFCs, ADRs, and technical specs with stakeholders. |
-| **`internal-comms`** | `npx skills add anthropics/skills@internal-comms` | Converts `CHANGELOG_v<N>.md` entries, `PROGRESS_v<N>.md` milestone ticks, and drift reports into 3P updates (Progress, Plans, Problems), company newsletters, executive status updates, and incident reports. |
+| **`internal-comms`** | `npx skills add anthropics/skills@internal-comms` | Converts `v<N>/changelog/` entries, `v<N>/CHECKLIST.md` milestone ticks, and drift reports into 3P updates (Progress, Plans, Problems), company newsletters, executive status updates, and incident reports. |
 
 ### B. Dev Workflow, Testing & Interrogation
 | Skill / Tool | Upstream Command | Role in `context-docs-kit` |
 |---|---|---|
-| **`using-superpowers`** | `npx skills add obra/superpowers` | Enforces disciplined engineering execution: micro-step implementation plans, strict TDD (red-green-refactor), and root-cause debugging against `PROGRESS_v<N>.md` checklist slices. |
+| **`using-superpowers`** | `npx skills add obra/superpowers` | Enforces disciplined engineering execution: micro-step implementation plans, strict TDD (red-green-refactor), and root-cause debugging against `v<N>/CHECKLIST.md` checklist slices. |
 | **`webapp-testing`** | `npx skills add anthropics/skills@webapp-testing` | Drives live Playwright browser verification of web UI surfaces. Required by `RULES.md` §2 Rule 10 and `aligning-context-docs` Step 6 to supply concrete browser evidence before ticking web acceptance criteria. |
 | **`skill-creator`** | `npx skills add anthropics/skills@skill-creator` | Encapsulates recurring project workflows, migration runbooks, or domain conventions discovered in `RULES.md` into project-scoped skills under `.agents/skills/`. |
 | **`ponytail`** | `npx skills add DietrichGebert/ponytail` | Orchestrates developer workflow and context continuity across multi-step implementation sessions. |
@@ -42,12 +42,12 @@ Because brand identity, positioning, SEO, and growth live directly on the produc
 ### E. Token Saving & Context Efficiency
 | Skill / Tool | Upstream Command | Role in `context-docs-kit` |
 |---|---|---|
-| **`@caveman-ai/cli`** | `npx @caveman-ai/cli@latest` | Cuts LLM output and context token burn via high-signal, zero-fluff communication, working alongside present-tense docs and `npx context-docs-kit compact-changelog --days 30` to keep long-running team repos fast and economical. |
+| **`@caveman-ai/cli`** | `npx @caveman-ai/cli@latest` | Cuts LLM output and context token burn via high-signal, zero-fluff communication, working alongside present-tense docs and 30-day changelog compaction to keep long-running team repos fast and economical. |
 
 ### F. Video Generation, Social/Website Media & Brag Docs
 | Skill / Tool | Upstream Command | Role in `context-docs-kit` |
 |---|---|---|
-| **`brag`** | `npx skills add https://github.com/NousResearch/hermes-agent --skill brag` | Synthesizes completed `PROGRESS_v<N>.md` acceptance criteria and `CHANGELOG_v<N>.md` logs into engineering brag documents, sprint review summaries, and social proof for launches. |
+| **`brag`** | `npx skills add https://github.com/NousResearch/hermes-agent --skill brag` | Synthesizes completed `v<N>/CHECKLIST.md` acceptance criteria and `v<N>/changelog/` logs into engineering brag documents, sprint review summaries, and social proof for launches. |
 | **`writing-beats`** | `npx skills add https://github.com/mattpocock/skills --skill writing-beats` | Powers the **Beat-Sheet Gate**: scripts social media reels, website hero demos, and technical explainers into tight narrative beats before rendering. |
 | **`remotion-best-practices`** | `npx skills add https://github.com/remotion-dev/skills --skill remotion-best-practices` | Builds programmatic React/Remotion launch videos, animated UI walkthroughs, and social media reels (`16:9` and `9:16`) directly from `DESIGN.md` tokens and `PRODUCT.md` specs. |
 | **`hyperframes`** | `npx skills add heygen-com/hyperframes` | Produces AI-driven video presentations, HeyGen avatar explainers, and hyperframe storyboards for social media and website onboarding flows. |
@@ -61,7 +61,7 @@ Whenever a user asks to generate a video, reel, teaser, or animated walkthrough 
 1. **Step 1 — Harvest `context/` Truth Automatically (Never Re-Ask Known Facts):**
    - Read `context/PRODUCT.md` for Brand Voice (`brand-discovery`), Named Incumbent Pain (§3.1), Structural Differentiation (§3.2), Core Value Loop (§3.3), and CRO/GTM hooks (`marketingskills`).
    - Read `context/DESIGN.md` for exact Brand Palette tokens (`--bg-base`, `--accent-primary`), Typography (`Display`, `Body`, `Mono`), Radii, and Motion curves (`brand-guidelines` + `design-taste-frontend`).
-   - Read `context/PROGRESS/PROGRESS_v<N>.md` and `CHANGELOG_v<N>.md` via **`brag`** if the media highlights a shipped feature, sprint milestone, or version release.
+   - Read `context/PROGRESS/v<N>/CHECKLIST.md` and `v<N>/changelog/` via **`brag`** if the media highlights a shipped feature, sprint milestone, or version release.
 2. **Step 2 — Present the Beat-Sheet Gate in Chat (`writing-beats`):**
    - Before writing video code or triggering renders, use **`writing-beats`** to present a concise 30–60s Beat Sheet in chat (*Beat 1: Hook / Incumbent Pain -> Beat 2: Structural Mechanism -> Beat 3: Live UI Proof -> Beat 4: Primary CTA*, with visual + audio per beat) and get user approval. Never save beat sheets inside `context/*.md`.
 3. **Step 3 — Render by Target Channel:**
@@ -75,23 +75,13 @@ Whenever a user asks to generate a video, reel, teaser, or animated walkthrough 
 
 ## 3. Installing & Keeping Everything Always Updated
 
-External skills are **never frozen as static copies** inside `context-docs-kit`. Instead, `context-docs-kit` installs and updates them live from their upstream GitHub repositories and `@latest` npm packages.
+External skills are **never frozen as static copies** inside `context-docs-kit`. Each one installs live from its upstream repository into the project, with the command in the tables above:
 
 ```bash
-# Install context-docs-kit + all 18 ecosystem integrations across all assistants
-npx context-docs-kit install --target all --ecosystem
+# Install one skill into this repo (.agents/skills, symlinked to each host)
+npx skills add <source> [--skill <name>] -a <claude-code|codex|gemini-cli|antigravity> -y
 
-# Install into the project repository (.agents/skills, .claude/skills) for the whole team
-npx context-docs-kit install --target all --ecosystem --project
-
-# Or install by unified team pod (--bundle)
-npx context-docs-kit install --bundle full-team      # All 6 categories (18 integrations)
-npx context-docs-kit install --bundle product        # Unified Product, Brand & Growth pod (same as --bundle growth)
-npx context-docs-kit install --bundle engineering    # Dev workflow, QA, docs, brag, caveman
-npx context-docs-kit install --bundle design         # 4-layer UI craft, brand, Remotion, QA
-npx context-docs-kit install --bundle video          # Social media & website video production suite
-
-# Keep context-docs-kit + all 16 upstream skill repos + @latest CLIs always updated
-npx context-docs-kit update
+# Keep every skill installed this way at its latest upstream version
+npx skills update
 ```
 

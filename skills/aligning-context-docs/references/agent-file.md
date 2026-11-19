@@ -36,7 +36,7 @@ doc(s) before working in that area:
 | [`context/SCHEMA.md`](./context/SCHEMA.md) | Data model |
 | [`context/DESIGN.md`](./context/DESIGN.md) | Theme colors, typography, layout/spacing, UI components to be built, motion & accessibility |
 | [`context/RULES.md`](./context/RULES.md) | Coding conventions, git workflow, AI assistant rules |
-| [`context/PROGRESS/`](./context/PROGRESS/) | `PROGRESS_v<N>.md` is current scope & checklist; `CHANGELOG_v<N>.md` logs task completions, sessions, and decision shifts (compacted after 30 days) |
+| [`context/PROGRESS/`](./context/PROGRESS/) | `v<N>/CHECKLIST.md` is current scope & checklist; `v<N>/changelog/YYYY-MM-DD.md` logs task completions, sessions, and decision shifts (compacted after 30 days); `v<N>/specs/`, `v<N>/plans/`, `v<N>/sdd/` hold superpowers specs, plans and SDD ledgers — never `docs/superpowers/` |
 ```
 
 Include only the docs that actually exist. The "Covers" column must describe *this* project's docs, not be copied boilerplate.
@@ -46,7 +46,7 @@ Include only the docs that actually exist. The "Covers" column must describe *th
 ```markdown
 ## Quick-Reference Key Facts
 
-- **Current version:** v1 — scope and checklist in `context/PROGRESS/PROGRESS_v1.md`
+- **Current version:** v1 — scope and checklist in `context/PROGRESS/v1/CHECKLIST.md`
 - **Repo layout:** <apps and packages, one line each>
 - **Frontend:** <framework, key libraries>
 - **Backend:** <framework, API style, ORM, database, cache, queues>
@@ -56,23 +56,25 @@ Include only the docs that actually exist. The "Covers" column must describe *th
 
 The **defining constraint** bullet matters most — it is the fact that most often prevents a wrong suggestion, and the one an agent is least likely to infer. The **current version** bullet is what stops an agent inventing scope: it points at the file that says what this version is committed to.
 
-**C. Team Skill Ecosystem & Media Routing** — maps the project's workstreams to the integrated ecosystem skills (see `references/ecosystem.md`) so every contributor's assistant invokes the right specialized skill chain and keeps the suite updated via `npx context-docs-kit update`:
+**C. Team Skill Ecosystem & Media Routing** — maps the project's workstreams to the integrated ecosystem skills (see `references/ecosystem.md`) so every contributor's assistant invokes the right specialized skill chain and keeps the suite updated via `npx skills update`:
 
 ```markdown
 ## Team Skill Ecosystem
 
-Keep all team skills updated to their latest upstream versions with `npx context-docs-kit update`.
+Keep all team skills updated to their latest upstream versions with `npx skills update`.
 
 | Workstream | Active Skills & Tools | How to Chain |
 |---|---|---|
 | **Product, Brand & Growth (Unified)** | `grill-me`, `brand-discovery`, `brand-guidelines`, `marketingskills`, `doc-coauthoring`, `internal-comms` | Interrogate positioning & audience (`grill-me` + `brand-discovery`), define CRO/SEO/GTM in `PRODUCT.md` (`marketingskills`), co-author specs (`doc-coauthoring`), and publish 3P updates (`internal-comms`) |
-| **Engineering & QA Workflow** | `using-superpowers`, `ponytail`, `webapp-testing`, `skill-creator`, `grill-me` | Plan & execute TDD slices (`using-superpowers` + `ponytail`), verify web UI in Playwright before ticking `PROGRESS_v<N>.md` (`webapp-testing`), package recurring workflows (`skill-creator`) |
+| **Engineering & QA Workflow** | `using-superpowers`, `ponytail`, `webapp-testing`, `skill-creator`, `grill-me` | Plan & execute TDD slices (`using-superpowers` + `ponytail`), verify web UI in Playwright before ticking `v<N>/CHECKLIST.md` (`webapp-testing`), package recurring workflows (`skill-creator`) |
 | **UI, Brand & Frontend Craft** | `brand-guidelines` → `design-taste-frontend` → `frontend-design` → `impeccable` | Enforce `DESIGN.md` tokens & brand spine (`brand-guidelines`), run anti-slop pre-flight (`design-taste-frontend`), build components after chat wireframe gate (`frontend-design`), run final craft audit (`impeccable`) |
-| **SocMed & Website Video / Media** | `brag` → `writing-beats` → `remotion-best-practices` / `hyperframes` → `marketingskills` | Read `PRODUCT.md` + `DESIGN.md` + `CHANGELOG_v<N>.md` (`brag`), gate a Beat Sheet in chat (`writing-beats`), render code video (`remotion-best-practices`) or AI presenter video (`hyperframes`), draft launch copy (`marketingskills`) |
-| **Token Efficiency** | `@caveman-ai/cli@latest`, `compact-changelog` | High-signal low-token communication and 30-day changelog compaction (`npx context-docs-kit compact-changelog`) |
+| **SocMed & Website Video / Media** | `brag` → `writing-beats` → `remotion-best-practices` / `hyperframes` → `marketingskills` | Read `PRODUCT.md` + `DESIGN.md` + `v<N>/changelog/` (`brag`), gate a Beat Sheet in chat (`writing-beats`), render code video (`remotion-best-practices`) or AI presenter video (`hyperframes`), draft launch copy (`marketingskills`) |
+| **Token Efficiency** | `@caveman-ai/cli@latest`, changelog compaction | High-signal low-token communication and 30-day changelog compaction into monthly rollups |
 ```
 
 **D. The rules, so conventions apply unconditionally** rather than only when an agent chooses to read them.
+
+**Kit version stamp.** Directly under the file's `# ` title, write `<!-- context-docs-kit:version X.Y.Z -->`, where X.Y.Z is the newest entry in `references/kit-changelog.md`. `upgrading-context-docs` reads it to know which kit changes the project still needs. Only `upgrading-context-docs` (`references/kit-upgrade.md` §6) moves it.
 
 Because `AGENTS.md` is shared across all coding tools, inlining `RULES.md` §2 between markers is the universal format that works across every tool (Claude Code, Codex, Gemini CLI, Antigravity, Cursor, etc.). Tools without `@file` import support (Codex, Antigravity) cannot resolve an `@context/RULES.md` line, whereas all tools read inlined markdown text between markers.
 
@@ -98,6 +100,8 @@ The markers are not decoration: `aligning-context-docs` refreshes what is betwee
 
 Either way, only `RULES.md` reaches the agent file this way. Do **not** import or inline the other docs — they are large, situational, and the map table already makes them discoverable. Loading all five would burn context in every conversation to no benefit.
 
+**E. Project Agents** — added only once project personas exist (`references/project-agents.md` §5): a table of each agent in `context/agents/` and when to dispatch it. On hosts without named subagents, this table is how an assistant finds the persona file to brief from.
+
 If the user has declined the rules wiring, include the map table and skip C.
 
 ## After merging
@@ -117,6 +121,7 @@ When you are updating rather than wiring for the first time, **merge, never over
 - **`RULES.md` §2 changed** — with import support there is nothing to do; the import picks it up. Without it, replace the text **between** the `context-docs-kit:rules` markers. Never append a second copy. If the markers are missing on an import-less host, the rules were never wired: add the block and say so.
 - **A key fact changed** — stack, layout, hosting, binding constraint, current version. Update those bullets and leave the rest.
 - **The doc set changed** — a doc added or dropped. Update the map table.
+- **A project persona was added, changed or removed** — update the Project Agents table (`references/project-agents.md` §6).
 - **Ongoing project missing the `## Team Skill Ecosystem` section or updated `RULES.md` §2** — when running `aligning-context-docs` on a project wired by an earlier version of `context-docs-kit`, merge in **C. Team Skill Ecosystem & Media Routing**, and once the `references/kit-upgrade.md` finding is approved, refresh `RULES.md` §2 (§2.1 Skill Usage, §2.2 Output Style, §2.3 Operating Rules) between the `context-docs-kit:rules` markers, so the project immediately gains the skill routing, the `grill-me` auto-invoke, and the caveman output style.
 
 Everything outside those blocks is the user's, including sections that look like they overlap. Preserve them verbatim.

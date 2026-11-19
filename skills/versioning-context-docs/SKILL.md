@@ -1,6 +1,6 @@
 ---
 name: versioning-context-docs
-description: Use when a project with context/ foundation docs is finishing one version and starting the next - the user says v1 is done, asks to close the current version, asks to start v2 or plan the next version, or wants to know whether the current version is actually finished. It closes PROGRESS_v<N>.md and CHANGELOG_v<N>.md, grills for the next version's scope, and opens PROGRESS_v<N+1>.md with fresh acceptance criteria. Do not use to create docs that do not exist yet (use bootstrapping-context-docs) or to fix drift inside the current version (use aligning-context-docs).
+description: Use when a project with context/ foundation docs is finishing one version and starting the next - the user says v1 is done, asks to close the current version, asks to start v2 or plan the next version, or wants to know whether the current version is actually finished. It closes v<N>/CHECKLIST.md and v<N>/changelog/, grills for the next version's scope, and opens v<N+1>/CHECKLIST.md with fresh acceptance criteria. Do not use to create docs that do not exist yet (use bootstrapping-context-docs) or to fix drift inside the current version (use aligning-context-docs).
 license: MIT
 ---
 
@@ -34,9 +34,9 @@ nothing moves silently.
 ## Before You Start
 
 1. **`references/hosts.md`** — host, subagents, whether the agent file supports `@file` imports.
-2. **`references/history-discipline.md`** — the shape of `PROGRESS_vN.md` and `CHANGELOG_vN.md`, and the In-Version Change Protocol you will still be applying for any doc that changes.
+2. **`references/history-discipline.md`** — the shape of `vN/CHECKLIST.md` and `vN/changelog/`, and the In-Version Change Protocol you will still be applying for any doc that changes.
 3. **`references/doc-contract.md`** — the header, and which field moves here. **`Project version` moves only in this skill.** Nothing else in the kit is allowed to touch it.
-4. **`references/dependencies.md`** — the companion-skill preflight. `npx skills add` cannot install the skills `RULES.md` §2.1 routes to, so check for them now and, if any are missing, offer the install once.
+4. **`references/dependencies.md`** — the companion-skill preflight. `npx skills add` cannot install the skills `RULES.md` §2.1 routes to, so check for them now and install any that are missing into the project's `.agents/skills/` (symlinked to each host). Check again before the closing summary.
 
 ## Flow
 
@@ -48,12 +48,12 @@ digraph versioning {
     "Resolve drift before closing" [shape=box];
     "Account for every open item\nmet / carried / dropped" [shape=box];
     "User confirms closure" [shape=diamond];
-    "Freeze PROGRESS_vN + CHANGELOG_vN" [shape=box];
+    "Freeze vN/CHECKLIST.md + vN/changelog/" [shape=box];
     "Grill for vN+1 scope" [shape=box];
     "Docs need changes for vN+1?" [shape=diamond];
     "Per-doc pass, gated" [shape=box];
     "Bump Project version on every doc" [shape=box];
-    "Write PROGRESS_vN+1 + empty CHANGELOG_vN+1" [shape=box];
+    "Write vN+1/CHECKLIST.md + empty vN+1/changelog/" [shape=box];
     "Refresh agent file" [shape=box];
     "Done" [shape=doublecircle];
 
@@ -64,14 +64,14 @@ digraph versioning {
     "Drift found?" -> "Account for every open item\nmet / carried / dropped" [label="no"];
     "Account for every open item\nmet / carried / dropped" -> "User confirms closure";
     "User confirms closure" -> "Account for every open item\nmet / carried / dropped" [label="no, keep working"];
-    "User confirms closure" -> "Freeze PROGRESS_vN + CHANGELOG_vN" [label="yes"];
-    "Freeze PROGRESS_vN + CHANGELOG_vN" -> "Grill for vN+1 scope";
+    "User confirms closure" -> "Freeze vN/CHECKLIST.md + vN/changelog/" [label="yes"];
+    "Freeze vN/CHECKLIST.md + vN/changelog/" -> "Grill for vN+1 scope";
     "Grill for vN+1 scope" -> "Docs need changes for vN+1?";
     "Docs need changes for vN+1?" -> "Per-doc pass, gated" [label="yes"];
     "Per-doc pass, gated" -> "Bump Project version on every doc";
     "Docs need changes for vN+1?" -> "Bump Project version on every doc" [label="no"];
-    "Bump Project version on every doc" -> "Write PROGRESS_vN+1 + empty CHANGELOG_vN+1";
-    "Write PROGRESS_vN+1 + empty CHANGELOG_vN+1" -> "Refresh agent file";
+    "Bump Project version on every doc" -> "Write vN+1/CHECKLIST.md + empty vN+1/changelog/";
+    "Write vN+1/CHECKLIST.md + empty vN+1/changelog/" -> "Refresh agent file";
     "Refresh agent file" -> "Done";
 }
 ```
@@ -79,7 +79,7 @@ digraph versioning {
 ## Step 1 — Establish where you are
 
 ```
-highest context/PROGRESS/PROGRESS_v*.md
+highest context/PROGRESS/v*/CHECKLIST.md
   Status: open      -> that is the current version. Proceed.
   Status: closed    -> the previous version is already closed and the next was
                        never opened. Skip to step 5 and open it.
@@ -87,7 +87,7 @@ highest context/PROGRESS/PROGRESS_v*.md
                        say so, and offer bootstrapping-context-docs.
 ```
 
-Read the checklist, the §4 provisional decisions, `CHANGELOG_v<N>.md`, and every doc's
+Read the checklist, the §4 provisional decisions, `v<N>/changelog/`, and every doc's
 header. State the position in one line before doing anything:
 
 > v1 has been open since 2026-03-14. Eleven checklist items, eight ticked,
@@ -96,7 +96,7 @@ header. State the position in one line before doing anything:
 ## Step 2 — Scan for drift before closing anything
 
 **Closing a version on drifted docs bakes the drift in permanently.** Once
-`PROGRESS_v1.md` is frozen, its doc-set table is a claim about history, and a
+`v1/CHECKLIST.md` is frozen, its doc-set table is a claim about history, and a
 wrong claim there is never revisited.
 
 Run the three-way diff from `references/drift-scan.md` — the same scan
@@ -158,7 +158,7 @@ Say the accounting out loud before asking for confirmation:
 
 Only after the user confirms, in these words or clearly equivalent: yes, close it.
 
-**`PROGRESS_v<N>.md`:**
+**`v<N>/CHECKLIST.md`:**
 
 - `**Status:**` becomes `closed YYYY-MM-DD`
 - `**Last updated:**` gets the real current date
@@ -175,8 +175,8 @@ entirely once the local-first design was confirmed; PRODUCT.md §8 records it
 as out of scope.
 ```
 
-**`CHANGELOG_v<N>.md`:** run the 30-day compaction protocol so any older entries are cleanly rolled up into monthly summaries, then append one final line noting the version closed and
-its date. **Never write to this file again.** Everything after this point belongs
+**`v<N>/changelog/`:** run the 30-day compaction protocol so any older entries are cleanly rolled up into monthly summaries, then append one final entry to today's day file noting the version closed and
+its date. **Never write to this folder again.** Everything after this point belongs
 to vN+1's changelog.
 
 The frozen files are never edited afterwards. If something in a closed version
@@ -211,7 +211,7 @@ changelog — nothing about the content changed.
 grill, draft, review, gate — exactly as in bootstrap. Read the matching
 `references/<doc>.md` from the bootstrap skill if it is installed, or run the
 pass from the same principles. Content changes here are logged in
-`CHANGELOG_v<N+1>.md` like any other change, because they belong to the new
+`v<N+1>/changelog/` like any other change, because they belong to the new
 version.
 
 Two docs are worth checking specifically:
@@ -221,7 +221,7 @@ Two docs are worth checking specifically:
 
 ## Step 7 — Open vN+1
 
-**`context/PROGRESS/PROGRESS_v<N+1>.md`** — same structure as v1, per
+**`context/PROGRESS/v<N+1>/CHECKLIST.md`** — same structure as v1, per
 `references/history-discipline.md`, with two additions:
 
 - **Carried items come first**, marked, with their original criteria and where they came from:
@@ -235,7 +235,7 @@ Two docs are worth checking specifically:
 
 Gate it with the user like any other doc.
 
-**`context/PROGRESS/CHANGELOG_v<N+1>.md`** — created with its title, an `## Active Log (Last 30 Days)` section, and a `## Compacted History (> 30 days)` section.
+**`context/PROGRESS/v<N+1>/` folders** — `changelog/`, `specs/`, `plans/` and `sdd/`, each holding only a `.gitkeep`. New specs, plans and SDD ledgers go here from now on; vN's stay where they are, frozen with the version.
 
 ## Step 8 — Refresh the agent file and report
 
@@ -248,7 +248,7 @@ Then report the whole transition in one block:
 > v1 closed 2026-06-01 — eight of eleven met, two carried, one dropped.
 > v2 open, seven items: two carried, five new. `ARCHITECTURE.md` rev 5 (sync
 > service added, §4 diagram redrawn and approved); every other doc bumped to v2
-> with no content change. `AGENTS.md` now points at `PROGRESS_v2.md`.
+> with no content change. `AGENTS.md` now points at `v2/CHECKLIST.md`.
 
 ## Red Flags — STOP
 
@@ -262,7 +262,7 @@ Then report the whole transition in one block:
 | "I'll fix the drift after closing" | Closing freezes a claim about what vN was. Fix drift first. |
 | "The docs are fine, skip the scan" | The scan is what makes the frozen doc-set table true. |
 | "Bumping the version is a revision" | It is not. `Revision` stays; nothing is logged for a bump alone. |
-| "I'll note in the doc that v1 used to work differently" | Never. Present tense, always. The account of v1 lives in `PROGRESS_v1.md`'s closing summary. |
+| "I'll note in the doc that v1 used to work differently" | Never. Present tense, always. The account of v1 lives in `v1/CHECKLIST.md`'s closing summary. |
 | "I'll correct the v1 checklist while I'm in there" | A closed version is frozen. Corrections go in the current version's docs. |
 | "v2 is everything we didn't finish" | Then v2 is uncloseable on day one. Grill for scope; carrying is a decision per item. |
 | "The docs describe the product, they don't need bumping" | Every doc carries `Project version`. A doc still saying v1 is a doc nobody can date. |

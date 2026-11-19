@@ -1,7 +1,7 @@
 {
   "name": "context-docs-kit",
-  "version": "2.1.0",
-  "description": "Three skills that build and maintain a project's context/ foundation docs: bootstrapping-context-docs interviews you into a doc set, aligning-context-docs pulls the docs back in line with the code, and versioning-context-docs closes one version and opens the next.",
+  "version": "2.2.0",
+  "description": "Four skills that build and maintain a project's context/ foundation docs: bootstrapping-context-docs interviews you into a doc set, aligning-context-docs pulls the docs back in line with the code, versioning-context-docs closes one version and opens the next, and upgrading-context-docs moves an existing project onto the newest kit.",
   "author": {
     "name": "Gabriel Castro"
   },

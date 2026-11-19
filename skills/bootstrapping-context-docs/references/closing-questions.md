@@ -34,7 +34,7 @@ exist, or the answer depends on something that has not happened.
 2. State what it costs to change later, concretely.
 3. Get the user to accept it as the decision **in force** — not as a placeholder, as the thing the code will be built against until it changes.
 4. Write it into the doc as a plain decision. **No hedging language in the doc**: no "TBD", no "probably", no "for now", no "to be decided". The doc reads exactly like a settled one, because operationally it is settled.
-5. Register it in `context/PROGRESS/PROGRESS_v<N>.md` §4, with the decision in force, what would settle it, and the reversal cost.
+5. Register it in `context/PROGRESS/v<N>/CHECKLIST.md` §4, with the decision in force, what would settle it, and the reversal cost.
 
 ```
 > "I have no idea what to charge yet."
@@ -94,7 +94,7 @@ from the future reader to the present conversation, where it is far cheaper.
 
 ---
 
-## The register: `PROGRESS_v<N>.md` §4
+## The register: `v<N>/CHECKLIST.md` §4
 
 One place, for the whole doc set, for everything still unsettled. The docs stay
 clean; the debt stays visible.
@@ -123,7 +123,7 @@ register to the doc that states it.
 
 An entry leaves the register in exactly one way: the question gets settled, the
 doc is updated through the In-Version Change Protocol, and the entry is deleted
-with the reason logged in `CHANGELOG_v<N>.md`. Entries are never edited into
+with the reason logged in `v<N>/changelog/`. Entries are never edited into
 vagueness and never silently dropped.
 
 ---

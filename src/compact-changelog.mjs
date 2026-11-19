@@ -96,7 +96,7 @@ function parseExistingCompacted(body) {
 /**
  * Compact a changelog string.
  *
- * @param {string} content - Markdown content of CHANGELOG_vN.md
+ * @param {string} content - Markdown content of a single-file changelog (legacy CHANGELOG_vN.md or ./CHANGELOG.md)
  * @param {object} [options]
  * @param {number} [options.days=30] - Cutoff age in days
  * @param {Date} [options.now=new Date()] - Reference date
@@ -238,25 +238,77 @@ export function compactChangelogFile(filePath, { days = DEFAULT_DAYS, now = new 
   return result;
 }
 
+const DAY_FILE = /^(\d{4}-\d{2}-\d{2})\.md$/;
+
 /**
- * Locate the current version's changelog file in a project.
+ * Compact a per-day changelog folder (context/PROGRESS/v<N>/changelog/).
+ * Day files (YYYY-MM-DD.md) older than `days` become one bullet per entry in
+ * the month's rollup (YYYY-MM.md), then the day file is deleted.
+ */
+export function compactChangelogDir(dir, { days = DEFAULT_DAYS, now = new Date(), dryRun = false } = {}) {
+  if (!fs.existsSync(dir)) throw new Error(`Changelog folder not found: ${dir}`);
+  const msPerDay = 24 * 60 * 60 * 1000;
+  const version = path.basename(path.dirname(dir));
+  const months = new Map();
+  const oldFiles = [];
+  let compactedCount = 0;
+  let activeCount = 0;
+
+  for (const file of fs.readdirSync(dir).sort()) {
+    const m = file.match(DAY_FILE);
+    if (!m) continue;
+    const dateStr = m[1];
+    const ageDays = (now.getTime() - new Date(`${dateStr}T00:00:00Z`).getTime()) / msPerDay;
+    const body = fs.readFileSync(path.join(dir, file), 'utf8').replace(/\r\n/g, '\n');
+    const blocks = body.split(/\n(?=##\s)/).filter((b) => /^##\s/.test(b.trim()));
+    if (ageDays <= days) {
+      activeCount += blocks.length;
+      continue;
+    }
+    const month = dateStr.slice(0, 7);
+    if (!months.has(month)) months.set(month, []);
+    for (const block of blocks) {
+      // Day-file headings carry only the title; the date comes from the file name.
+      const entry = parseEntry(block.trim().replace(/^##\s+/, `## ${dateStr} — `));
+      if (entry) months.get(month).push(formatCompactedBullet(entry));
+      compactedCount += 1;
+    }
+    oldFiles.push(path.join(dir, file));
+  }
+
+  if (!dryRun) {
+    for (const [month, bullets] of months) {
+      const rollup = path.join(dir, `${month}.md`);
+      const existing = fs.existsSync(rollup)
+        ? fs.readFileSync(rollup, 'utf8').trimEnd()
+        : `# ${version} — ${month} (Compacted)\n`;
+      fs.writeFileSync(rollup, `${existing}\n${bullets.join('\n')}\n`, 'utf8');
+    }
+    for (const file of oldFiles) fs.rmSync(file);
+  }
+
+  return { compactedCount, activeCount, months: [...months.keys()].sort() };
+}
+
+/**
+ * Locate the current version's changelog: the highest
+ * context/PROGRESS/v<N>/changelog/ folder, else a legacy
+ * context/PROGRESS/CHANGELOG_v<N>.md file, else ./CHANGELOG.md.
  */
 export function findCurrentChangelog(cwd = process.cwd()) {
   const progressDir = path.join(cwd, 'context', 'PROGRESS');
   if (fs.existsSync(progressDir)) {
-    const files = fs.readdirSync(progressDir);
-    // Find highest CHANGELOG_v*.md
-    const changelogs = files
-      .filter((f) => /^CHANGELOG_v\d+\.md$/i.test(f))
-      .sort((a, b) => {
-        const vA = Number.parseInt(a.match(/\d+/)[0], 10);
-        const vB = Number.parseInt(b.match(/\d+/)[0], 10);
-        return vB - vA;
-      });
+    const byVersion = (re) =>
+      fs
+        .readdirSync(progressDir)
+        .filter((f) => re.test(f))
+        .sort((a, b) => Number.parseInt(b.match(/\d+/)[0], 10) - Number.parseInt(a.match(/\d+/)[0], 10));
 
-    if (changelogs.length > 0) {
-      return path.join(progressDir, changelogs[0]);
-    }
+    const folder = byVersion(/^v\d+$/i).map((v) => path.join(progressDir, v, 'changelog')).find((d) => fs.existsSync(d));
+    if (folder) return folder;
+
+    const legacy = byVersion(/^CHANGELOG_v\d+\.md$/i);
+    if (legacy.length > 0) return path.join(progressDir, legacy[0]);
   }
 
   const rootChangelog = path.join(cwd, 'CHANGELOG.md');
@@ -266,4 +318,3 @@ export function findCurrentChangelog(cwd = process.cwd()) {
 
   return null;
 }
-

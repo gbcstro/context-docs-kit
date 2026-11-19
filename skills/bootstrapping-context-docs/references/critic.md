@@ -35,7 +35,7 @@ revisits it, and every downstream doc inherits it. Quote it, locate it, and say
 whether it should be **removed**, **confirmed with the user**, or **converted
 into a registered provisional decision** per `references/closing-questions.md`.
 
-A value that traces to a `PROGRESS_v<N>.md` §4 register entry is **not** an
+A value that traces to a `v<N>/CHECKLIST.md` §4 register entry is **not** an
 invented specific — it is a provisional decision the user made. Check the
 register before flagging.
 
@@ -74,7 +74,7 @@ Grep the draft for the banned phrases in `references/history-discipline.md`:
 `we now`.
 
 Every hit about a *decision* is a defect at the same severity as an invented fact,
-and belongs in `CHANGELOG_v<current>.md` instead. Hits about *runtime behaviour*
+and belongs in `v<current>/changelog/` instead. Hits about *runtime behaviour*
 ("once the token expires the session is no longer valid") are fine.
 
 ### 5. Missing constraint treatment
@@ -130,7 +130,7 @@ that follows.
 ## What not to do
 
 - **Don't restyle.** Wording, tone and formatting preferences are not findings. The doc should sound like the user, not like you.
-- **Don't demand content the user deliberately descoped.** Read `## Out of Scope` and the `PROGRESS_v<N>.md` §4 register before reporting anything missing — a registered provisional decision and an explicit descope are both correct, not gaps.
+- **Don't demand content the user deliberately descoped.** Read `## Out of Scope` and the `v<N>/CHECKLIST.md` §4 register before reporting anything missing — a registered provisional decision and an explicit descope are both correct, not gaps.
 - **Don't propose scope.** A feature the doc does not mention is out of scope, not an omission — unless an upstream doc contradicts that.
 - **Don't pad.** Six real findings beat twenty with fourteen nitpicks; padding buries the ones that matter.
 

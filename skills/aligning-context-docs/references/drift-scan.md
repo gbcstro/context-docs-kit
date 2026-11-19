@@ -6,7 +6,7 @@ For each doc in the set, hold three sources against each other:
 
 - **the doc** — what was decided (intent)
 - **the code** — what exists (evidence)
-- **`PROGRESS_v<N>.md`** — what this version committed to (scope)
+- **`v<N>/CHECKLIST.md`** — what this version committed to (scope)
 
 Read the doc, then read the code the table points at, then read the checklist
 items whose `Source:` pointer names that doc. A finding is any place two of the
@@ -23,7 +23,10 @@ looked at `ARCHITECTURE.md`, and finding it twice wastes the user's attention.
 Before any doc, check whether the project was bootstrapped by an older
 `context-docs-kit`: `references/kit-upgrade.md`. It compares `RULES.md` §2 and the
 agent file against the current template, not against the code, and reports as
-its own group at the top of the report.
+its own group at the top of the report. When the agent file's
+`context-docs-kit:version` stamp is older than `references/kit-changelog.md`, or
+missing, also tell the user that `upgrading-context-docs` shows everything the
+new kit changes and applies it in one pass.
 
 ---
 
@@ -164,7 +167,7 @@ show the user, or park the principle.
 
 ---
 
-## PROGRESS_v<N>.md
+## v<N>/CHECKLIST.md
 
 | Read | Compare against |
 |---|---|

@@ -22,13 +22,13 @@ export const ECOSYSTEM_CATEGORIES = {
     id: 'documentation',
     label: 'Documentation & Internal Comms',
     description: 'Collaborative spec/RFC co-authoring and company-wide internal communications, 3P updates, and release notes.',
-    docs: ['PRODUCT.md', 'ARCHITECTURE.md', 'PROGRESS_vN.md', 'CHANGELOG_vN.md'],
+    docs: ['PRODUCT.md', 'ARCHITECTURE.md', 'vN/CHECKLIST.md', 'vN/changelog/'],
   },
   'dev-workflow': {
     id: 'dev-workflow',
     label: 'Dev Workflow, Testing & Interrogation',
     description: 'Relentless requirement grilling, disciplined TDD/superpowers execution, Playwright webapp E2E testing, context orchestration, and custom skill creation.',
-    docs: ['ARCHITECTURE.md', 'RULES.md', 'PROGRESS_vN.md'],
+    docs: ['ARCHITECTURE.md', 'RULES.md', 'vN/CHECKLIST.md'],
   },
   'ui-design': {
     id: 'ui-design',
@@ -46,13 +46,13 @@ export const ECOSYSTEM_CATEGORIES = {
     id: 'tokens-saving',
     label: 'Token Saving & Context Efficiency',
     description: 'Ultra-compressed token-efficient agent communication paired with present-tense docs and 30-day changelog compaction.',
-    docs: ['RULES.md', 'AGENTS.md', 'CHANGELOG_vN.md'],
+    docs: ['RULES.md', 'AGENTS.md', 'vN/changelog/'],
   },
   'video-generation': {
     id: 'video-generation',
     label: 'Video Generation, Social/Web Media & Brag Docs',
     description: '4-step media pipeline: Brag evidence harvesting -> Beat-Sheet scripting -> Remotion (code video) or Hyperframes (AI video) -> SocMed/web launch copy.',
-    docs: ['PRODUCT.md', 'DESIGN.md', 'PROGRESS_vN.md', 'CHANGELOG_vN.md'],
+    docs: ['PRODUCT.md', 'DESIGN.md', 'vN/CHECKLIST.md', 'vN/changelog/'],
   },
 };
 
@@ -84,8 +84,8 @@ export const ECOSYSTEM_ITEMS = [
     skill: 'internal-comms',
     command: 'npx skills add anthropics/skills@internal-comms',
     roles: ['product', 'growth', 'engineering', 'leadership', 'ops'],
-    docs: ['PROGRESS_vN.md', 'CHANGELOG_vN.md'],
-    summary: 'Turns CHANGELOG_vN and PROGRESS_vN milestones into 3P updates, company newsletters, incident reports, and release notes.',
+    docs: ['vN/CHECKLIST.md', 'vN/changelog/'],
+    summary: 'Turns vN/changelog/ and vN/CHECKLIST.md milestones into 3P updates, company newsletters, incident reports, and release notes.',
   },
 
   // 2. Dev Workflow
@@ -101,7 +101,7 @@ export const ECOSYSTEM_ITEMS = [
     skill: null,
     command: 'npx skills add obra/superpowers',
     roles: ['engineering'],
-    docs: ['ARCHITECTURE.md', 'RULES.md', 'PROGRESS_vN.md'],
+    docs: ['ARCHITECTURE.md', 'RULES.md', 'vN/CHECKLIST.md'],
     summary: 'Enforces disciplined engineering workflows: step-by-step planning, TDD, and systematic root-cause debugging.',
   },
   {
@@ -113,8 +113,8 @@ export const ECOSYSTEM_ITEMS = [
     skill: 'webapp-testing',
     command: 'npx skills add anthropics/skills@webapp-testing',
     roles: ['engineering', 'qa', 'design'],
-    docs: ['ARCHITECTURE.md', 'RULES.md', 'PROGRESS_vN.md'],
-    summary: 'Playwright browser testing to verify live web UI behavior and provide concrete evidence before ticking PROGRESS_vN acceptance criteria.',
+    docs: ['ARCHITECTURE.md', 'RULES.md', 'vN/CHECKLIST.md'],
+    summary: 'Playwright browser testing to verify live web UI behavior and provide concrete evidence before ticking vN/CHECKLIST.md acceptance criteria.',
   },
   {
     id: 'skill-creator',
@@ -241,7 +241,7 @@ export const ECOSYSTEM_ITEMS = [
     command: 'npx @caveman-ai/cli@latest',
     updateCommand: 'npx @caveman-ai/cli@latest',
     roles: ['engineering', 'product', 'growth', 'design', 'all'],
-    docs: ['RULES.md', 'AGENTS.md', 'CHANGELOG_vN.md'],
+    docs: ['RULES.md', 'AGENTS.md', 'vN/changelog/'],
     summary: 'Cuts LLM output and context token usage via terse, high-signal communication alongside 30-day changelog compaction.',
   },
 
@@ -255,7 +255,7 @@ export const ECOSYSTEM_ITEMS = [
     skill: 'remotion-best-practices',
     command: 'npx skills add https://github.com/remotion-dev/skills --skill remotion-best-practices',
     roles: ['product', 'growth', 'design', 'engineering'],
-    docs: ['PRODUCT.md', 'DESIGN.md', 'PROGRESS_vN.md'],
+    docs: ['PRODUCT.md', 'DESIGN.md', 'vN/CHECKLIST.md'],
     summary: 'Programmatic React/Remotion video engineering for website hero demos, social media reels (16:9 & 9:16), and release teasers using DESIGN.md tokens.',
   },
   {
@@ -267,8 +267,8 @@ export const ECOSYSTEM_ITEMS = [
     skill: 'brag',
     command: 'npx skills add https://github.com/NousResearch/hermes-agent --skill brag',
     roles: ['product', 'growth', 'engineering', 'leadership'],
-    docs: ['PROGRESS_vN.md', 'CHANGELOG_vN.md'],
-    summary: 'Synthesizes shipped commits, ticked PROGRESS_vN criteria, and CHANGELOG_vN entries into brag docs, sprint demos, and social proof.',
+    docs: ['vN/CHECKLIST.md', 'vN/changelog/'],
+    summary: 'Synthesizes shipped commits, ticked vN/CHECKLIST.md criteria, and vN/changelog/ entries into brag docs, sprint demos, and social proof.',
   },
   {
     id: 'hyperframes',
@@ -291,7 +291,7 @@ export const ECOSYSTEM_ITEMS = [
     skill: 'writing-beats',
     command: 'npx skills add https://github.com/mattpocock/skills --skill writing-beats',
     roles: ['product', 'growth', 'leadership'],
-    docs: ['PRODUCT.md', 'PROGRESS_vN.md'],
+    docs: ['PRODUCT.md', 'vN/CHECKLIST.md'],
     summary: 'Powers the Beat-Sheet Gate: scripts social media reels, website hero videos, and technical explainers into tight narrative beats before rendering.',
   },
 ];
@@ -303,10 +303,10 @@ export const ECOSYSTEM_ITEMS = [
  * `npx skills add gbcstro/context-docs-kit` cannot pull these in — the skills
  * CLI has no dependency resolution and runs no install hooks — so they reach the
  * user through three other paths, all driven by this one list:
- *   1. `npx context-docs-kit install` / `update` offer whichever are missing,
+ *   1. `node bin/cli.mjs install` / `update` (run from a clone) offer whichever are missing,
  *      and install them only on a yes (or --yes in CI).
- *   2. The skills' own preflight (shared/references/dependencies.md) offers the
- *      install when a skill runs and finds one absent.
+ *   2. The skills' own preflight (shared/references/dependencies.md) installs
+ *      any not in the project's .agents/skills/ when a skill runs.
  *   3. package.json `skills` (read by `npx skills experimental_sync`) and the
  *      Claude Code plugin `dependencies` in .claude-plugin/marketplace.json.
  * Each id doubles as the installed skill's directory name, which is how
